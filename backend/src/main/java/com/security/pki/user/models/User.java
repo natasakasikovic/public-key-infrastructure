@@ -19,7 +19,7 @@ import java.util.Collections;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;

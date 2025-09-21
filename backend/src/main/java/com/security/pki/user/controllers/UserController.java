@@ -1,5 +1,7 @@
 package com.security.pki.user.controllers;
 
+import com.security.pki.user.dtos.LoginRequestDto;
+import com.security.pki.user.dtos.LoginResponseDto;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,15 @@ public class UserController {
     private final UserService service;
 
     // TODO: change ret value type
-    @PostMapping(value = "/registration")
+    @PostMapping("/registration")
     public ResponseEntity<Void> createAccount(@Validated @RequestBody RegistrationRequestDto user) {
         service.register(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Validated @RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(service.login(request));
+    }
+
 }
