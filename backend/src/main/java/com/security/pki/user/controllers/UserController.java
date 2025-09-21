@@ -1,6 +1,7 @@
 package com.security.pki.user.controllers;
 
 import com.security.pki.user.dtos.RegistrationRequestDto;
+import com.security.pki.user.dtos.RegistrationResponseDto;
 import com.security.pki.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService service;
 
-    // TODO: change ret value type
-    @PostMapping(value = "/registration")
-    public ResponseEntity<Void> createAccount(@Validated @RequestBody RegistrationRequestDto user) {
-        service.register(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping("/registration")
+    public ResponseEntity<RegistrationResponseDto> createAccount(
+            @Validated @RequestBody RegistrationRequestDto user) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.register(user));
     }
 }

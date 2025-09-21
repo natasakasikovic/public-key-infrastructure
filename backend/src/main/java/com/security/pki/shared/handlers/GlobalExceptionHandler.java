@@ -1,5 +1,6 @@
 package com.security.pki.shared.handlers;
 
+import com.security.pki.shared.exceptions.EmailSendingException;
 import com.security.pki.shared.models.ExceptionResponse;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -25,5 +26,12 @@ public class GlobalExceptionHandler {
                         .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                         .message(errorMessage)
                         .build());
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<String> handleEmailException(EmailSendingException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Email error: " + ex.getMessage());
     }
 }
