@@ -1,4 +1,4 @@
-package com.security.pki.user.exceptions;
+package com.security.pki.auth.exceptions;
 
 public class AccountNotVerifiedException extends RuntimeException {
 
