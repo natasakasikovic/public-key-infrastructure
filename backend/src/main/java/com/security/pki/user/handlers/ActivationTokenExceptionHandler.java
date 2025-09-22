@@ -11,16 +11,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ActivationTokenExceptionHandler {
     @ExceptionHandler(ActivationTokenExpiredException.class)
-    public ResponseEntity<String> handleActivationTokenExpiredHandler(ActivationTokenExpiredException ex) {
+    public ResponseEntity<ExceptionResponse> handleActivationTokenExpiredHandler(ActivationTokenExpiredException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ExceptionResponse.builder().error(ex.getMessage()).build().toString());
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(ActivationTokenAlreadyUsedException.class)
-    public ResponseEntity<String> handleActivationTokenAlreadyUsedHandler(ActivationTokenAlreadyUsedException ex) {
+    public ResponseEntity<ExceptionResponse> handleActivationTokenAlreadyUsedHandler(ActivationTokenAlreadyUsedException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .body(ExceptionResponse.builder().error(ex.getMessage()).build().toString());
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
     }
 }

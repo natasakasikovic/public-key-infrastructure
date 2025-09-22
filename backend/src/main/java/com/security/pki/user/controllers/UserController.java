@@ -18,13 +18,13 @@ public class UserController {
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDto> createAccount(
             @Valid @RequestBody RegistrationRequestDto user) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(service.register(user));
     }
 
     @GetMapping("/activation")
     public ResponseEntity<Void> activateUser(@RequestParam("token") String token) {
         service.activateUser(token);
+        // TODO: redirect to login once frontend implementation is ready
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
