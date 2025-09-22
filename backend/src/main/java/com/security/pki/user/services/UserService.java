@@ -2,6 +2,9 @@ package com.security.pki.user.services;
 
 import com.security.pki.security.utils.JwtUtil;
 import com.security.pki.shared.services.EmailService;
+import com.security.pki.shared.services.LoggerService;
+import com.security.pki.shared.utils.ClientUtils;
+import com.security.pki.shared.utils.LogFormat;
 import com.security.pki.user.dtos.LoginRequestDto;
 import com.security.pki.user.dtos.LoginResponseDto;
 import com.security.pki.user.dtos.RegistrationRequestDto;
@@ -35,6 +38,7 @@ public class UserService {
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
     private final PasswordEncoder passwordEncoder;
+    private final LoggerService loggerService;
 
     public RegistrationResponseDto register(RegistrationRequestDto request) {
         if (Boolean.TRUE.equals(repository.existsByEmail(request.getEmail())))
@@ -64,18 +68,24 @@ public class UserService {
     }
 
     public LoginResponseDto login(LoginRequestDto request) {
+        String email = request.getEmail();
+        String clientIp = ClientUtils.getClientIp();
+
+        loggerService.info(LogFormat.loginAttempt(email, clientIp));
         Authentication authentication = authenticateUser(request.getEmail(), request.getPassword());
         User user = (User) authentication.getPrincipal();
 
-        if(Boolean.FALSE.equals(user.getVerified()))
+        if(Boolean.FALSE.equals(user.getVerified())) {
+            loggerService.warning(LogFormat.loginFailure(email, clientIp, "AccountNotVerified"));
             throw new AccountNotVerifiedException("Your account is not verified. Please check your email.");
-
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().toString(), user.getId());
         // TODO: Think about adding RefreshToken to HttpOnly cookie
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getId());
 
+        loggerService.info(LogFormat.loginSuccess(email, clientIp, user.getId()));
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

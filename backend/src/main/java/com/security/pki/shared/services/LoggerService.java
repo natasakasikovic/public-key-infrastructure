@@ -20,7 +20,7 @@ public class LoggerService {
         logger.addHandler(fileHandler);
     }
 
-    public void withRecord(LogRecord log){
+    public void log(LogRecord log){
         logger.log(log);
     }
 
