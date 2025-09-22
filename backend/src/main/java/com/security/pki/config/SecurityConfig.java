@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/users/registration").permitAll()
                         .requestMatchers("/api/v1/users/login").permitAll()
+                        .requestMatchers("/api/v1/users/activation").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
