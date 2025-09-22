@@ -11,6 +11,7 @@ import com.security.pki.user.models.ActivationToken;
 import com.security.pki.user.models.User;
 import com.security.pki.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,12 +23,14 @@ public class UserService {
     private final UserMapper mapper;
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
+    private final PasswordEncoder passwordEncoder;
 
     public RegistrationResponseDto register(RegistrationRequestDto request) {
-        if (repository.existsByEmail(request.getEmail()))
+        if (Boolean.TRUE.equals(repository.existsByEmail(request.getEmail())))
             throw new EmailAlreadyTakenException("This email is already taken. Please log in or activate your account via the email we sent you.");
 
         User user = mapper.fromRequest(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = repository.save(user);
         String token = activationTokenService.generateToken(user);
         emailService.sendVerificationEmail(request.getEmail(), token);
