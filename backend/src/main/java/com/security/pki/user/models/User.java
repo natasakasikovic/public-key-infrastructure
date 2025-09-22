@@ -13,7 +13,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -31,7 +31,7 @@ public class User {
     private String organization;
 
     @Column(name = "verified", nullable = false)
-    private boolean verified = false;
+    private Boolean verified = false;
 
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
