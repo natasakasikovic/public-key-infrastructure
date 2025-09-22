@@ -3,9 +3,9 @@ package com.security.pki.shared.services;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 @Service
 public class LoggerService {

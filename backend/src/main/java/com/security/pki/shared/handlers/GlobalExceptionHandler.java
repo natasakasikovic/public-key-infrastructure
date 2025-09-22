@@ -1,5 +1,6 @@
 package com.security.pki.shared.handlers;
 
+import com.security.pki.shared.exceptions.EmailSendingException;
 import com.security.pki.shared.models.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -37,4 +38,10 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ExceptionResponse> handleEmailException(EmailSendingException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ExceptionResponse.builder().error("Failed to send email.").build());
+    }
 }

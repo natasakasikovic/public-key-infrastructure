@@ -2,7 +2,10 @@ package com.security.pki.user.models;
 
 import com.security.pki.user.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,7 +40,7 @@ public class User implements UserDetails {
     private String organization;
 
     @Column(name = "verified", nullable = false)
-    private boolean verified = false;
+    private Boolean verified = false;
 
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
