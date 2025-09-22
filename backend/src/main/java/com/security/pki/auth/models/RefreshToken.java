@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -19,8 +21,16 @@ public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String token;
+
     @ManyToOne
     private User user;
-    private LocalDateTime expiryDate;
+
+    @Column(nullable = false)
+    private Instant expiryDate;
+
+    @Column(nullable = false)
+    private boolean revoked = false;
 }
