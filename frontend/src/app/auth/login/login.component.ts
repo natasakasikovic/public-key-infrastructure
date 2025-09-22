@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {AuthService} from '../auth.service';
+import {LoginResponse} from '../model/login-response.model';
 
 @Component({
   selector: 'app-login',
@@ -10,11 +12,20 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 export class LoginComponent {
 
   loginForm: FormGroup = new FormGroup({
-    username: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
 
-  onLogin(): void {
+  constructor(private authService: AuthService) {}
 
+  onLogin(): void {
+    if(this.loginForm.invalid) return;
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response: LoginResponse) => {
+        this.authService.setTokens(response);
+        console.log("Success");
+      },
+      error: (_) => {}
+    });
   }
 }
