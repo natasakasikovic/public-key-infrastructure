@@ -4,9 +4,8 @@ import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
 import com.security.pki.user.models.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

@@ -1,5 +1,7 @@
 package com.security.pki.user.controllers;
 
+import com.security.pki.user.dtos.LoginRequestDto;
+import com.security.pki.user.dtos.LoginResponseDto;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
 import com.security.pki.user.services.UserService;
@@ -27,4 +29,10 @@ public class UserController {
         // TODO: redirect to login once frontend implementation is ready
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(service.login(request));
+    }
+
 }

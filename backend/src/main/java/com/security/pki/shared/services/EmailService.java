@@ -1,10 +1,13 @@
 package com.security.pki.shared.services;
 
-import com.sendgrid.*;
+import com.security.pki.shared.exceptions.EmailSendingException;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import com.security.pki.shared.exceptions.EmailSendingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
