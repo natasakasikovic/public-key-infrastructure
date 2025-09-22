@@ -3,14 +3,11 @@ package com.security.pki.user.controllers;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
 import com.security.pki.user.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -20,8 +17,14 @@ public class UserController {
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDto> createAccount(
-            @Validated @RequestBody RegistrationRequestDto user) {
+            @Valid @RequestBody RegistrationRequestDto user) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(service.register(user));
+    }
+
+    @GetMapping("/activation")
+    public ResponseEntity<Void> activateUser(@RequestParam("token") String token) {
+        service.activateUser(token);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }

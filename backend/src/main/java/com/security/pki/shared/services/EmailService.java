@@ -48,7 +48,7 @@ public class EmailService {
         Email from = new Email(fromEmail);
         Email recipient = new Email(to);
 
-        String activationLink = baseUrl + "/api/v1/activation?token=" + token;
+        String activationLink = baseUrl + "/api/v1/users/activation?token=" + token;
 
         Content content = new Content(
                 "text/html",
