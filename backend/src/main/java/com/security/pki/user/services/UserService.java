@@ -6,6 +6,7 @@ import com.security.pki.user.dtos.LoginRequestDto;
 import com.security.pki.user.dtos.LoginResponseDto;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
+import com.security.pki.user.exceptions.AccountNotVerifiedException;
 import com.security.pki.user.exceptions.ActivationTokenAlreadyUsedException;
 import com.security.pki.user.exceptions.ActivationTokenExpiredException;
 import com.security.pki.user.exceptions.EmailAlreadyTakenException;
@@ -41,7 +42,7 @@ public class UserService {
 
         User user = mapper.fromRequest(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user = repository.save(user);
+        repository.save(user);
         String token = activationTokenService.generateToken(user);
         emailService.sendVerificationEmail(request.getEmail(), token);
         return mapper.toRegistrationResponse(user);
@@ -65,6 +66,10 @@ public class UserService {
     public LoginResponseDto login(LoginRequestDto request) {
         Authentication authentication = authenticateUser(request.getEmail(), request.getPassword());
         User user = (User) authentication.getPrincipal();
+
+        if(Boolean.FALSE.equals(user.getVerified()))
+            throw new AccountNotVerifiedException("Your account is not verified. Please check your email.");
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().toString(), user.getId());
