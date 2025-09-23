@@ -1,7 +1,7 @@
-package com.security.pki.certification.validators;
+package com.security.pki.certificate.validators;
 
-import com.security.pki.certification.models.Certificate;
-import com.security.pki.certification.models.Status;
+import com.security.pki.certificate.models.Certificate;
+import com.security.pki.certificate.models.Status;
 
 public class CertificateStatusValidator {
     public void validate(Certificate certificate) {

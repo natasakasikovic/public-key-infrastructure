@@ -1,4 +1,4 @@
-package com.security.pki.certification.models;
+package com.security.pki.certificate.models;
 
 public enum Status {
     ACTIVE,

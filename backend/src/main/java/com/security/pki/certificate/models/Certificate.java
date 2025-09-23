@@ -1,4 +1,4 @@
-package com.security.pki.certification.models;
+package com.security.pki.certificate.models;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,4 +34,7 @@ public class Certificate {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
+
+    @Column(name = "can_sign", nullable = false)
+    private boolean canSign = false;
 }
