@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../auth.service';
 import {LoginResponse} from '../model/login-response.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ export class LoginComponent {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
+  serverError: string | null = null;
 
   constructor(private authService: AuthService) {}
 
@@ -23,9 +25,10 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response: LoginResponse) => {
         this.authService.setTokens(response);
-        console.log("Success");
       },
-      error: (_) => {}
+      error: (error: HttpErrorResponse) => {
+        this.serverError = error?.error?.message;
+      }
     });
   }
 }

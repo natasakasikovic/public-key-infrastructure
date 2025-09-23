@@ -26,6 +26,10 @@
       </mat-error>
     </mat-form-field>
 
+    <div *ngIf="serverError" class="error-message">
+      {{ serverError }}
+    </div>
+
     <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
       Login
     </button>

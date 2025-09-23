@@ -7,3 +7,16 @@ form {
 .full-width {
   width: 100%;
 }
+
+.error-message {
+  color: #fc6a59;
+  background-color: #f8d7da;
+  border: 1px solid #fc6a59;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
