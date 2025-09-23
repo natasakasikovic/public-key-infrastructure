@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { env } from '../../env/env';
 import {LoginRequest} from './model/login-request.model';
 import {LoginResponse} from './model/login-response.model';
+import {jwtDecode} from 'jwt-decode';
+import {JwtPayload} from './model/jwt-payload.model';
 
 @Injectable({
   providedIn: 'root'
@@ -50,5 +52,17 @@ export class AuthService {
   clearTokens(): void {
     sessionStorage.removeItem(this.REFRESH_TOKEN_KEY);
     this.accessToken$.next(null);
+  }
+
+  getRole(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      return decoded.role ?? null;
+    } catch (e) {
+      return null;
+    }
   }
 }
