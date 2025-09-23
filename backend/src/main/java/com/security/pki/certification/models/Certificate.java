@@ -1,21 +1,37 @@
 package com.security.pki.certification.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.stereotype.Component;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
 public class Certificate {
-    private Subject subject;
-    private Issuer issuer;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
     private String serialNumber;
-    private Date startDate;
-    private Date endDate;
-    private X509Certificate x509Certificate;
+
+    @Embedded
+    private Subject subject;
+
+    @Embedded
+    private Issuer issuer;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date validFrom;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date validTo;
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
 }
