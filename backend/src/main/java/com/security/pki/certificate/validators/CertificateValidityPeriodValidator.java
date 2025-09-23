@@ -1,10 +1,15 @@
 package com.security.pki.certificate.validators;
 
 import com.security.pki.certificate.models.Certificate;
+import org.springframework.stereotype.Component;
 
-public class CertificateValidityPeriodValidator{
+@Component
+public class CertificateValidityPeriodValidator implements CertificateValidator{
 
-    public void validate(Certificate childCertificate, Certificate parentCertificate) {
+    @Override
+    public void validate(CertificateValidationContext context) {
+        Certificate parentCertificate = context.signingCertificate();
+        Certificate childCertificate = context.childCertificate();
 
         if (parentCertificate == null) return;
 

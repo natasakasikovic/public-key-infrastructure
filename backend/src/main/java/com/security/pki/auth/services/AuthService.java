@@ -8,12 +8,15 @@ import com.security.pki.shared.utils.LogFormat;
 import com.security.pki.auth.dtos.LoginRequestDto;
 import com.security.pki.auth.dtos.LoginResponseDto;
 import com.security.pki.auth.exceptions.AccountNotVerifiedException;
+import com.security.pki.user.enums.Role;
 import com.security.pki.user.models.User;
+import com.security.pki.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +26,7 @@ public class AuthService {
     private final LoggerService loggerService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
     private final RefreshTokenService refreshTokenService;
 
@@ -50,6 +54,18 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .role(user.getRole().toString())
                 .build();
+    }
+
+    public Role getCurrentUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetails details)
+                return userService.findByEmail(details.getUsername()).getRole();
+        }
+        return null;
     }
 
     private Authentication authenticateUser(String email, String password) {
