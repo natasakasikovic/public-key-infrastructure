@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RegisterRequest } from '../model/register-request.model';
 import { AuthService } from '../auth.service';
 import { passwordMatchValidator } from '../validators/password-match.validator';
+import zxcvbn from 'zxcvbn';
 
 @Component({
   selector: 'app-register',
@@ -13,6 +14,8 @@ import { passwordMatchValidator } from '../validators/password-match.validator';
 export class RegisterComponent implements OnInit {
 
   registerForm!: FormGroup;
+  passwordScore: number = 0;
+  passwordFeedback: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +37,17 @@ export class RegisterComponent implements OnInit {
         updateOn: 'change'
     }
     );
+
+    this.registerForm.get('password')?.valueChanges.subscribe(value => {
+      if (value) {
+        const result = zxcvbn(value);
+        this.passwordScore = result.score;
+        this.passwordFeedback = result.feedback.suggestions || [];
+      } else {
+        this.passwordScore = 0;
+        this.passwordFeedback = [];
+      }
+    });
   }
 
   onSubmit() {
