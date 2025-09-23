@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RegisterRequest } from '../model/register-request.model';
 import { AuthService } from '../auth.service';
+import { passwordMatchValidator } from '../validators/password-match.validator';
 
 @Component({
   selector: 'app-register',
@@ -19,21 +20,20 @@ export class RegisterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.registerForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(64)]],
-      passwordConfirmation: ['', [Validators.required]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      organization: ['', Validators.required]
-    }, { validators: this.passwordsMatch });
-  }
-
-  // TODO: this is not working properly, fix it
-  passwordsMatch(group: AbstractControl): ValidationErrors | null {
-    const password = group.get('password')?.value;
-    const confirm = group.get('passwordConfirmation')?.value;
-    return password === confirm ? null : { passwordsMismatch: true };
+    this.registerForm = this.fb.group(
+      {
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(64)]],
+        passwordConfirmation: ['', [Validators.required]],
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        organization: ['', Validators.required]
+      },
+      {
+        validators: passwordMatchValidator(),
+        updateOn: 'change'
+    }
+    );
   }
 
   onSubmit() {
