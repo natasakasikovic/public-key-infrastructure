@@ -1,5 +1,6 @@
-<div>
-  <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+<div class="login-container">
+  <h2 class="login-title">Login</h2>
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
@@ -17,12 +18,6 @@
       <input matInput type="password" formControlName="password" placeholder="Enter password">
       <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
         Password is required
-      </mat-error>
-      <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
-        Password must be at least 8 characters
-      </mat-error>
-      <mat-error *ngIf="loginForm.get('password')?.hasError('maxlength')">
-        The maximum password length is 64
       </mat-error>
     </mat-form-field>
 
