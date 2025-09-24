@@ -4,14 +4,15 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {CertificateTemplate} from '../model/certificate-template.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ToastrService} from 'ngx-toastr';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-template-form',
   standalone: false,
-  templateUrl: './template-form.component.html',
-  styleUrl: './template-form.component.css'
+  templateUrl: './create-template.component.html',
+  styleUrl: './create-template.component.css'
 })
-export class TemplateFormComponent {
+export class CreateTemplateComponent {
 
   templateForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
@@ -26,6 +27,7 @@ export class TemplateFormComponent {
   constructor(
     private templateService: TemplateService,
     private toasterService: ToastrService,
+    private router: Router
   ) {}
 
   onCreate(): void {
@@ -41,9 +43,10 @@ export class TemplateFormComponent {
           keyUsage: 'digitalSignature,keyEncipherment',
           extendedKeyUsage: 'serverAuth,clientAuth'
         });
+        void this.router.navigate(['/templates']);
       },
       error: (error: HttpErrorResponse) => {
-        this.toasterService.error(error?.error?.message);
+        this.toasterService.error("Failed to create template.");
       }
     });
   }

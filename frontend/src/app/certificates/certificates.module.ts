@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TemplateFormComponent } from './template-form/template-form.component';
+import { CreateTemplateComponent } from './create-template/create-template.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatError, MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatButton, MatIconButton} from '@angular/material/button';
@@ -24,14 +24,16 @@ import {MatSort} from '@angular/material/sort';
 import {MatToolbar} from '@angular/material/toolbar';
 import { TemplateCardComponent } from './template-card/template-card.component';
 import {RouterLink} from '@angular/router';
+import { EditTemplateComponent } from './edit-template/edit-template.component';
 
 
 
 @NgModule({
   declarations: [
-    TemplateFormComponent,
+    CreateTemplateComponent,
     TemplateOverviewComponent,
-    TemplateCardComponent
+    TemplateCardComponent,
+    EditTemplateComponent
   ],
   imports: [
     CommonModule,
