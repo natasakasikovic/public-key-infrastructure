@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class CertificateTemplateController {
     private final CertificateTemplateService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<CertificateTemplateDto> createTemplate(@Valid @RequestBody CertificateTemplateDto request) {
         return new ResponseEntity<>(service.createTemplate(request), HttpStatus.CREATED);
     }
@@ -28,6 +30,7 @@ public class CertificateTemplateController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<List<CertificateTemplateDto>> getTemplates() {
         return ResponseEntity.ok(service.getTemplates());
     }
@@ -38,6 +41,7 @@ public class CertificateTemplateController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<CertificateTemplateDto> updateTemplate(
             @PathVariable Long id,
             @Valid @RequestBody CertificateTemplateDto request
@@ -46,6 +50,7 @@ public class CertificateTemplateController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<Void> deleteTemplate(@PathVariable Long id) {
         service.deleteTemplate(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

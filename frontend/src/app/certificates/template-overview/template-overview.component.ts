@@ -3,6 +3,8 @@ import {CertificateTemplate} from '../model/certificate-template.model';
 import {TemplateService} from '../template.service';
 import {ToastrService} from 'ngx-toastr';
 import {Router} from '@angular/router';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {ConfirmationDialogComponent} from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-template-overview',
@@ -16,15 +18,29 @@ export class TemplateOverviewComponent implements OnInit {
   constructor(
     private templateService: TemplateService,
     private toasterService: ToastrService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
     this.templateService.getTemplates().subscribe({
       next: (templates: CertificateTemplate[]) => {
         this.templates = templates;
-        console.log(this.templates);
       }
+    });
+  }
+
+  openDeleteConfirmation(template: CertificateTemplate): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: { message: "Are you sure you want to delete " + template.name + "?"}
+    });
+    this.handleConfirmationDialogClose(dialogRef, template);
+  }
+
+  private handleConfirmationDialogClose(dialogRef: MatDialogRef<ConfirmationDialogComponent>, template: CertificateTemplate){
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed)
+        this.deleteTemplate(template);
     });
   }
 

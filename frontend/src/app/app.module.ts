@@ -9,6 +9,7 @@ import {CertificatesModule} from './certificates/certificates.module';
 import {AuthInterceptor} from './auth/auth.interceptor';
 import {ToastrModule} from 'ngx-toastr';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {SharedModule} from './shared/shared.module';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
     AppRoutingModule,
     LayoutModule,
     CertificatesModule,
+    SharedModule,
     AuthModule
   ],
   providers: [

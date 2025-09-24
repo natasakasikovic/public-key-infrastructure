@@ -43,7 +43,7 @@ export class EditTemplateComponent implements OnInit {
       )
       .subscribe({
         next: (template: CertificateTemplate) => {
-          this.editTemplateForm.patchValue(template);
+          this.editTemplateForm.patchValue({...template, issuer: template.issuer.principalName});
         }
       });
   }

@@ -1,7 +1,6 @@
 package com.security.pki.auth.controllers;
 
 import com.security.pki.auth.dtos.RefreshTokenRequestDto;
-import com.security.pki.auth.models.RefreshToken;
 import com.security.pki.auth.services.AuthService;
 import com.security.pki.auth.dtos.LoginRequestDto;
 import com.security.pki.auth.dtos.LoginResponseDto;

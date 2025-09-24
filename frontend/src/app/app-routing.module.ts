@@ -5,15 +5,31 @@ import {LoginComponent} from './auth/login/login.component';
 import {CreateTemplateComponent} from './certificates/create-template/create-template.component';
 import {TemplateOverviewComponent} from './certificates/template-overview/template-overview.component';
 import {EditTemplateComponent} from './certificates/edit-template/edit-template.component';
+import {AuthGuard} from './auth/auth.guard';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'create-template', component: CreateTemplateComponent }, // TODO: allow only CA users
-  { path: 'edit-template/:id', component: EditTemplateComponent }, // TODO: allow only CA users
-  { path: 'templates', component: TemplateOverviewComponent }, // TODO: allow only CA users
-  { path: '', redirectTo: 'register', pathMatch: 'full' },
-  { path: '**', redirectTo: 'register', pathMatch: 'full' }, // TODO: change to login or error page
+  {
+    path: 'create-template',
+    component: CreateTemplateComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER'] }
+  },
+  {
+    path: 'edit-template/:id',
+    component: EditTemplateComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER'] }
+  },
+  {
+    path: 'templates',
+    component: TemplateOverviewComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER'] }
+  },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login', pathMatch: 'full' },
 ];
 
 @NgModule({

@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CertificateTemplate} from '../model/certificate-template.model';
-import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-template-card',
@@ -13,7 +12,6 @@ export class TemplateCardComponent {
   @Output() edit = new EventEmitter<CertificateTemplate>();
   @Output() delete = new EventEmitter<CertificateTemplate>();
   @Output() use = new EventEmitter<CertificateTemplate>();
-  @Output() duplicateEvent = new EventEmitter<CertificateTemplate>();
 
   shortLabel(text?: string): string {
     if (!text) return '';
@@ -28,9 +26,4 @@ export class TemplateCardComponent {
   useTemplate(): void {
     this.use.emit(this.template);
   }
-
-  duplicate(): void {
-    this.duplicateEvent.emit(this.template);
-  }
-
 }

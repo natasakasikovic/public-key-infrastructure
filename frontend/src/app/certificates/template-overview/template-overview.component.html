@@ -13,7 +13,7 @@
     *ngFor="let tmpl of templates"
     [template]="tmpl"
     (edit)="editTemplate($event)"
-    (delete)="deleteTemplate($event)"
+    (delete)="openDeleteConfirmation($event)"
     (use)="useTemplate($event)"
     (duplicateEvent)="duplicateTemplate($event)">
   </app-template-card>
