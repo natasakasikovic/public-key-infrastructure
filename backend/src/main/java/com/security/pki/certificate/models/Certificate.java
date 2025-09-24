@@ -15,15 +15,17 @@ import java.util.UUID;
 public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String serialNumber;
 
     @Embedded
+    @AttributeOverride(name = "principalName", column = @Column(name = "subject_principal_name", nullable = false))
     private Subject subject;
 
     @Embedded
+    @AttributeOverride(name = "principalName", column = @Column(name = "issuer_principal_name", nullable = false))
     private Issuer issuer;
 
     @Temporal(TemporalType.TIMESTAMP)
