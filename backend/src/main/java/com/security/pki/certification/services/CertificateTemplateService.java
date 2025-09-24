@@ -4,6 +4,7 @@ import com.security.pki.certification.dtos.CertificateTemplateDto;
 import com.security.pki.certification.mappers.CertificateTemplateMapper;
 import com.security.pki.certification.models.CertificateTemplate;
 import com.security.pki.certification.repositories.CertificateTemplateRepository;
+import com.security.pki.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,21 @@ public class CertificateTemplateService {
     private final CertificateTemplateMapper mapper;
 
     public void createTemplate(CertificateTemplateDto request) {
-        repository.save(mapper.fromCertificateTemplate(request));
+        repository.save(mapper.fromRequest(request));
     }
 
     public CertificateTemplateDto getTemplate(Long id) {
-        return mapper.toCertificateTemplateDto(repository.findById(id)
+        return mapper.toResponse(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found")));
+    }
+
+    public List<CertificateTemplateDto> getTemplates() {
+        // TODO: Load authenticated user
+        return repository.findByCreatedBy(new User()).stream().map(mapper::toResponse).toList();
+    }
+
+    public List<CertificateTemplateDto> getTemplatesByIssuer(String name) {
+        return repository.findByIssuer(name).stream().map(mapper::toResponse).toList();
     }
 
     public CertificateTemplateDto updateTemplate(Long id, CertificateTemplateDto request) {
@@ -37,7 +47,7 @@ public class CertificateTemplateService {
         existing.setTtlDays(request.getTtlDays());
         existing.setKeyUsage(request.getKeyUsage());
         existing.setExtendedKeyUsage(request.getExtendedKeyUsage());
-        return mapper.toCertificateTemplateDto(repository.save(existing));
+        return mapper.toResponse(repository.save(existing));
     }
 
     public void deleteTemplate(Long id) {

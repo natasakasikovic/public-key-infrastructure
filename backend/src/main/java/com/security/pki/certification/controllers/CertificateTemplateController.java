@@ -1,7 +1,6 @@
 package com.security.pki.certification.controllers;
 
 import com.security.pki.certification.dtos.CertificateTemplateDto;
-import com.security.pki.certification.models.CertificateTemplate;
 import com.security.pki.certification.services.CertificateTemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,16 @@ public class CertificateTemplateController {
     @GetMapping("/{id}")
     public ResponseEntity<CertificateTemplateDto> getTemplate(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTemplate(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CertificateTemplateDto>> getTemplates() {
+        return ResponseEntity.ok(service.getTemplates());
+    }
+
+    @GetMapping("/issuer/{name}")
+    public ResponseEntity<List<CertificateTemplateDto>> getByIssuer(@PathVariable String name) {
+        return ResponseEntity.ok(service.getTemplatesByIssuer(name));
     }
 
     @PutMapping("/{id}")

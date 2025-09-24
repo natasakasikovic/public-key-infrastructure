@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 public class CertificateTemplateMapper {
     private final ModelMapper modelMapper;
 
-    public CertificateTemplate fromCertificateTemplate(CertificateTemplateDto certificateTemplate) {
+    public CertificateTemplate fromRequest(CertificateTemplateDto certificateTemplate) {
         return modelMapper.map(certificateTemplate, CertificateTemplate.class);
     }
 
-    public CertificateTemplateDto toCertificateTemplateDto(CertificateTemplate certificateTemplate) {
+    public CertificateTemplateDto toResponse(CertificateTemplate certificateTemplate) {
         return modelMapper.map(certificateTemplate, CertificateTemplateDto.class);
     }
 

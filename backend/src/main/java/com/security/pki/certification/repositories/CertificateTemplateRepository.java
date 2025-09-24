@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CertificateTemplateRepository extends JpaRepository<CertificateTemplate, Long> {
     List<CertificateTemplate> findByCreatedBy(User createdBy);
+    List<CertificateTemplate> findByIssuer(String issuer);
 }
