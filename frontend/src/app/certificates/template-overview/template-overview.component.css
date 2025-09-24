@@ -1,0 +1,20 @@
+.toolbar {
+  display: flex;
+  gap: 1rem;
+}
+.spacer { flex: 1; }
+.search { width: 240px !important; }
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: rgba(0,0,0,0.6);
+}

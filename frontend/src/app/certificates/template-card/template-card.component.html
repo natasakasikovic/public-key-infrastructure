@@ -1,0 +1,46 @@
+<mat-card class="ct-card" tabindex="0" (keydown.enter)="onCardClick()">
+  <div class="ct-header">
+    <div class="ct-title">
+      <h3 class="name" [title]="template.name">{{ template.name }}</h3>
+      <div class="issuer" aria-hidden="true">by {{ template.issuer.principalName }}</div>
+    </div>
+    <div class="ct-actions">
+      <button mat-icon-button aria-label="Edit certificate template" (click)="edit.emit(template)" (keydown)="$event.stopPropagation()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Delete certificate template" (click)="delete.emit(template)" (keydown)="$event.stopPropagation()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+
+
+  <div class="ct-body">
+    <div class="ct-row">
+      <div class="label">Common Name</div>
+      <div class="value" matTooltip="{{template.commonNameRegex}}" matTooltipPosition="above">{{ template.commonNameRegex || '—' }}</div>
+    </div>
+
+
+    <div class="ct-row">
+      <div class="label">SAN</div>
+      <div class="value" matTooltip="{{template.sanRegex}}" matTooltipPosition="above">{{ template.sanRegex || '—' }}</div>
+    </div>
+
+
+    <div class="ct-row ct-meta">
+      <mat-chip-listbox aria-label="Certificate details" class="chips">
+        <mat-chip-option selected="true">TTL: {{ template.ttlDays }}d</mat-chip-option>
+        <mat-chip-option *ngIf="template.keyUsage">Key usage: {{ shortLabel(template.keyUsage) }}</mat-chip-option>
+        <mat-chip-option *ngIf="template.extendedKeyUsage">Extended: {{ shortLabel(template.extendedKeyUsage) }}</mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+  </div>
+
+
+  <div class="ct-footer">
+    <button mat-stroked-button aria-label="Use template" (click)="useTemplate()">Use</button>
+    <div class="footer-spacer"></div>
+    <button mat-flat-button color="primary" aria-label="Duplicate template" (click)="duplicate()">Duplicate</button>
+  </div>
+</mat-card>

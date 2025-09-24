@@ -1,0 +1,24 @@
+<mat-toolbar color="primary" class="toolbar">
+  <span>Certificate Templates</span>
+  <span class="spacer"></span>
+
+  <button mat-flat-button color="accent" [routerLink]="['/create-template']">
+    <mat-icon>add</mat-icon>
+    New Template
+  </button>
+</mat-toolbar>
+
+<div class="grid-container">
+  <app-template-card
+    *ngFor="let tmpl of templates"
+    [template]="tmpl"
+    (edit)="editTemplate($event)"
+    (delete)="deleteTemplate($event)"
+    (use)="useTemplate($event)"
+    (duplicateEvent)="duplicateTemplate($event)">
+  </app-template-card>
+
+  <div *ngIf="templates.length === 0" class="empty-stat\">
+    No templates found.
+  </div>
+</div>

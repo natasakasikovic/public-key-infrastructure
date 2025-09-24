@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+.ct-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.ct-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.ct-title {
+  display:flex;
+  flex-direction:column;
+  gap:0.125rem;
+}
+
+.name {
+  margin:0;
+  font-size:1.125rem;
+  line-height:1.2;
+  font-weight:600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: min(60vw, 24rem);
+}
+
+.issuer {
+  font-size:0.875rem;
+  color: rgba(0,0,0,0.6);
+}
+
+.ct-actions button { --mat-icon-size: 20px; }
+
+.ct-body {
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+}
+
+.ct-row {
+  display:flex;
+  gap:0.75rem;
+  align-items:center;
+}
+
+.label {
+  min-width:5.5rem;
+  font-size:0.875rem;
+  color: rgba(0,0,0,0.65);
+}
+
+.value {
+  flex:1;
+  font-size:0.95rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.ct-meta .chips { padding-top:0.25rem; }
+.ct-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
