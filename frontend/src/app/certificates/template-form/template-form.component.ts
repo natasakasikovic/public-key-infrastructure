@@ -3,6 +3,7 @@ import {TemplateService} from '../template.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {CertificateTemplate} from '../model/certificate-template.model';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-template-form',
@@ -22,22 +23,27 @@ export class TemplateFormComponent {
     extendedKeyUsage: new FormControl('serverAuth,clientAuth', Validators.required),
   });
 
-  constructor(private templateService: TemplateService) {}
+  constructor(
+    private templateService: TemplateService,
+    private toasterService: ToastrService,
+  ) {}
 
   onCreate(): void {
     if(this.templateForm.invalid) return;
     const request: CertificateTemplate = this.templateForm.value;
     this.templateService.createTemplate(request).subscribe({
       next: () => {
-        console.log("Success");
+        this.toasterService.success("Template has been created successfully")
         this.templateForm.reset({
+          commonNameRegex: '\'.*\\\\.example\\\\.com\'',
+          sanRegex: '.&',
           ttlDays: 365,
           keyUsage: 'digitalSignature,keyEncipherment',
           extendedKeyUsage: 'serverAuth,clientAuth'
         });
       },
       error: (error: HttpErrorResponse) => {
-        console.error(error);
+        this.toasterService.error(error?.error?.message);
       }
     });
   }

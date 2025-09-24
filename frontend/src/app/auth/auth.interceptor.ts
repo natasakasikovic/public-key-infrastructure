@@ -9,20 +9,17 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     const token = this.authService.getAccessToken();
-    console.log(token);
     if (token) {
-      req = req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` },
-      });
+      req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
     }
+
     return next.handle(req).pipe(
       catchError(err => {
         if (err instanceof HttpErrorResponse && err.status === 401) {
           return this.authService.refresh().pipe(
-            switchMap(() => {
-              const newToken = this.authService.getAccessToken();
+            switchMap(res => {
               const retryReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${newToken}` },
+                setHeaders: { Authorization: `Bearer ${res.accessToken}` },
               });
               return next.handle(retryReq);
             }),
@@ -37,3 +34,4 @@ export class AuthInterceptor implements HttpInterceptor {
     );
   }
 }
+

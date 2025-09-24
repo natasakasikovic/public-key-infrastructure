@@ -12,7 +12,7 @@ export class TemplateService {
   constructor(private httpClient: HttpClient) { }
 
   createTemplate(request: CertificateTemplate): Observable<CertificateTemplate> {
-    return this.httpClient.post<CertificateTemplate>(`${env.apiHost}/templates`, {request});
+    return this.httpClient.post<CertificateTemplate>(`${env.apiHost}/templates`, request);
   }
 
   getTemplate(id: number): Observable<CertificateTemplate> {
@@ -28,7 +28,7 @@ export class TemplateService {
   }
 
   updateTemplate(id: number, request: CertificateTemplate): Observable<CertificateTemplate> {
-    return this.httpClient.put<CertificateTemplate>(`${env.apiHost}/templates/${id}`, {request});
+    return this.httpClient.put<CertificateTemplate>(`${env.apiHost}/templates/${id}`, request);
   }
 
   deleteTemplate(id: number): Observable<void> {

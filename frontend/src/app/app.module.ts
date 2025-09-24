@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import {HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi} from '@angular/common/http';
 import {CertificatesModule} from './certificates/certificates.module';
 import {AuthInterceptor} from './auth/auth.interceptor';
+import {ToastrModule} from 'ngx-toastr';
 
 
 @NgModule({
@@ -15,6 +16,11 @@ import {AuthInterceptor} from './auth/auth.interceptor';
   ],
   imports: [
     BrowserModule,
+    ToastrModule.forRoot({
+      timeOut: 1000,
+      extendedTimeOut: 500,
+      easeTime: 200,
+    }),
     AppRoutingModule,
     LayoutModule,
     CertificatesModule,
