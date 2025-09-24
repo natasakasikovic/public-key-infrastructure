@@ -1,4 +1,4 @@
-package com.security.pki.user.dtos;
+package com.security.pki.auth.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

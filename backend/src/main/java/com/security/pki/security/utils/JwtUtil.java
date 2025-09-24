@@ -21,9 +21,6 @@ public class JwtUtil {
     @Value("${jwt.access-token.expiration:900000}") // 15 minutes default
     private long accessTokenExpiration;
 
-    @Value("${jwt.refresh-token.expiration:604800000}") // 7 days default
-    private long refreshTokenExpiration;
-
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
@@ -35,14 +32,6 @@ public class JwtUtil {
         claims.put("role", role);
 
         return createToken(claims, email, accessTokenExpiration);
-    }
-
-    public String generateRefreshToken(String email, Long userId) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("tokenType", "REFRESH");
-
-        return createToken(claims, email, refreshTokenExpiration);
     }
 
     private String createToken(Map<String, Object> claims, String subject, long expiration) {
