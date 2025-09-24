@@ -33,7 +33,7 @@ export class TemplateFormComponent {
     const request: CertificateTemplate = this.templateForm.value;
     this.templateService.createTemplate(request).subscribe({
       next: () => {
-        this.toasterService.success("Template has been created successfully")
+        this.toasterService.success("Template created successfully.");
         this.templateForm.reset({
           commonNameRegex: '\'.*\\\\.example\\\\.com\'',
           sanRegex: '.&',

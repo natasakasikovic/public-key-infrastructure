@@ -8,6 +8,7 @@ import {HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi}
 import {CertificatesModule} from './certificates/certificates.module';
 import {AuthInterceptor} from './auth/auth.interceptor';
 import {ToastrModule} from 'ngx-toastr';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import {ToastrModule} from 'ngx-toastr';
     AuthModule
   ],
   providers: [
+    provideAnimationsAsync(),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
     {
       provide: HTTP_INTERCEPTORS,
