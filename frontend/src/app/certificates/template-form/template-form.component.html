@@ -1,0 +1,68 @@
+<div class="register-container">
+  <h2 class="register-title">Certificate Template</h2>
+  <form [formGroup]="templateForm" (ngSubmit)="onCreate()">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter template name">
+      <mat-error *ngIf="templateForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Issuer</mat-label>
+      <input matInput formControlName="issuer" placeholder="Enter issuer name">
+      <mat-error *ngIf="templateForm.get('issuer')?.hasError('required')">
+        Issuer is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Common Name Regex</mat-label>
+      <input matInput formControlName="commonNameRegex" placeholder="e.g. .*\.example\.com">
+      <mat-error *ngIf="templateForm.get('commonNameRegex')?.hasError('required')">
+        Common Name Regex is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>SAN Regex</mat-label>
+      <input matInput formControlName="sanRegex" placeholder="e.g. .*">
+      <mat-error *ngIf="templateForm.get('sanRegex')?.hasError('required')">
+        SAN Regex is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>TTL (Days)</mat-label>
+      <input matInput type="number" formControlName="ttlDays" placeholder="Enter days to live">
+      <mat-error *ngIf="templateForm.get('ttlDays')?.hasError('required')">
+        TTL is required
+      </mat-error>
+      <mat-error *ngIf="templateForm.get('ttlDays')?.hasError('min')">
+        TTL must be at least 1 day
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Key Usage</mat-label>
+      <input matInput formControlName="keyUsage" placeholder="e.g. digitalSignature,keyEncipherment">
+      <mat-error *ngIf="templateForm.get('keyUsage')?.hasError('required')">
+        Key Usage is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Extended Key Usage</mat-label>
+      <input matInput formControlName="extendedKeyUsage" placeholder="e.g. serverAuth,clientAuth">
+      <mat-error *ngIf="templateForm.get('extendedKeyUsage')?.hasError('required')">
+        Extended Key Usage is required
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="templateForm.invalid">
+      Save Template
+    </button>
+  </form>
+</div>

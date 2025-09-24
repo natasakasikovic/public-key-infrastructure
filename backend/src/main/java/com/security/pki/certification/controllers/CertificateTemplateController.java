@@ -18,9 +18,8 @@ public class CertificateTemplateController {
     private final CertificateTemplateService service;
 
     @PostMapping
-    public ResponseEntity<Void> createTemplate(@Valid @RequestBody CertificateTemplateDto request) {
-        service.createTemplate(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<CertificateTemplateDto> createTemplate(@Valid @RequestBody CertificateTemplateDto request) {
+        return new ResponseEntity<>(service.createTemplate(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

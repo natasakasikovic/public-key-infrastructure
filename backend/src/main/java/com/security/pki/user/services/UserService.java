@@ -55,4 +55,9 @@ public class UserService {
             throw new ActivationTokenExpiredException("Activation token expired.");
         }
     }
+
+    public User getUserByEmail(String email) {
+        return repository.findByEmail(email).orElse(null);
+    }
+
 }

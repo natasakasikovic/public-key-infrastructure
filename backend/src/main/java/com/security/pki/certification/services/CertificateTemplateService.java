@@ -1,10 +1,10 @@
 package com.security.pki.certification.services;
 
+import com.security.pki.auth.services.AuthService;
 import com.security.pki.certification.dtos.CertificateTemplateDto;
 import com.security.pki.certification.mappers.CertificateTemplateMapper;
 import com.security.pki.certification.models.CertificateTemplate;
 import com.security.pki.certification.repositories.CertificateTemplateRepository;
-import com.security.pki.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,12 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CertificateTemplateService {
 
+    private final AuthService authService;
+
     private final CertificateTemplateRepository repository;
 
     private final CertificateTemplateMapper mapper;
 
-    public void createTemplate(CertificateTemplateDto request) {
-        repository.save(mapper.fromRequest(request));
+    public CertificateTemplateDto createTemplate(CertificateTemplateDto request) {
+        CertificateTemplate template = mapper.fromRequest(request);
+        template.setCreatedBy(authService.getCurrentUser());
+        return mapper.toResponse(repository.save(template));
     }
 
     public CertificateTemplateDto getTemplate(Long id) {
@@ -29,8 +33,10 @@ public class CertificateTemplateService {
     }
 
     public List<CertificateTemplateDto> getTemplates() {
-        // TODO: Load authenticated user
-        return repository.findByCreatedBy(new User()).stream().map(mapper::toResponse).toList();
+        return repository.findByCreatedBy(authService.getCurrentUser())
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     public List<CertificateTemplateDto> getTemplatesByIssuer(String name) {

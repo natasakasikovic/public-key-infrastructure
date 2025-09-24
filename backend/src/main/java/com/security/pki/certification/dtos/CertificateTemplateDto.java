@@ -1,10 +1,14 @@
 package com.security.pki.certification.dtos;
 
 import com.security.pki.certification.models.Issuer;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class CertificateTemplateDto {
     private Long id;
