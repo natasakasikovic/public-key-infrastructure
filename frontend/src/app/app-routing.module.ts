@@ -3,11 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegisterComponent } from './auth/register/register.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
+import {CertificateOverviewComponent} from './certificate/certificate-overview/certificate-overview.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'root-certificate-issuance', component: RootCertificateIssuanceComponent },
+  { path: 'home', component: CertificateOverviewComponent },
   { path: '', redirectTo: 'register', pathMatch: 'full' },
   { path: '**', redirectTo: 'register', pathMatch: 'full' }, // TODO: change to login or error page
 ];

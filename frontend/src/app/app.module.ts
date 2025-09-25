@@ -7,14 +7,17 @@ import { AuthModule } from './auth/auth.module';
 import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
+import { CertificateOverviewComponent } from './certificate/certificate-overview/certificate-overview.component';
+import {CertificateModule} from './certificate/certificate.module';
 
 @NgModule({
-  declarations: [AppComponent, RootCertificateIssuanceComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     LayoutModule,
     AuthModule,
+    CertificateModule,
     FormsModule,
   ],
   providers: [provideHttpClient()],

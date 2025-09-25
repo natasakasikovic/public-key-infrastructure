@@ -4,6 +4,7 @@ import { RegisterComponent } from './register/register.component';
 import { MaterialModule } from '../infrastructure/material/material.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 
 
@@ -12,10 +13,11 @@ import { LoginComponent } from './login/login.component';
     RegisterComponent,
     LoginComponent
   ],
-  imports: [
-    CommonModule,
-    MaterialModule,
-    ReactiveFormsModule
-  ]
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ReactiveFormsModule,
+        MatProgressBar
+    ]
 })
 export class AuthModule { }

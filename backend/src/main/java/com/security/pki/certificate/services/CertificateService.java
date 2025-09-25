@@ -1,6 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
+import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.exceptions.CertificateCreationException;
@@ -16,7 +17,9 @@ import com.security.pki.certificate.utils.CertificateUtils;
 import com.security.pki.certificate.utils.KeyStoreService;
 import com.security.pki.certificate.validators.CertificateValidationContext;
 import com.security.pki.certificate.validators.CertificateValidator;
+import com.security.pki.shared.models.PagedResponse;
 import com.security.pki.user.enums.Role;
+import com.security.pki.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -57,6 +61,7 @@ public class CertificateService {
             final X500Name x500Name = buildX500Name(request);
             final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
             final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
+            certificate.setOwner(authService.getCurrentUser());
             final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
             storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
         } catch (Exception e) {
@@ -151,5 +156,9 @@ public class CertificateService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Certificate with serial number '%s' was not found.", serialNumber)
                 ));
+    }
+
+    public PagedResponse<CertificateResponseDto> getCertificates(Pageable pageable) {
+        return mapper.toPagedResponse(repository.findAll(pageable));
     }
 }

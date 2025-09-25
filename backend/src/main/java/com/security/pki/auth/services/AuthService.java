@@ -11,6 +11,7 @@ import com.security.pki.auth.exceptions.AccountNotVerifiedException;
 import com.security.pki.user.enums.Role;
 import com.security.pki.user.models.User;
 import com.security.pki.user.services.UserService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,15 +58,8 @@ public class AuthService {
     }
 
     public Role getCurrentUserRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            Object principal = authentication.getPrincipal();
-
-            if (principal instanceof UserDetails details)
-                return userService.findByEmail(details.getUsername()).getRole();
-        }
-        return null;
+        User user = getCurrentUser();
+        return user != null ? user.getRole() : null;
     }
 
     private Authentication authenticateUser(String email, String password) {
@@ -73,4 +67,16 @@ public class AuthService {
         return authenticationManager.authenticate(token);
     }
 
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetails details) {
+                return userService.findByEmail(details.getUsername());
+            }
+        }
+        return null;
+    }
 }
