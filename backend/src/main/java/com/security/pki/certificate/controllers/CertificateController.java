@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
-
 @RestController
 @RequestMapping("/api/v1/certificates")
 @RequiredArgsConstructor
@@ -26,7 +22,7 @@ public class CertificateController {
     private final CertificateService service;
 
     @PostMapping("/root")
-    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) throws NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException, CertificateException, CertIOException {
+    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) {
         service.createRootCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

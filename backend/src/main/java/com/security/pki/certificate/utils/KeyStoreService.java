@@ -1,6 +1,6 @@
 package com.security.pki.certificate.utils;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +9,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 
-@Component
+@Service
 public class KeyStoreService {
 
     private KeyStore keyStore;

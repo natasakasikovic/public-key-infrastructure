@@ -2,7 +2,9 @@ package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;import com.security.pki.certificate.mappers.CertificateMapper;
+import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.exceptions.CertificateCreationException;
+import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.models.Status;
@@ -10,7 +12,6 @@ import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;
 import com.security.pki.certificate.utils.CertificateUtils;
-import com.security.pki.certificate.utils.KeyStoreService;
 import com.security.pki.certificate.validators.CertificateValidationContext;
 import com.security.pki.certificate.validators.CertificateValidator;
 import com.security.pki.user.enums.Role;
@@ -19,16 +20,16 @@ import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
+import java.security.*;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,29 +41,35 @@ public class CertificateService {
 
     private final AuthService authService;
     private final CryptoService cryptoService;
-    private final KeyStoreService keyStoreService;
     private final CertificateGenerator certificateGenerator;
 
     private final CertificateMapper mapper;
     private final List<CertificateValidator> validators;
 
 
-    public void createRootCertificate(CreateRootCertificateRequest request) throws NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException, CertificateException, CertIOException {
-        final KeyPair keyPair = cryptoService.generateKeyPair();
-        final X500Name x500Name = buildX500Name(request);
-        final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
-        final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
-        final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
-        final String password = CertificateUtils.generatePassword(20);
+    public void createRootCertificate(CreateRootCertificateRequest request) {
+        try {
+            final KeyPair keyPair = cryptoService.generateKeyPair();
+            final X500Name x500Name = buildX500Name(request);
+            final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
+            final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
+            final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
+            storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
+        } catch (Exception e) {
+            throw new CertificateCreationException("An error occurred while generating the certificate. Please try again later.");
+        }
+    }
 
-        keyStoreService.loadKeyStore("keystore/test", password.toCharArray());
-        keyStoreService.write(
-                serialNumber.toString(),
-                keyPair.getPrivate(),
-                password.toCharArray(),
-                new java.security.cert.Certificate[]{x509Certificate}
-        );
-        keyStoreService.saveKeyStore(serialNumber + ".p12", password.toCharArray());
+    private void storeCertificate(Certificate certificate, X509Certificate x509Certificate, PrivateKey privateKey) throws Exception {
+        SecretKey dek = cryptoService.generateDek();
+        byte[] encryptedPrivateKey = cryptoService.encrypt(dek, privateKey.getEncoded());
+
+        SecretKey wrappingKey = cryptoService.loadMasterKey();
+        byte[] wrappedDek = cryptoService.wrapDek(wrappingKey, dek);
+
+        certificate.setEncryptedPrivateKey(encryptedPrivateKey);
+        certificate.setWrappedDek(wrappedDek);
+        certificate.setCertificateData(x509Certificate.getEncoded());
 
         repository.save(certificate);
     }
