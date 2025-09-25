@@ -30,7 +30,7 @@
 .row {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .col {
@@ -39,7 +39,28 @@
   padding: 0.5rem;
 }
 
+.usage-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap; 
+  margin-top: 1.5rem;
+}
+
+.usage-col {
+  flex: 1;
+  min-width: 20rem;
+}
+
+.usage-col h5 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+}
+
 .form-check {
+  display: flex;
+  align-items: center;
   margin-bottom: 0.5rem;
 }
 
@@ -67,15 +88,46 @@
   font-size: 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .custombutton:hover {
   background-color: #0056b3;
 }
 
+input[type="text"],
 input[type="date"] {
-  padding: 0.25rem 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
   border-radius: 0.25rem;
   border: 1px solid #ccc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.date-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.date-col {
+  flex: 1;
+  min-width: 12rem;
 }

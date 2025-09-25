@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { LayoutModule } from './layout/layout.module';
 import { AuthModule } from './auth/auth.module';
 import { provideHttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
 
 @NgModule({
@@ -16,6 +16,7 @@ import { RootCertificateIssuanceComponent } from './certificate/root-certificate
     LayoutModule,
     AuthModule,
     FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [provideHttpClient()],
   bootstrap: [AppComponent],
