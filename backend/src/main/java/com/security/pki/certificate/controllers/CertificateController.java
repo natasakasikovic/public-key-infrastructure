@@ -5,14 +5,13 @@ import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.services.CertificateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.operator.OperatorCreationException;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/certificates")
@@ -31,5 +30,14 @@ public class CertificateController {
     public ResponseEntity<Void> createCertificate(@RequestBody CreateCertificateDto request) {
         service.createCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{serialNumber}/download")
+    public ResponseEntity<Resource> downloadCertificate(@PathVariable String serialNumber) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"keystore.p12\"")
+                .body(service.exportAsPkcs12(serialNumber));
     }
 }

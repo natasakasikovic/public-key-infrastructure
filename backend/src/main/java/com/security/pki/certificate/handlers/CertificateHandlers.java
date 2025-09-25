@@ -1,6 +1,7 @@
 package com.security.pki.certificate.handlers;
 
 import com.security.pki.certificate.exceptions.CertificateCreationException;
+import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateNotAllowedToSignException;
 import com.security.pki.certificate.exceptions.RootCertificateIssuanceNotAllowedException;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,8 @@ public class CertificateHandlers {
                 .body(ex.getMessage());
     }
 
-    @ExceptionHandler(CertificateCreationException.class)
-    public ResponseEntity<String> handleCertificateNotAllowedToSignException(CertificateCreationException ex) {
+    @ExceptionHandler({ CertificateCreationException.class, CertificateDownloadException.class })
+    public ResponseEntity<String> handleCertificateNotAllowedToSignException(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());

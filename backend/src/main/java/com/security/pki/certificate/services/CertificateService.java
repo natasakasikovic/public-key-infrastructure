@@ -4,6 +4,7 @@ import com.security.pki.auth.services.AuthService;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.exceptions.CertificateCreationException;
+import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
@@ -12,19 +13,21 @@ import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;
 import com.security.pki.certificate.utils.CertificateUtils;
+import com.security.pki.certificate.utils.KeyStoreService;
 import com.security.pki.certificate.validators.CertificateValidationContext;
 import com.security.pki.certificate.validators.CertificateValidator;
 import com.security.pki.user.enums.Role;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateFactory;
@@ -42,11 +45,12 @@ public class CertificateService {
     private final AuthService authService;
     private final CryptoService cryptoService;
     private final CertificateGenerator certificateGenerator;
+    private final KeyStoreService keyStoreService;
 
     private final CertificateMapper mapper;
     private final List<CertificateValidator> validators;
 
-
+    @Transactional
     public void createRootCertificate(CreateRootCertificateRequest request) {
         try {
             final KeyPair keyPair = cryptoService.generateKeyPair();
@@ -60,7 +64,8 @@ public class CertificateService {
         }
     }
 
-    private void storeCertificate(Certificate certificate, X509Certificate x509Certificate, PrivateKey privateKey) throws Exception {
+    @Transactional
+    protected void storeCertificate(Certificate certificate, X509Certificate x509Certificate, PrivateKey privateKey) throws GeneralSecurityException {
         SecretKey dek = cryptoService.generateDek();
         byte[] encryptedPrivateKey = cryptoService.encrypt(dek, privateKey.getEncoded());
 
@@ -119,7 +124,29 @@ public class CertificateService {
         // TODO: save certificate
     }
 
-    private Certificate findBySerialNumber(String serialNumber) {
+    @Transactional
+    public Resource exportAsPkcs12(String serialNumber) {
+        Certificate certificate = findBySerialNumber(serialNumber);
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509Certificate cert = (X509Certificate) cf.generateCertificate(
+                    new ByteArrayInputStream(certificate.getCertificateData())
+            );
+
+            SecretKey masterKey = cryptoService.loadMasterKey();
+            SecretKey dek = cryptoService.unwrapDek(masterKey, certificate.getWrappedDek());
+
+            byte[] privateKeyBytes = cryptoService.decrypt(dek, certificate.getEncryptedPrivateKey());
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            return keyStoreService.generatePkcs12Resource("alias", privateKey, "changeit".toCharArray(), new java.security.cert.Certificate[]{cert});
+
+        } catch (Exception e) {
+            throw new CertificateDownloadException("An error occurred while generating the certificate. Please try again later.");
+        }
+    }
+
+    public Certificate findBySerialNumber(String serialNumber) {
         return repository.findBySerialNumber(serialNumber)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Certificate with serial number '%s' was not found.", serialNumber)
