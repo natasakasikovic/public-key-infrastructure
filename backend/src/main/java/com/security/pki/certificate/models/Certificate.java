@@ -14,8 +14,7 @@ import java.util.UUID;
 @Entity
 public class Certificate {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false, unique = true)
     private String serialNumber;
@@ -27,6 +26,9 @@ public class Certificate {
     @Embedded
     @AttributeOverride(name = "principalName", column = @Column(name = "issuer_principal_name", nullable = false))
     private Issuer issuer;
+
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    private Certificate parent;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date validFrom;

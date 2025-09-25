@@ -1,0 +1,49 @@
+package com.security.pki.certificate.utils;
+
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+
+@Component
+public class KeyStoreService {
+
+    private KeyStore keyStore;
+
+    public void loadKeyStore(String filePath, char[] password) {
+        try {
+            keyStore = KeyStore.getInstance("PKCS12");
+            File file = new File(filePath);
+            if (file.exists()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    keyStore.load(fis, password);
+                }
+            } else {
+                keyStore.load(null, password);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading keystore: " + e.getMessage(), e);
+        }
+    }
+
+
+    public void write(String alias, PrivateKey privateKey, char[] keyPassword, Certificate[] certificateChain) {
+        try {
+            keyStore.setKeyEntry(alias, privateKey, keyPassword, certificateChain);
+        } catch (Exception e) {
+            throw new RuntimeException("Error writing to keystore: " + e.getMessage(), e);
+        }
+    }
+
+    public void saveKeyStore(String filePath, char[] password) {
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            keyStore.store(fos, password);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving keystore: " + e.getMessage(), e);
+        }
+    }
+}
