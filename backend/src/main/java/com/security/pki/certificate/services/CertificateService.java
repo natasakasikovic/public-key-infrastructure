@@ -55,14 +55,14 @@ public class CertificateService {
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         final String password = CertificateUtils.generatePassword(20);
 
-        keyStoreService.loadKeyStore(null, password.toCharArray());
+        keyStoreService.loadKeyStore("keystore/test", password.toCharArray());
         keyStoreService.write(
                 serialNumber.toString(),
                 keyPair.getPrivate(),
                 password.toCharArray(),
                 new java.security.cert.Certificate[]{x509Certificate}
         );
-        keyStoreService.saveKeyStore(serialNumber.toString() + ".p12", password.toCharArray());
+        keyStoreService.saveKeyStore(serialNumber + ".p12", password.toCharArray());
 
         repository.save(certificate);
     }
