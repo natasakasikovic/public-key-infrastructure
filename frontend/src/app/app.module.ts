@@ -4,9 +4,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LayoutModule } from './layout/layout.module';
 import { AuthModule } from './auth/auth.module';
-import { provideHttpClient } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
+import {AuthInterceptor} from './auth/auth.interceptor';
 
 @NgModule({
   declarations: [AppComponent, RootCertificateIssuanceComponent],
@@ -18,7 +19,14 @@ import { RootCertificateIssuanceComponent } from './certificate/root-certificate
     FormsModule,
     ReactiveFormsModule,
   ],
-  providers: [provideHttpClient()],
+  providers: [
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
