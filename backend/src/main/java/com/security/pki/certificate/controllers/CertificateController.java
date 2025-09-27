@@ -5,12 +5,20 @@ import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.services.CertificateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +29,7 @@ public class CertificateController {
     private final CertificateService service;
 
     @PostMapping("/root")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) {
         service.createRootCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -8,7 +8,6 @@ import com.security.pki.shared.utils.LogFormat;
 import com.security.pki.auth.dtos.LoginRequestDto;
 import com.security.pki.auth.dtos.LoginResponseDto;
 import com.security.pki.auth.exceptions.AccountNotVerifiedException;
-import com.security.pki.user.enums.Role;
 import com.security.pki.user.models.User;
 import com.security.pki.user.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-
     private final RefreshTokenService refreshTokenService;
 
     public LoginResponseDto login(LoginRequestDto request) {
@@ -56,14 +54,14 @@ public class AuthService {
                 .build();
     }
 
-    public Role getCurrentUserRole() {
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
 
             if (principal instanceof UserDetails details)
-                return userService.findByEmail(details.getUsername()).getRole();
+                return userService.findByEmail(details.getUsername());
         }
         return null;
     }
