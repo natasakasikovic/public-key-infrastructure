@@ -57,7 +57,7 @@ export class EditTemplateComponent implements OnInit {
         this.toasterService.success("Template updated successfully.");
         void this.router.navigate(['/templates']);
       },
-      error: () => this.toasterService.success("Failed to update template.")
+      error: () => this.toasterService.error("Failed to update template.")
     });
   }
 }
