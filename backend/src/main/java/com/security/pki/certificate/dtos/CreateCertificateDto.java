@@ -11,6 +11,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+// NOTE: This DTO is intended for creating End-Entity and Intermediate certificates (next PR) - skip for now
 public class CreateCertificateDto {
     private String signingSerialNumber;
     private Date validFrom;

@@ -3,20 +3,20 @@
     <div class="inside-div">
       <h2 class="title">Add Root Certificate</h2>
 
-=     <div class="container" [formGroup]="rootCertForm">
+      <div class="container" [formGroup]="rootCertForm">
 
         <!-- subject fields -->
         <div class="row gap">
           <div class="col">
             <label for="commonName">
-              Common Name (CN):
+              Common Name (CN)*:
               <input type="text" id="commonName" formControlName="commonName" required>
             </label>
           </div>
 
           <div class="col">
             <label for="organization">
-              Organization (O):
+              Organization (O)*:
               <input type="text" id="organization" formControlName="organization" required>
             </label>
           </div>
@@ -25,7 +25,7 @@
         <div class="row gap">
           <div class="col">
             <label for="country">
-              Country (C):
+              Country (C)*:
               <input type="text" id="country" formControlName="country" maxlength="2" required>
             </label>
           </div>
