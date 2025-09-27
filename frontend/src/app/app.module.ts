@@ -4,18 +4,22 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LayoutModule } from './layout/layout.module';
 import { AuthModule } from './auth/auth.module';
-import {HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi} from '@angular/common/http';
-import {CertificatesModule} from './certificates/certificates.module';
-import {AuthInterceptor} from './auth/auth.interceptor';
-import {ToastrModule} from 'ngx-toastr';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
-import {SharedModule} from './shared/shared.module';
-
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withFetch,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { CertificatesModule } from './certificates/certificates.module';
+import { ToastrModule } from 'ngx-toastr';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent, RootCertificateIssuanceComponent],
   imports: [
     BrowserModule,
     ToastrModule.forRoot({
@@ -25,9 +29,12 @@ import {SharedModule} from './shared/shared.module';
     }),
     AppRoutingModule,
     LayoutModule,
+    AuthModule,
+    FormsModule,
+    ReactiveFormsModule,
     CertificatesModule,
     SharedModule,
-    AuthModule
+    AuthModule,
   ],
   providers: [
     provideAnimationsAsync(),
@@ -36,8 +43,8 @@ import {SharedModule} from './shared/shared.module';
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
-    }
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

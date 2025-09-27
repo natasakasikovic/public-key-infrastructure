@@ -1,6 +1,6 @@
-package com.security.pki.certification.repositories;
+package com.security.pki.certificate.repositories;
 
-import com.security.pki.certification.models.CertificateTemplate;
+import com.security.pki.certificate.models.CertificateTemplate;
 import com.security.pki.user.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

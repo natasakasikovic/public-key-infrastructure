@@ -1,6 +1,6 @@
-package com.security.pki.certification.dtos;
+package com.security.pki.certificate.dtos;
 
-import com.security.pki.certification.models.Issuer;
+import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certification.validators.template.ValidRegex;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

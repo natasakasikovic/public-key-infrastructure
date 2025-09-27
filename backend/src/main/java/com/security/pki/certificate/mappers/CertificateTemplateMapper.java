@@ -1,7 +1,7 @@
-package com.security.pki.certification.mappers;
+package com.security.pki.certificate.mappers;
 
-import com.security.pki.certification.dtos.CertificateTemplateDto;
-import com.security.pki.certification.models.CertificateTemplate;
+import com.security.pki.certificate.dtos.CertificateTemplateDto;
+import com.security.pki.certificate.models.CertificateTemplate;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

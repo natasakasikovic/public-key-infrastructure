@@ -9,7 +9,6 @@ import com.security.pki.auth.dtos.LoginRequestDto;
 import com.security.pki.auth.dtos.LoginResponseDto;
 import com.security.pki.auth.exceptions.AccountNotVerifiedException;
 import com.security.pki.user.models.User;
-import com.security.pki.user.repository.UserRepository;
 import com.security.pki.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,9 +25,8 @@ public class AuthService {
     private final LoggerService loggerService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-
-    private final RefreshTokenService refreshTokenService;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     public LoginResponseDto login(LoginRequestDto request) {
         String email = request.getEmail();
@@ -62,9 +60,8 @@ public class AuthService {
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
 
-            if (principal instanceof UserDetails details) {
-                return userService.getUserByEmail(details.getUsername());
-            }
+            if (principal instanceof UserDetails details)
+                return userService.findByEmail(details.getUsername());
         }
         return null;
     }

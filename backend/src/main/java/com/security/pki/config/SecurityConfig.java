@@ -5,7 +5,9 @@ import com.security.pki.security.auth.JwtAuthenticationFilter;
 import com.security.pki.security.auth.RestAuthenticationEntryPoint;
 import com.security.pki.security.utils.JwtUtil;
 import com.security.pki.user.services.CustomUserDetailsService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.security.Security;
+
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity
@@ -29,6 +33,13 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomUserDetailsService userDetailsService;
+
+    @PostConstruct
+    public void registerProvider() {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {

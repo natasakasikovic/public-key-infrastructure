@@ -1,7 +1,7 @@
-package com.security.pki.certification.controllers;
+package com.security.pki.certificate.controllers;
 
-import com.security.pki.certification.dtos.CertificateTemplateDto;
-import com.security.pki.certification.services.CertificateTemplateService;
+import com.security.pki.certificate.dtos.CertificateTemplateDto;
+import com.security.pki.certificate.services.CertificateTemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,10 +1,10 @@
-package com.security.pki.certification.services;
+package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certification.dtos.CertificateTemplateDto;
-import com.security.pki.certification.mappers.CertificateTemplateMapper;
-import com.security.pki.certification.models.CertificateTemplate;
-import com.security.pki.certification.repositories.CertificateTemplateRepository;
+import com.security.pki.certificate.dtos.CertificateTemplateDto;
+import com.security.pki.certificate.mappers.CertificateTemplateMapper;
+import com.security.pki.certificate.models.CertificateTemplate;
+import com.security.pki.certificate.repositories.CertificateTemplateRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
