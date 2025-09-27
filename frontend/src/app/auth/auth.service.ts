@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, finalize, Observable, shareReplay, tap, throwError} from 'rxjs';
 import { RegisterRequest } from './model/register-request.model';
 import { HttpClient } from '@angular/common/http';
 import { env } from '../../env/env';
@@ -14,6 +14,7 @@ import {JwtPayload} from './model/jwt-payload.model';
 export class AuthService {
   private accessToken$ = new BehaviorSubject<string | null>(null);
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
+  private refreshInProgress$: Observable<LoginResponse> | null = null
 
   constructor(private http: HttpClient) { }
 
@@ -26,17 +27,31 @@ export class AuthService {
   }
 
   refresh(): Observable<LoginResponse> {
+    if (this.refreshInProgress$) {
+      return this.refreshInProgress$;
+    }
+
     const refreshToken = this.getRefreshToken();
-    return this.http.post<LoginResponse>(`${env.apiHost}/auth/refresh`, { refreshToken })
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token'));
+    }
+
+    this.refreshInProgress$ = this.http.post<LoginResponse>(`${env.apiHost}/auth/refresh`, { token: refreshToken }).pipe(
+      tap(res => this.setTokens(res)),
+      shareReplay(1),
+      finalize(() => this.refreshInProgress$ = null)
+    );
+
+    return this.refreshInProgress$;
   }
 
   setTokens(response: LoginResponse): void {
-    sessionStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
     this.accessToken$.next(response.accessToken);
   }
 
   getRefreshToken(): string | null {
-    return sessionStorage.getItem(this.REFRESH_TOKEN_KEY);
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   getAccessToken(): string | null {
@@ -50,7 +65,7 @@ export class AuthService {
   }
 
   clearTokens(): void {
-    sessionStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     this.accessToken$.next(null);
   }
 

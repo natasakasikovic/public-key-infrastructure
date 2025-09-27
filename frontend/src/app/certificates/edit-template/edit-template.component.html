@@ -1,0 +1,87 @@
+<div class="register-container">
+  <form class="register-form" [formGroup]="editTemplateForm" (ngSubmit)="onUpdate()">
+    <h2 class="register-title">Certificate Template</h2>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter template name">
+      <mat-error *ngIf="editTemplateForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Issuer</mat-label>
+      <input matInput formControlName="issuer" placeholder="Enter issuer name">
+      <mat-error *ngIf="editTemplateForm.get('issuer')?.hasError('required')">
+        Issuer is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Common Name Regex</mat-label>
+      <input matInput formControlName="commonNameRegex" placeholder="e.g. .*\.example\.com">
+      <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('required')">
+        Common Name Regex is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>SAN Regex</mat-label>
+      <input matInput formControlName="sanRegex" placeholder="e.g. .*">
+      <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('required')">
+        SAN Regex is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>TTL (Days)</mat-label>
+      <input matInput type="number" formControlName="ttlDays" placeholder="Enter days to live">
+      <mat-error *ngIf="editTemplateForm.get('ttlDays')?.hasError('required')">
+        TTL is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('ttlDays')?.hasError('min')">
+        TTL must be at least 1 day
+      </mat-error>
+    </mat-form-field>
+
+    <div class="usage-row">
+      <div class="usage-col">
+        <h5>Key Usages</h5>
+        <div *ngFor="let option of keyUsageOptions" class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [value]="option"
+            [checked]="keyUsages.includes(option)"
+            (change)="onCheckboxChange($event, 'keyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
+
+      <div class="usage-col">
+        <h5>Extended Key Usages</h5>
+        <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [value]="option"
+            [checked]="extendedKeyUsages.includes(option)"
+            (change)="onCheckboxChange($event, 'extendedKeyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" type="submit"
+            class="save-button" [disabled]="editTemplateForm.invalid">
+      Save Template
+    </button>
+  </form>
+</div>
