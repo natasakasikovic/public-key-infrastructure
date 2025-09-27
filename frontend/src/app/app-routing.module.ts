@@ -7,6 +7,7 @@ import { CreateTemplateComponent } from './certificates/create-template/create-t
 import { TemplateOverviewComponent } from './certificates/template-overview/template-overview.component';
 import { EditTemplateComponent } from './certificates/edit-template/edit-template.component';
 import { AuthGuard } from './auth/auth.guard';
+import { SubordinateCertificateIssuanceComponent } from './certificates/subordinate-certificate-issuance/subordinate-certificate-issuance.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
@@ -32,6 +33,12 @@ const routes: Routes = [
   {
     path: 'root-certificate-issuance',
     component: RootCertificateIssuanceComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['ADMIN'] },
+  },
+  {
+    path: 'subordinate-certificate-issuance',
+    component: SubordinateCertificateIssuanceComponent,
     canActivate: [AuthGuard],
     data: { role: ['ADMIN'] },
   },

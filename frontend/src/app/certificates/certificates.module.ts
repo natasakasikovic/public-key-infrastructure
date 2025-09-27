@@ -7,6 +7,7 @@ import { TemplateCardComponent } from './template-card/template-card.component';
 import { RouterLink } from '@angular/router';
 import { EditTemplateComponent } from './edit-template/edit-template.component';
 import { MaterialModule } from '../infrastructure/material/material.module';
+import { SubordinateCertificateIssuanceComponent } from './subordinate-certificate-issuance/subordinate-certificate-issuance.component';
 
 
 
@@ -15,7 +16,8 @@ import { MaterialModule } from '../infrastructure/material/material.module';
     CreateTemplateComponent,
     TemplateOverviewComponent,
     TemplateCardComponent,
-    EditTemplateComponent
+    EditTemplateComponent,
+    SubordinateCertificateIssuanceComponent
   ],
   imports: [
     CommonModule,

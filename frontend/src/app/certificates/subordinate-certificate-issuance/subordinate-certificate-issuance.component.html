@@ -1,0 +1,137 @@
+<div class="mainContainer">
+  <div class="window">
+    <div class="inside-div">
+      <h2 class="title">Add Certificate</h2>
+
+      <div class="container" [formGroup]="certificateForm">
+
+        <!-- user selection -->
+        <div class="row gap">
+          <div class="col">
+            <h5>Select User</h5>
+            <div style="background-color: #fff; padding: 0.5rem; border-radius: 0.25rem;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Organization Unit</th>
+                    <th>Country</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of users" (click)="certificateForm.get('user')?.setValue(user)">
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.organizationUnit }}</td>
+                    <td>{{ user.country }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- date selection -->
+        <div class="row gap date-row">
+          <div class="date-col">
+            <label>Pick start date:
+              <input type="date" formControlName="dateFrom" (change)="onDateChange()">
+            </label>
+          </div>
+          <div class="date-col">
+            <label>Pick expiration date:
+              <input type="date" formControlName="dateTo" (change)="onDateChange()">
+            </label>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- certificates table -->
+        <div class="row gap">
+          <div class="col">
+            <h5>Available Certificates</h5>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Serial Number</th>
+                  <th>Type</th>
+                  <th>Issuer Mail</th>
+                  <th>Subject Mail</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cert of certificates" (click)="selectCertificate(cert)">
+                  <td>{{ cert.serialNumber }}</td>
+                  <td>{{ cert.certificateType }}</td>
+                  <td>{{ cert.issuerEmail }}</td>
+                  <td>{{ cert.subjectEmail }}</td>
+                  <td>
+                    <button class="btn btn-link">Details</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- key usages -->
+        <div class="usage-row">
+          <div class="usage-col">
+            <h5>Key Usages</h5>
+            <div *ngFor="let option of keyUsageOptions" class="form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [value]="option"
+                (change)="onCheckboxChange($event, keyUsagesFormArray)">
+              <label class="form-check-label">{{ option }}</label>
+            </div>
+          </div>
+
+          <div class="usage-col">
+            <h5>Extended Key Usages</h5>
+            <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [value]="option"
+                (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)">
+              <label class="form-check-label">{{ option }}</label>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- certificate type -->
+        <div class="row gap">
+          <div class="col">
+            <h5>Select Certificate Type</h5>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" formControlName="certificateType" id="intermediate" value="INTERMEDIATE">
+              <label class="form-check-label" for="intermediate">Intermediate Certificate</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" formControlName="certificateType" id="endEntity" value="END_ENTITY">
+              <label class="form-check-label" for="endEntity">End Entity Certificate</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-button">
+          <button type="button" class="btn custombutton btn-primary" [disabled]="certificateForm.invalid" (click)="createCertificate()">
+            Confirm
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
