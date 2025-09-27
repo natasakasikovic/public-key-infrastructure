@@ -28,7 +28,6 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-
     private final RefreshTokenService refreshTokenService;
 
     public LoginResponseDto login(LoginRequestDto request) {
@@ -55,11 +54,6 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .role(user.getRole().toString())
                 .build();
-    }
-
-    public Role getCurrentUserRole() {
-        User user = getCurrentUser();
-        return user != null ? user.getRole() : null;
     }
 
     private Authentication authenticateUser(String email, String password) {

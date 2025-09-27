@@ -3,78 +3,111 @@
     <div class="inside-div">
       <h2 class="title">Add Root Certificate</h2>
 
-      <div class="container">
+      <div class="container" [formGroup]="rootCertForm">
+
+        <!-- subject fields -->
+        <div class="row gap">
+          <div class="col">
+            <label for="commonName">
+              Common Name (CN)*:
+              <input type="text" id="commonName" formControlName="commonName" required>
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="organization">
+              Organization (O)*:
+              <input type="text" id="organization" formControlName="organization" required>
+            </label>
+          </div>
+        </div>
+
+        <div class="row gap">
+          <div class="col">
+            <label for="country">
+              Country (C)*:
+              <input type="text" id="country" formControlName="country" maxlength="2" required>
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="organizationalUnit">
+              Organizational Unit (OU):
+              <input type="text" id="organizationalUnit" formControlName="organizationalUnit">
+            </label>
+          </div>
+        </div>
+
+        <div class="row gap">
+          <div class="col">
+            <label for="state">
+              State (ST):
+              <input type="text" id="state" formControlName="state">
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="locality">
+              Locality (L):
+              <input type="text" id="locality" formControlName="locality">
+            </label>
+          </div>
+        </div>
+
+        <hr>
 
         <!-- date selection -->
         <div class="row gap date-row">
           <div class="date-col">
-          <label for="startDate">
-          Pick start date:
-          <input type="date" [(ngModel)]="rootCertDTO.startDate">
-          </label>
-        </div>
+            <label for="validFrom">
+              Pick start date:
+              <input type="date" id="validFrom" formControlName="validFrom">
+            </label>
+          </div>
 
-        <div class="date-col">
-          <label for="endDate">
-          Pick expiration date:
-          <input type="date" [(ngModel)]="rootCertDTO.endDate">
-          </label>
+          <div class="date-col">
+            <label for="validTo">
+              Pick expiration date:
+              <input type="date" id="validTo" formControlName="validTo">
+            </label>
+          </div>
         </div>
-      </div>
 
         <hr>
 
-        <!-- key usages -->
-        <div class="row gap">
-          <div class="col">
+          <!-- key usages -->
+        <div class="usage-row">
+          <div class="usage-col">
             <h5>Key Usages</h5>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="keyUsage1">
-              <label class="form-check-label" for="keyUsage1">Digital Signature</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="keyUsage2">
-              <label class="form-check-label" for="keyUsage2">Non Repudiation</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="keyUsage3">
-              <label class="form-check-label" for="keyUsage3">Key Encipherment</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="keyUsage4">
-              <label class="form-check-label" for="keyUsage4">Data Encipherment</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="keyUsage5">
-              <label class="form-check-label" for="keyUsage5">Key Agreement</label>
+            <div *ngFor="let option of keyUsageOptions" class="form-check">
+              <input 
+                class="form-check-input"
+                type="checkbox" 
+                [value]="option"
+                (change)="onCheckboxChange($event, keyUsages)">
+              <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
 
           <!-- extended key usages -->
-          <div class="col">
+          <div class="usage-col">
             <h5>Extended Key Usages</h5>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="extKeyUsage1">
-              <label class="form-check-label" for="extKeyUsage1">TSL Web Server Authentication</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="extKeyUsage2">
-              <label class="form-check-label" for="extKeyUsage2">TLS Web Client Authentication</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="extKeyUsage3">
-              <label class="form-check-label" for="extKeyUsage3">Sign Executable Code</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="extKeyUsage4">
-              <label class="form-check-label" for="extKeyUsage4">Email Protection</label>
+            <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
+              <input 
+                class="form-check-input"
+                type="checkbox" 
+                [value]="option"
+                (change)="onCheckboxChange($event, extendedKeyUsages)">
+              <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
         </div>
 
         <!-- confirm button -->
         <div class="add-button">
-          <button type="button" class="btn custombutton btn-primary">Confirm</button>
+          <button type="button" class="btn custombutton btn-primary" (click)="onSubmit()">
+            Confirm
+          </button>
         </div>
 
       </div>

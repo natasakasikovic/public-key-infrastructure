@@ -113,14 +113,14 @@ public class CertificateService {
     // NOTE: method below serves for creating intermediate and end-entity certificates (IN PROGRESS)
     public void createCertificate(CreateCertificateDto request) {
 
-        Role sessionUserRole = authService.getCurrentUserRole();
+        // TODO: think about removing method in AuthService (getCurrentUserRole) if you don't use it
         String signingSerialNumber = request.getSigningSerialNumber();
         Certificate signingCertificate = null;
 
         if (signingSerialNumber != null)
             signingCertificate =findBySerialNumber(signingSerialNumber);
 
-        CertificateValidationContext context = new CertificateValidationContext(sessionUserRole, signingCertificate, mapper.fromRequest(request));
+        CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
 
         for (CertificateValidator validator : validators)
             validator.validate(context);

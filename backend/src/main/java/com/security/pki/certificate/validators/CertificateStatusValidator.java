@@ -12,5 +12,5 @@ public class CertificateStatusValidator implements CertificateValidator{
         Certificate certificate = context.signingCertificate();
         if (certificate.getStatus() == Status.REVOKED)
             throw new IllegalStateException(String.format("Certificate with serial number %s is revoked.", certificate.getSerialNumber()));
-    }
+    }   // TODO: make custom exceptions for validators
 }
