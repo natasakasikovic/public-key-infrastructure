@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CertificateService } from '../certificate.service';
+import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
 
 @Component({
   standalone: false,
@@ -8,8 +9,10 @@ import { CertificateService } from '../certificate.service';
   templateUrl: './root-certificate-issuance.component.html',
   styleUrls: ['./root-certificate-issuance.component.css'],
 })
-export class RootCertificateIssuanceComponent {
+export class RootCertificateIssuanceComponent implements OnInit {
   rootCertForm!: FormGroup;
+  keyUsageOptions = KEY_USAGE_OPTIONS;
+  extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
 
   constructor(private fb: FormBuilder, private service: CertificateService) {}
 
@@ -27,22 +30,6 @@ export class RootCertificateIssuanceComponent {
       extendedKeyUsages: this.fb.array([]),
     });
   }
-
-  // TODO: extract?
-  keyUsageOptions: string[] = [
-    'Digital Signature',
-    'Non Repudiation',
-    'Key Encipherment',
-    'Data Encipherment',
-    'Key Agreement',
-  ];
-
-  extendedKeyUsageOptions: string[] = [
-    'TSL Web Server Authentication',
-    'TLS Web Client Authentication',
-    'Sign Executable Code',
-    'Email Protection',
-  ];
 
   get keyUsages(): FormArray {
     return this.rootCertForm.get('keyUsages') as FormArray;
