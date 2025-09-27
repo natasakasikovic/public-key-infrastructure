@@ -39,4 +39,14 @@ export class CertificateService {
       responseType: 'blob'
     });
   }
+
+  getEndEntityCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(
+      `${env.apiHost}/certificates/end-entities/`,
+      { params: params }
+    );
+  }
 }

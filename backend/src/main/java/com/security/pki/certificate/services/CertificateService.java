@@ -163,4 +163,8 @@ public class CertificateService {
     public CertificateDetailsResponseDto getCertificate(UUID id) {
         return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
     }
+
+    public PagedResponse<CertificateResponseDto> getEndEntityCertificates(Long id, Pageable pageable) {
+        return mapper.toPagedResponse(repository.findByOwnerId(id, pageable));
+    }
 }

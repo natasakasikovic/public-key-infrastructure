@@ -4,6 +4,8 @@ import {CertificateService} from '../certificate.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {CertificateResponse} from '../models/certificate-response.model';
 import {Router} from '@angular/router';
+import {AuthService} from '../../auth/auth.service';
+import {PagedResponse} from '../../shared/model/paged-response';
 
 @Component({
   selector: 'app-certificate-overview',
@@ -22,6 +24,7 @@ export class CertificateOverviewComponent implements OnInit {
 
   constructor(
     private certificateService: CertificateService,
+    private authService: AuthService,
     private router: Router,
   ) {}
 
@@ -30,10 +33,25 @@ export class CertificateOverviewComponent implements OnInit {
   }
 
   loadCertificates(pageIndex: number, pageSize: number) {
-    this.certificateService.getAll(pageIndex, pageSize).subscribe(
-      response => {
-        this.dataSource.data = response.content;
-        this.totalElements = response.totalElements;
+    const role = this.authService.getRole();
+    let fetchObservable;
+
+    if (role === 'ADMIN') {
+      fetchObservable = this.certificateService.getAll(pageIndex, pageSize);
+    } else if (role === 'CA_USER') {
+      // TODO: fetch for CA_USER
+      fetchObservable = this.certificateService.getAll(pageIndex, pageSize);
+    } else if (role === 'REGULAR_USER') {
+      fetchObservable = this.certificateService.getEndEntityCertificates(pageIndex, pageSize);
+    } else {
+      return;
+    }
+
+    fetchObservable.subscribe({
+        next: (response: PagedResponse<CertificateResponse>) => {
+            this.dataSource.data = response.content;
+            this.totalElements = response.totalElements;
+        }
       }
     );
   }
