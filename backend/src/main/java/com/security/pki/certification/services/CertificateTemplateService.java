@@ -51,8 +51,8 @@ public class CertificateTemplateService {
         existing.setCommonNameRegex(request.getCommonNameRegex());
         existing.setSanRegex(request.getSanRegex());
         existing.setTtlDays(request.getTtlDays());
-        existing.setKeyUsage(request.getKeyUsage());
-        existing.setExtendedKeyUsage(request.getExtendedKeyUsage());
+        existing.setKeyUsages(request.getKeyUsages());
+        existing.setExtendedKeyUsages(request.getExtendedKeyUsages());
         return mapper.toResponse(repository.save(existing));
     }
 

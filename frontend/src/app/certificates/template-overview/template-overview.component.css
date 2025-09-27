@@ -1,20 +1,30 @@
+.template-overview {
+  width: 100%;
+  padding: 2rem 2rem;
+  box-sizing: border-box;
+}
+
 .toolbar {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
-.spacer { flex: 1; }
-.search { width: 240px !important; }
+
+.spacer {
+  flex: 1;
+}
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
 }
 
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 2rem;
-  color: rgba(0,0,0,0.6);
+  padding: 4rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 1.15rem;
 }

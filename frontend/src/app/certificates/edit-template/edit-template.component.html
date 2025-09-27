@@ -1,6 +1,6 @@
 <div class="register-container">
-  <h2 class="register-title">Edit Certificate Template</h2>
-  <form [formGroup]="editTemplateForm" (ngSubmit)="onUpdate()">
+  <form class="register-form" [formGroup]="editTemplateForm" (ngSubmit)="onUpdate()">
+    <h2 class="register-title">Certificate Template</h2>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Name</mat-label>
@@ -24,6 +24,9 @@
       <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('required')">
         Common Name Regex is required
       </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
@@ -31,6 +34,9 @@
       <input matInput formControlName="sanRegex" placeholder="e.g. .*">
       <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('required')">
         SAN Regex is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
       </mat-error>
     </mat-form-field>
 
@@ -45,23 +51,36 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Key Usage</mat-label>
-      <input matInput formControlName="keyUsage" placeholder="e.g. digitalSignature,keyEncipherment">
-      <mat-error *ngIf="editTemplateForm.get('keyUsage')?.hasError('required')">
-        Key Usage is required
-      </mat-error>
-    </mat-form-field>
+    <div class="usage-row">
+      <div class="usage-col">
+        <h5>Key Usages</h5>
+        <div *ngFor="let option of keyUsageOptions" class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [value]="option"
+            [checked]="keyUsages.includes(option)"
+            (change)="onCheckboxChange($event, 'keyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Extended Key Usage</mat-label>
-      <input matInput formControlName="extendedKeyUsage" placeholder="e.g. serverAuth,clientAuth">
-      <mat-error *ngIf="editTemplateForm.get('extendedKeyUsage')?.hasError('required')">
-        Extended Key Usage is required
-      </mat-error>
-    </mat-form-field>
+      <div class="usage-col">
+        <h5>Extended Key Usages</h5>
+        <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [value]="option"
+            [checked]="extendedKeyUsages.includes(option)"
+            (change)="onCheckboxChange($event, 'extendedKeyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
+    </div>
 
-    <button mat-raised-button color="primary" type="submit" [disabled]="editTemplateForm.invalid">
+    <button mat-raised-button color="primary" type="submit"
+            class="save-button" [disabled]="editTemplateForm.invalid">
       Save Template
     </button>
   </form>

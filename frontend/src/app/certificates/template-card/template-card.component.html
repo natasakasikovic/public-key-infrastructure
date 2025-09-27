@@ -30,13 +30,16 @@
 
     <div class="ct-row ct-meta">
       <mat-chip-listbox aria-label="Certificate details" class="chips">
-        <mat-chip-option selected="true">TTL: {{ template.ttlDays }}d</mat-chip-option>
-        <mat-chip-option *ngIf="template.keyUsage">Key usage: {{ shortLabel(template.keyUsage) }}</mat-chip-option>
-        <mat-chip-option *ngIf="template.extendedKeyUsage">Extended: {{ shortLabel(template.extendedKeyUsage) }}</mat-chip-option>
+        <mat-chip>TTL: {{ template.ttlDays }}d</mat-chip>
+        <mat-chip *ngFor="let usage of template.keyUsages">
+          {{ usage }}
+        </mat-chip>
+        <mat-chip *ngFor="let ext of template.extendedKeyUsages">
+          {{ ext }}
+        </mat-chip>
       </mat-chip-listbox>
     </div>
   </div>
-
 
   <div class="ct-footer">
     <button mat-stroked-button aria-label="Use template" (click)="useTemplate()">Use</button>

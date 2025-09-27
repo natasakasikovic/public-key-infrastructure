@@ -7,6 +7,6 @@ export interface CertificateTemplate {
   commonNameRegex: string;
   sanRegex: string;
   ttlDays: number;
-  keyUsage: string;
-  extendedKeyUsage: string;
+  keyUsages: string[];
+  extendedKeyUsages: string[];
 }

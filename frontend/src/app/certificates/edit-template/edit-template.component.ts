@@ -5,6 +5,9 @@ import {switchMap} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CertificateTemplate} from '../model/certificate-template.model';
 import {ToastrService} from 'ngx-toastr';
+import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
+import {HttpErrorResponse} from '@angular/common/http';
+import {regexValidator} from '../validators/regex-validator.validator';
 
 @Component({
   selector: 'app-edit-template',
@@ -14,14 +17,16 @@ import {ToastrService} from 'ngx-toastr';
 })
 export class EditTemplateComponent implements OnInit {
   id?: number;
+  extendedKeyUsageOptions: string[] = EXTENDED_KEY_USAGE_OPTIONS;
+  keyUsageOptions: string[] = KEY_USAGE_OPTIONS;
   editTemplateForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
     issuer: new FormControl('', Validators.required),
-    commonNameRegex: new FormControl('', Validators.required),
-    sanRegex: new FormControl('', Validators.required),
+    commonNameRegex: new FormControl('', [Validators.required, regexValidator()]),
+    sanRegex: new FormControl('', [Validators.required, regexValidator()]),
     ttlDays: new FormControl(0, [Validators.required, Validators.min(1)]),
-    keyUsage: new FormControl('', Validators.required),
-    extendedKeyUsage: new FormControl('', Validators.required),
+    keyUsages: new FormControl([]),
+    extendedKeyUsages: new FormControl([]),
   });
 
   constructor(
@@ -29,7 +34,14 @@ export class EditTemplateComponent implements OnInit {
     private toasterService: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {
+  ) {}
+
+  get keyUsages(): string[] {
+    return this.editTemplateForm.get('keyUsages')?.value || [];
+  }
+
+  get extendedKeyUsages(): string[] {
+    return this.editTemplateForm.get('extendedKeyUsages')?.value || [];
   }
 
   ngOnInit(): void {
@@ -59,5 +71,19 @@ export class EditTemplateComponent implements OnInit {
       },
       error: () => this.toasterService.error("Failed to update template.")
     });
+  }
+
+  onCheckboxChange(event: Event, controlName: 'keyUsages' | 'extendedKeyUsages'): void {
+    const checkbox = event.target as HTMLInputElement;
+    const currentArray = this.editTemplateForm.get(controlName)?.value as string[];
+
+    if (checkbox.checked) {
+      this.editTemplateForm.get(controlName)?.setValue([...currentArray, checkbox.value]);
+    } else {
+      this.editTemplateForm.get(controlName)?.setValue(
+        currentArray.filter(item => item !== checkbox.value)
+      );
+    }
+    this.editTemplateForm.get(controlName)?.markAsTouched();
   }
 }
