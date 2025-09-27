@@ -7,9 +7,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -17,7 +23,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatCardModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatMenuModule,
+    MatSortModule,
   ],
   exports: [
     MatButtonModule,
@@ -25,7 +38,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatCardModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatMenuModule,
+    MatSortModule,
   ]
 })
 export class MaterialModule { }
