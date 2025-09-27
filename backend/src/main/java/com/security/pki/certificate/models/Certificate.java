@@ -39,6 +39,18 @@ public class Certificate {
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
+    @Lob
+    @Column(name = "encrypted_private_key")
+    private byte[] encryptedPrivateKey;
+
+    @Lob
+    @Column(name = "wrapped_dek")
+    private byte[] wrappedDek;
+
+    @Lob
+    @Column(name = "certificate_data")
+    private byte[] certificateData; // DER format
+
     @Column(name = "can_sign", nullable = false)
     private boolean canSign = false;
 }
