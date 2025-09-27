@@ -27,7 +27,7 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="password-strength">
+    <div class="password-strength" *ngIf="!!registerForm.get('password')?.value">
       <mat-progress-bar
         mode="determinate"
         [value]="registerForm.get('password')?.value ? (passwordScore + 1) * 20 : 0"
@@ -35,7 +35,7 @@
       </mat-progress-bar>
 
       <span class="strength-label">
-        {{ registerForm.get('password')?.value 
+        {{ registerForm.get('password')?.value
           ? (passwordScore === 0 ? 'Very Weak' :
               passwordScore === 1 ? 'Weak' :
               passwordScore === 2 ? 'Fair' :
@@ -83,6 +83,8 @@
       </mat-error>
     </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit">Register</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
+      Register
+    </button>
   </form>
 </div>

@@ -1,0 +1,17 @@
+.custom-dialog-title {
+  font-size: 1.5rem;
+  text-align: center;
+  color: #35422F;
+}
+
+.custom-dialog-content {
+  font-size: 1rem;
+  color: #35422F;
+  text-align: center;
+}
+
+.custom-dialog-actions button {
+  font-weight: bold;
+  color: #35422F;
+  transition: background-color 0.3s ease;
+}
