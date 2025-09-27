@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { PagedResponse } from '../shared/model/paged-response';
 import { CertificateResponse } from './models/certificate-response.model';
-import { CreateRootCertificateRequest } from './models/CreateRootCertificate.model';
+import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
+import {CertificateDetails} from './models/certificate-details-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -19,11 +20,21 @@ export class CertificateService {
     const params = new HttpParams()
       .set('page', page)
       .set('size', size);
-    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates`);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(
+      `${env.apiHost}/certificates`,
+      { params: params }
+    );
   }
 
   createRootCertificate(request: CreateRootCertificateRequest): Observable<void> {
     return this.httpClient.post<void>(`${env.apiHost}/certificates/root`, request);
   }
 
+  getCertificate(id: string): Observable<CertificateDetails> {
+    return this.httpClient.get<CertificateDetails>(`${env.apiHost}/certificates/${id}`);
+  }
+
+  downloadCertificate(serialNumber: string): Observable<Blob> {
+    return this.httpClient.get<Blob>(`${env.apiHost}certificates/{serialNumber}/download`);
+  }
 }

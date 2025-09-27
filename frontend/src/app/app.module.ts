@@ -13,14 +13,13 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AuthInterceptor } from './auth/auth.interceptor';
-import { CertificatesModule } from './certificates/certificates.module';
 import { ToastrModule } from 'ngx-toastr';
 import { SharedModule } from './shared/shared.module';
 import {CertificateModule} from './certificate/certificate.module';
-import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
+import {TemplateModule} from './template/template.module';
 
 @NgModule({
-  declarations: [AppComponent, RootCertificateIssuanceComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     ToastrModule.forRoot({
@@ -34,7 +33,7 @@ import { RootCertificateIssuanceComponent } from './certificate/root-certificate
     CertificateModule,
     FormsModule,
     ReactiveFormsModule,
-    CertificatesModule,
+    TemplateModule,
     SharedModule,
     AuthModule,
   ],

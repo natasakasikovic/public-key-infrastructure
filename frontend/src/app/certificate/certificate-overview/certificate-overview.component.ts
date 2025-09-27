@@ -3,6 +3,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {CertificateService} from '../certificate.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {CertificateResponse} from '../models/certificate-response.model';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-certificate-overview',
@@ -19,7 +20,10 @@ export class CertificateOverviewComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private certificateService: CertificateService) {}
+  constructor(
+    private certificateService: CertificateService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.loadCertificates(0, this.pageSize);
@@ -38,8 +42,13 @@ export class CertificateOverviewComponent implements OnInit {
     this.loadCertificates(event.pageIndex, event.pageSize);
   }
 
-  viewDetails(cert: CertificateResponse): void {
-    // TODO
+  viewDetails(certificate: CertificateResponse): void {
+    const id = certificate?.id;
+    if (!id) {
+      console.warn('Cannot navigate, certificate ID is undefined');
+      return;
+    }
+    void this.router.navigate(["certificate", certificate.id])
   }
 
   revokeCertificate(cert: CertificateResponse): void {

@@ -12,19 +12,24 @@ import {
   MatHeaderRow,
   MatRow, MatTable
 } from '@angular/material/table';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { CertificateDetailsComponent } from './certificate-details/certificate-details.component';
+import {RouterLink} from '@angular/router';
 
 
 
 @NgModule({
   declarations: [
     CertificateOverviewComponent,
-    RootCertificateIssuanceComponent
+    RootCertificateIssuanceComponent,
+    CertificateDetailsComponent
   ],
   imports: [
     CommonModule,
     MaterialModule,
     FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
 
   ]
 })

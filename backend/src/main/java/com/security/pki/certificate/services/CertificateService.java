@@ -1,6 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
+import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
@@ -133,10 +134,7 @@ public class CertificateService {
     public Resource exportAsPkcs12(String serialNumber) {
         Certificate certificate = findBySerialNumber(serialNumber);
         try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate) cf.generateCertificate(
-                    new ByteArrayInputStream(certificate.getCertificateData())
-            );
+            X509Certificate cert = mapper.toX509(certificate);
 
             SecretKey masterKey = cryptoService.loadMasterKey();
             SecretKey dek = cryptoService.unwrapDek(masterKey, certificate.getWrappedDek());
@@ -160,5 +158,9 @@ public class CertificateService {
 
     public PagedResponse<CertificateResponseDto> getCertificates(Pageable pageable) {
         return mapper.toPagedResponse(repository.findAll(pageable));
+    }
+
+    public CertificateDetailsResponseDto getCertificate(UUID id) {
+        return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
     }
 }

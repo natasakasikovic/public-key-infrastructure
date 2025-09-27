@@ -1,6 +1,7 @@
 export interface CertificateResponse {
+  id: string;
   serialNumber: string;
   certificateType: string;
-  issuerMail: string;
-  subjectMail: string;
+  issuerEmail: string;
+  subjectEmail: string;
 }

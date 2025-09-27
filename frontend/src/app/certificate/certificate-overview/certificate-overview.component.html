@@ -7,19 +7,19 @@
 
   <ng-container matColumnDef="certificateType">
     <th mat-header-cell *matHeaderCellDef> Certificate Type </th>
-    <td mat-cell *matCellDef="let cert" [ngClass]="{'red-text': cert.serialNumber === '1709158319'}">
+    <td mat-cell *matCellDef="let cert">
       {{cert.certificateType}}
     </td>
   </ng-container>
 
   <ng-container matColumnDef="issuerMail">
     <th mat-header-cell *matHeaderCellDef> Issuer Mail </th>
-    <td mat-cell *matCellDef="let cert"> {{cert.issuerMail}} </td>
+    <td mat-cell *matCellDef="let cert"> {{cert.issuerEmail}} </td>
   </ng-container>
 
   <ng-container matColumnDef="subjectMail">
     <th mat-header-cell *matHeaderCellDef> Subject Mail </th>
-    <td mat-cell *matCellDef="let cert"> {{cert.subjectMail}} </td>
+    <td mat-cell *matCellDef="let cert"> {{cert.subjectEmail}} </td>
   </ng-container>
 
   <ng-container matColumnDef="revoke">
@@ -32,7 +32,7 @@
   <ng-container matColumnDef="details">
     <th mat-header-cell *matHeaderCellDef> Details </th>
     <td mat-cell *matCellDef="let cert">
-      <a href="#" (click)="viewDetails(cert)">Details</a>
+      <button mat-stroked-button color="primary" (click)="viewDetails(cert)">Details</button>
     </td>
   </ng-container>
 

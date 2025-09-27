@@ -1,5 +1,6 @@
 package com.security.pki.certificate.controllers;
 
+import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/certificates")
@@ -40,6 +43,12 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CertificateDetailsResponseDto> getCertificate(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.getCertificate(id));
+    }
+
+
     @GetMapping("/{serialNumber}/download")
     public ResponseEntity<Resource> downloadCertificate(@PathVariable String serialNumber) {
         return ResponseEntity.ok()
@@ -51,7 +60,7 @@ public class CertificateController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PagedResponse<CertificateResponseDto>> downloadCertificates(Pageable pageable) {
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
     }
 }
