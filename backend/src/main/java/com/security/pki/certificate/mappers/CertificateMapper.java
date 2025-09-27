@@ -50,25 +50,25 @@ public class CertificateMapper {
 
     public CertificateDetailsResponseDto toDetailsResponse(Certificate certificate) {
         if (certificate == null) return null;
-        CertificateDetailsResponseDto dto = modelMapper.map(certificate, CertificateDetailsResponseDto.class);
+        CertificateDetailsResponseDto response = modelMapper.map(certificate, CertificateDetailsResponseDto.class);
 
-        dto.setCertificateType(getType(certificate));
-        dto.setSubject(toPartyDto(certificate.getSubject()));
-        dto.setIssuer(toPartyDto(certificate.getIssuer()));
-        dto.setStatus(certificate.getStatus().name());
-        dto.setCanSign(certificate.isCanSign());
-        dto.setOwnerEmail(certificate.getOwner() != null ? certificate.getOwner().getEmail() : null);
+        response.setCertificateType(getType(certificate));
+        response.setSubject(toPartyDto(certificate.getSubject()));
+        response.setIssuer(toPartyDto(certificate.getIssuer()));
+        response.setStatus(certificate.getStatus().name());
+        response.setCanSign(certificate.isCanSign());
+        response.setOwnerEmail(certificate.getOwner() != null ? certificate.getOwner().getEmail() : null);
 
         try {
             X509Certificate x509 = toX509(certificate);
-            dto.setKeyUsages(extractKeyUsages(x509));
-            dto.setExtendedKeyUsages(CertificateUtils.mapEkuOids(extractExtendedKeyUsages(x509)));
+            response.setKeyUsages(extractKeyUsages(x509));
+            response.setExtendedKeyUsages(CertificateUtils.mapEkuOids(extractExtendedKeyUsages(x509)));
         } catch (Exception ignored) {
-            dto.setKeyUsages(Collections.emptyList());
-            dto.setExtendedKeyUsages(Collections.emptyList());
+            response.setKeyUsages(Collections.emptyList());
+            response.setExtendedKeyUsages(Collections.emptyList());
         }
 
-        return dto;
+        return response;
     }
 
 

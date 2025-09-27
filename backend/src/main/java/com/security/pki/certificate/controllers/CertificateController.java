@@ -63,4 +63,5 @@ public class CertificateController {
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
     }
+
 }
