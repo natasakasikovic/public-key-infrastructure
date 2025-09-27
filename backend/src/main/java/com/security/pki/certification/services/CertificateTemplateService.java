@@ -46,14 +46,17 @@ public class CertificateTemplateService {
     public CertificateTemplateDto updateTemplate(Long id, CertificateTemplateDto request) {
         CertificateTemplate existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found"));
-        existing.setName(request.getName());
-        existing.setIssuer(request.getIssuer());
-        existing.setCommonNameRegex(request.getCommonNameRegex());
-        existing.setSanRegex(request.getSanRegex());
-        existing.setTtlDays(request.getTtlDays());
-        existing.setKeyUsages(request.getKeyUsages());
-        existing.setExtendedKeyUsages(request.getExtendedKeyUsages());
-        return mapper.toResponse(repository.save(existing));
+        CertificateTemplate updated = CertificateTemplate.builder()
+                .id(existing.getId())
+                .name(request.getName())
+                .issuer(request.getIssuer())
+                .commonNameRegex(request.getCommonNameRegex())
+                .sanRegex(request.getSanRegex())
+                .ttlDays(request.getTtlDays())
+                .keyUsages(request.getKeyUsages())
+                .extendedKeyUsages(request.getExtendedKeyUsages())
+                .build();
+        return mapper.toResponse(repository.save(updated));
     }
 
     public void deleteTemplate(Long id) {

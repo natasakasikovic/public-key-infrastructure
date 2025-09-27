@@ -25,6 +25,7 @@ public class CertificateTemplateController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<CertificateTemplateDto> getTemplate(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTemplate(id));
     }
