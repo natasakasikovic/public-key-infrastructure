@@ -3,6 +3,7 @@ import {CertificateDetails} from '../models/certificate-details-response.model';
 import {switchMap} from 'rxjs';
 import {CertificateService} from '../certificate.service';
 import {ActivatedRoute} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-certificate-details',
@@ -16,6 +17,7 @@ export class CertificateDetailsComponent implements OnInit {
   constructor(
     private certificateService: CertificateService,
     private route: ActivatedRoute,
+    private toasterService: ToastrService,
   ) {}
 
 
@@ -35,6 +37,21 @@ export class CertificateDetailsComponent implements OnInit {
   }
 
   onDownload(): void {
-
+    if(!this.data) return;
+    this.certificateService.downloadCertificate(this.data.serialNumber).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cert-${this.data?.serialNumber}.p12`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.toasterService.error("Failed to download certificate. Please try again later.");
+      }
+    });
   }
 }

@@ -35,6 +35,8 @@ export class CertificateService {
   }
 
   downloadCertificate(serialNumber: string): Observable<Blob> {
-    return this.httpClient.get<Blob>(`${env.apiHost}certificates/{serialNumber}/download`);
+    return this.httpClient.get(`${env.apiHost}/certificates/${serialNumber}/download`, {
+      responseType: 'blob'
+    });
   }
 }
