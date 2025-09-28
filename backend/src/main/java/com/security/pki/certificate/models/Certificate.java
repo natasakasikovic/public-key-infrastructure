@@ -1,8 +1,8 @@
 package com.security.pki.certificate.models;
 
+import com.security.pki.certificate.enums.Status;
 import com.security.pki.user.models.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Date;

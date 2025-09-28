@@ -10,7 +10,7 @@ import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
-import com.security.pki.certificate.models.Status;
+import com.security.pki.certificate.enums.Status;
 import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;

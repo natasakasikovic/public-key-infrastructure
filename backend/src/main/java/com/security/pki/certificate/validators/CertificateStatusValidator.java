@@ -1,7 +1,7 @@
 package com.security.pki.certificate.validators;
 
 import com.security.pki.certificate.models.Certificate;
-import com.security.pki.certificate.models.Status;
+import com.security.pki.certificate.enums.Status;
 import org.springframework.stereotype.Component;
 
 @Component

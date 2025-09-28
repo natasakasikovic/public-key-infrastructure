@@ -1,7 +1,6 @@
 package com.security.pki.certificate.dtos;
 
-import com.security.pki.certificate.models.CertificateType;
-import jakarta.validation.constraints.NotBlank;
+import com.security.pki.certificate.enums.CertificateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -5,7 +5,7 @@ import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.PartyDto;
 import com.security.pki.certificate.models.Certificate;
-import com.security.pki.certificate.models.CertificateType;
+import com.security.pki.certificate.enums.CertificateType;
 import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.utils.CertificateUtils;

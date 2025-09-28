@@ -1,4 +1,4 @@
-package com.security.pki.certificate.models;
+package com.security.pki.certificate.enums;
 
 public enum CertificateType {
     ROOT,
