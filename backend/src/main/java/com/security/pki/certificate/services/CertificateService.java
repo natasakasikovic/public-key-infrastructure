@@ -28,6 +28,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +40,7 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -156,15 +157,60 @@ public class CertificateService {
                 ));
     }
 
+    @Transactional
     public PagedResponse<CertificateResponseDto> getCertificates(Pageable pageable) {
-        return mapper.toPagedResponse(repository.findAll(pageable));
+        User user = authService.getCurrentUser();
+        Role role = user.getRole();
+
+        return switch (role) {
+            case ADMIN -> mapper.toPagedResponse(repository.findAll(pageable));
+            case CA_USER -> getCACertificates(user.getId(), pageable);
+            case REGULAR_USER -> mapper.toPagedResponse(repository.findByOwner_Id(user.getId(), pageable));
+        };
+    }
+
+    private PagedResponse<CertificateResponseDto> getCACertificates(Long ownerId, Pageable pageable) {
+        List<Certificate> caCerts = repository.findByOwner_IdAndCanSignTrue(ownerId);
+        if (caCerts.isEmpty())
+            return mapper.toPagedResponse(new PageImpl<>(Collections.emptyList(), pageable, 0));
+
+        // BFS
+        LinkedHashMap<String, Certificate> collected = new LinkedHashMap<>();
+        Deque<Certificate> stack = new ArrayDeque<>(caCerts);
+        for (Certificate ca : caCerts)
+            collected.putIfAbsent(ca.getSerialNumber(), ca);
+
+        while (!stack.isEmpty()) {
+            Certificate current = stack.pop();
+            List<Certificate> children = repository.findByParent_SerialNumber(current.getSerialNumber());
+            for (Certificate child : children) {
+                if (!collected.containsKey(child.getSerialNumber())) {
+                    collected.put(child.getSerialNumber(), child);
+                    if (child.isCanSign())
+                        stack.push(child);
+                }
+            }
+        }
+
+        List<Certificate> all = new ArrayList<>(collected.values());
+        all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
+        return mapper.toPagedResponse(toPage(all, pageable));
     }
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {
         return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
     }
 
-    public PagedResponse<CertificateResponseDto> getEndEntityCertificates(Long id, Pageable pageable) {
-        return mapper.toPagedResponse(repository.findByOwnerId(id, pageable));
+    private Page<Certificate> toPage(List<Certificate> source, Pageable pageable) {
+        int total = source.size();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), total);
+        List<Certificate> content;
+        if (start >= end) {
+            content = Collections.emptyList();
+        } else {
+            content = source.subList(start, end);
+        }
+        return new PageImpl<>(content, pageable, total);
     }
 }

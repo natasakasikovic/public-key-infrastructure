@@ -24,48 +24,27 @@ export class CertificateOverviewComponent implements OnInit {
 
   constructor(
     private certificateService: CertificateService,
-    private authService: AuthService,
     private router: Router,
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadCertificates(0, this.pageSize);
   }
 
-  loadCertificates(pageIndex: number, pageSize: number) {
-    const role = this.authService.getRole();
-    let fetchObservable;
-
-    if (role === 'ADMIN') {
-      fetchObservable = this.certificateService.getAll(pageIndex, pageSize);
-    } else if (role === 'CA_USER') {
-      // TODO: fetch for CA_USER
-      fetchObservable = this.certificateService.getAll(pageIndex, pageSize);
-    } else if (role === 'REGULAR_USER') {
-      fetchObservable = this.certificateService.getEndEntityCertificates(pageIndex, pageSize);
-    } else {
-      return;
-    }
-
-    fetchObservable.subscribe({
-        next: (response: PagedResponse<CertificateResponse>) => {
-            this.dataSource.data = response.content;
-            this.totalElements = response.totalElements;
-        }
+  loadCertificates(pageIndex: number, pageSize: number): void {
+    this.certificateService.getAll(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<CertificateResponse>) => {
+        this.dataSource.data = response.content;
+        this.totalElements = response.totalElements;
       }
-    );
+    });
   }
 
-  onPageChange(event: PageEvent) {
+  onPageChange(event: PageEvent): void {
     this.loadCertificates(event.pageIndex, event.pageSize);
   }
 
   viewDetails(certificate: CertificateResponse): void {
-    const id = certificate?.id;
-    if (!id) {
-      console.warn('Cannot navigate, certificate ID is undefined');
-      return;
-    }
     void this.router.navigate(["certificate", certificate.id])
   }
 

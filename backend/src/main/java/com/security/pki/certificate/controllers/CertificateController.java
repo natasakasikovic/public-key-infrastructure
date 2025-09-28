@@ -59,18 +59,8 @@ public class CertificateController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
-    }
-
-    @GetMapping("/end-entities/{id}")
-    @PreAuthorize("hasRole('REGULAR_USER')")
-    public ResponseEntity<PagedResponse<CertificateResponseDto>> getEndEntityCertificates(
-        @PathVariable Long id,
-        Pageable pageable
-    ) {
-        return ResponseEntity.ok(service.getEndEntityCertificates(id, pageable));
     }
 
 }
