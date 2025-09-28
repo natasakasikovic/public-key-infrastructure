@@ -2,6 +2,7 @@ package com.security.pki.certificate.controllers;
 
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/certificates")
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class CertificateController {
 
     private final CertificateService service;
+    private final CSRService csrService;
 
     @PostMapping("/root")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -48,5 +48,16 @@ public class CertificateController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"keystore.p12\"")
                 .body(service.exportAsPkcs12(serialNumber));
+    }
+
+    @PostMapping("csr/self-generation")
+    @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
+    public ResponseEntity<Void> createCSRSelfGenerate(
+            @RequestParam String caCertificateId,
+            @RequestParam String validTo,
+            @RequestParam MultipartFile pemFile
+    ) {
+        csrService.processCsrUpload(caCertificateId, validTo, pemFile);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
