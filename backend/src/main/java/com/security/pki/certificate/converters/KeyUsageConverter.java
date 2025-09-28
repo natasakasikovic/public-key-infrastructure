@@ -5,8 +5,12 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 
 public class KeyUsageConverter {
 
+    private KeyUsageConverter() {}
+
     public static int convertKeyUsageToInt(List<String> keyUsages) {
         int usage = 0;
+        if(keyUsages == null || keyUsages.isEmpty())
+            return 0;
 
         for (String ku : keyUsages) {
             switch (ku) {

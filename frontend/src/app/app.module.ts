@@ -11,15 +11,15 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AuthInterceptor } from './auth/auth.interceptor';
-import { CertificatesModule } from './certificates/certificates.module';
 import { ToastrModule } from 'ngx-toastr';
 import { SharedModule } from './shared/shared.module';
+import {CertificateModule} from './certificate/certificate.module';
+import {TemplateModule} from './template/template.module';
 
 @NgModule({
-  declarations: [AppComponent, RootCertificateIssuanceComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     ToastrModule.forRoot({
@@ -30,9 +30,10 @@ import { SharedModule } from './shared/shared.module';
     AppRoutingModule,
     LayoutModule,
     AuthModule,
+    CertificateModule,
     FormsModule,
     ReactiveFormsModule,
-    CertificatesModule,
+    TemplateModule,
     SharedModule,
     AuthModule,
   ],
