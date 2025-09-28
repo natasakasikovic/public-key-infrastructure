@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CertificateService } from '../certificate.service';
 import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
+import {ToastrService} from 'ngx-toastr';
+import {Router} from '@angular/router';
 
 @Component({
   standalone: false,
@@ -14,7 +16,12 @@ export class RootCertificateIssuanceComponent implements OnInit {
   keyUsageOptions = KEY_USAGE_OPTIONS;
   extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
 
-  constructor(private fb: FormBuilder, private service: CertificateService) {}
+  constructor(
+    private fb: FormBuilder,
+    private service: CertificateService,
+    private toasterService: ToastrService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.rootCertForm = this.fb.group({
@@ -53,11 +60,10 @@ export class RootCertificateIssuanceComponent implements OnInit {
   onSubmit() {
     this.service.createRootCertificate(this.rootCertForm.value).subscribe({
       next: () => {
-        console.log('Creation successful'); // TODO: replace with propriate dialogs
+        this.toasterService.success("Certificate has been created successfully!");
+        void this.router.navigate(["/home"]);
       },
-      error: (err) => {
-        console.error('Creation failed', err);
-      },
+      error: () => this.toasterService.error("Failed to create certificate. Please try again later."),
     });
   }
 }
