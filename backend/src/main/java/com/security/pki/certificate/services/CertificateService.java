@@ -19,6 +19,7 @@ import com.security.pki.certificate.utils.KeyStoreService;
 import com.security.pki.certificate.validators.CertificateValidationContext;
 import com.security.pki.certificate.validators.CertificateValidator;
 import com.security.pki.shared.models.PagedResponse;
+import com.security.pki.shared.services.LoggerService;
 import com.security.pki.user.enums.Role;
 import com.security.pki.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,10 +35,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
@@ -52,6 +51,7 @@ public class CertificateService {
     private final CryptoService cryptoService;
     private final CertificateGenerator certificateGenerator;
     private final KeyStoreService keyStoreService;
+    private final LoggerService loggerService;
 
     private final CertificateMapper mapper;
     private final List<CertificateValidator> validators;
@@ -67,6 +67,7 @@ public class CertificateService {
             final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
             storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
         } catch (Exception e) {
+            loggerService.warning("Failed to generate certificate: " + e.getMessage());
             throw new CertificateCreationException("An error occurred while generating the certificate. Please try again later.");
         }
     }

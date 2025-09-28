@@ -7,7 +7,13 @@ import java.util.List;
 
 public class ExtendedKeyUsageConverter {
 
+    private ExtendedKeyUsageConverter() {}
+
     public static KeyPurposeId[] convertToExtendedKeyUsages(List<String> extendedKeyUsages) {
+        if (extendedKeyUsages == null || extendedKeyUsages.isEmpty()) {
+            return new KeyPurposeId[0];
+        }
+
         List<KeyPurposeId> purposes = new ArrayList<>();
 
         for (String eku : extendedKeyUsages) {

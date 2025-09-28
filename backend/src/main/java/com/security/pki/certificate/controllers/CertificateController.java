@@ -32,7 +32,7 @@ public class CertificateController {
 
     @PostMapping("/root")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) {
+    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) throws Exception {
         service.createRootCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
