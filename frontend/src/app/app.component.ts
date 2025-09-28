@@ -1,5 +1,4 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from './auth/auth.service';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,16 +6,6 @@ import {AuthService} from './auth/auth.service';
   standalone: false,
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
-  constructor(private auth: AuthService) {}
+export class AppComponent {
 
-  ngOnInit() {
-    const refresh$ = this.auth.tryRestoreSession();
-    if (refresh$) {
-      refresh$.subscribe({
-        next: () => console.log('Session restored'),
-        error: () => this.auth.clearTokens()
-      });
-    }
-  }
 }

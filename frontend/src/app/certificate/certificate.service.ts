@@ -1,16 +1,52 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CreateRootCertificateRequest } from './models/CreateRootCertificate.model';
-import { env } from '../../env/env';
+import {HttpClient} from '@angular/common/http';
+import {env} from '../../env/env';
 import { Observable } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
+import { PagedResponse } from '../shared/model/paged-response';
+import { CertificateResponse } from './models/certificate-response.model';
+import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
+import {CertificateDetails} from './models/certificate-details-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CertificateService {
-  constructor(private http: HttpClient) {}
+
+  constructor(private httpClient: HttpClient) {
+  }
+
+  getAll(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(
+      `${env.apiHost}/certificates`,
+      { params: params }
+    );
+  }
 
   createRootCertificate(request: CreateRootCertificateRequest): Observable<void> {
-    return this.http.post<void>(`${env.apiHost}/certificates/root`, request);
+    return this.httpClient.post<void>(`${env.apiHost}/certificates/root`, request);
+  }
+
+  getCertificate(id: string): Observable<CertificateDetails> {
+    return this.httpClient.get<CertificateDetails>(`${env.apiHost}/certificates/${id}`);
+  }
+
+  downloadCertificate(serialNumber: string): Observable<Blob> {
+    return this.httpClient.get(`${env.apiHost}/certificates/${serialNumber}/download`, {
+      responseType: 'blob'
+    });
+  }
+
+  getEndEntityCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(
+      `${env.apiHost}/certificates/end-entities/`,
+      { params: params }
+    );
   }
 }

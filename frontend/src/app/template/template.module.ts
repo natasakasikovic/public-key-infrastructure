@@ -24,4 +24,4 @@ import { MaterialModule } from '../infrastructure/material/material.module';
     RouterLink,
   ]
 })
-export class CertificatesModule { }
+export class TemplateModule { }

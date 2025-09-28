@@ -4,6 +4,7 @@ import {AuthService} from '../auth.service';
 import {LoginResponse} from '../model/login-response.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ToastrService} from 'ngx-toastr';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private toasterService: ToastrService,
+    private router: Router,
   ) {}
 
   onLogin(): void {
@@ -30,6 +32,7 @@ export class LoginComponent {
       next: (response: LoginResponse) => {
         this.authService.setTokens(response);
         this.toasterService.success("Login successful. Welcome back!");
+        void this.router.navigate(['/home']);
       },
       error: (error: HttpErrorResponse) => {
         this.serverError = error?.error?.message;

@@ -1,12 +1,16 @@
 package com.security.pki.certificate.controllers;
 
+import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
+import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
+import com.security.pki.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/certificates")
 @RequiredArgsConstructor
@@ -30,7 +36,7 @@ public class CertificateController {
 
     @PostMapping("/root")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) {
+    public ResponseEntity<String> createRootCertificate(@Valid @RequestBody CreateRootCertificateRequest request) throws Exception {
         service.createRootCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -40,6 +46,12 @@ public class CertificateController {
         service.createCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CertificateDetailsResponseDto> getCertificate(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.getCertificate(id));
+    }
+
 
     @GetMapping("/{serialNumber}/download")
     public ResponseEntity<Resource> downloadCertificate(@PathVariable String serialNumber) {
@@ -59,5 +71,10 @@ public class CertificateController {
     ) {
         csrService.processCsrUpload(caCertificateId, validTo, pemFile);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
+        return ResponseEntity.ok(service.getCertificates(pageable));
     }
 }

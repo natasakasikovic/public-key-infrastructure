@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, finalize, Observable, shareReplay, tap, throwError} from 'rxjs';
+import {BehaviorSubject, finalize, Observable, of, shareReplay, tap, throwError} from 'rxjs';
 import { RegisterRequest } from './model/register-request.model';
 import { HttpClient } from '@angular/common/http';
 import { env } from '../../env/env';
@@ -58,9 +58,11 @@ export class AuthService {
     return this.accessToken$.value;
   }
 
-  tryRestoreSession(): Observable<LoginResponse> | null {
+  tryRestoreSession(): Observable<LoginResponse | null> {
     const refresh = this.getRefreshToken();
-    if (!refresh) return null;
+    if (!refresh) {
+      return of(null);
+    }
     return this.refresh();
   }
 

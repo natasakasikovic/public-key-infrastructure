@@ -1,0 +1,36 @@
+.certificate-card {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+}
+
+.party-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 16px;
+}
+
+.party h3 {
+  margin-bottom: 8px;
+}
+
+.info {
+  margin-bottom: 4px;
+}
+
+.meta {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.usages {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+
+  ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+}

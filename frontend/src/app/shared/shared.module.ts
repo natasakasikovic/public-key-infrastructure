@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ConfirmationDialogComponent} from './confirmation-dialog/confirmation-dialog.component';
-import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {MatButton} from '@angular/material/button';
+import { MaterialModule } from '../infrastructure/material/material.module';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
+import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
 
 
 
@@ -15,11 +15,7 @@ import {MatButton} from '@angular/material/button';
   ],
   imports: [
     CommonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatButton,
-    MatDialogContent,
-    MatDialogTitle
+    MaterialModule,
   ]
 })
 export class SharedModule { }
