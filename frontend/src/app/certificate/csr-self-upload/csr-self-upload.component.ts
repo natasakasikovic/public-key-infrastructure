@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CaCertificate } from '../models/ca-certificate.model';
 import { CertificateService } from '../certificate.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-csr-self-upload',
@@ -18,7 +19,8 @@ export class CsrSelfUploadComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private service: CertificateService,
-    private toaster: ToastrService
+    private toaster: ToastrService,
+    private router: Router
   ) {
     this.csrSelfForm = this.fb.group({
       caCertificateId: ['', Validators.required],
@@ -69,6 +71,7 @@ export class CsrSelfUploadComponent implements OnInit {
         this.toaster.success('CSR self-generated request created successfully.', 'Success');
         this.csrSelfForm.reset();
         this.selectedFile = null;
+        void this.router.navigate(['/home']);
       },
       error: (err) => {
         console.error('Error creating CSR self-generated request', err);
