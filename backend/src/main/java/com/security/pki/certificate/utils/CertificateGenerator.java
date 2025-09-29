@@ -3,6 +3,7 @@ package com.security.pki.certificate.utils;
 import com.security.pki.certificate.converters.ExtendedKeyUsageConverter;
 import com.security.pki.certificate.converters.KeyUsageConverter;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.exceptions.CertificateGenerationException;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -24,24 +25,36 @@ import java.security.cert.X509Certificate;
 @Component
 public class CertificateGenerator {
 
-    public X509Certificate generateRootCertificate(CreateRootCertificateRequest request,KeyPair keyPair,BigInteger serialNumber,X500Name x500Name) throws OperatorCreationException, CertIOException, CertificateException {
+    public X509Certificate generateRootCertificate(CreateRootCertificateRequest request, KeyPair keyPair,
+                                                   BigInteger serialNumber, X500Name x500Name) {
+        try {
+            final ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+                    .setProvider("BC").build(keyPair.getPrivate());
 
-        final ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption").setProvider("BC").build(keyPair.getPrivate());
+            final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+                    x500Name,
+                    serialNumber,
+                    request.getValidFrom(),
+                    request.getValidTo(),
+                    x500Name,
+                    keyPair.getPublic()
+            );
 
-        final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
-                x500Name,                   // issuer
-                serialNumber,               // serial number
-                request.getValidFrom(),     // valid from
-                request.getValidTo(),       // valid to
-                x500Name,                   // subject
-                keyPair.getPublic()         // public key
-        );
+            certBuilder.addExtension(Extension.keyUsage, false,
+                    new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(request.getKeyUsages())));
 
-        certBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(request.getKeyUsages())));
+            certBuilder.addExtension(Extension.extendedKeyUsage, false,
+                    new ExtendedKeyUsage(ExtendedKeyUsageConverter.convertToExtendedKeyUsages(request.getExtendedKeyUsages())));
 
-        certBuilder.addExtension(Extension.extendedKeyUsage,false, new ExtendedKeyUsage(ExtendedKeyUsageConverter.convertToExtendedKeyUsages(request.getExtendedKeyUsages())));
+            final X509CertificateHolder certHolder = certBuilder.build(contentSigner);
+            return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
 
-        final X509CertificateHolder certHolder = certBuilder.build(contentSigner);
-        return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
+        } catch (OperatorCreationException e) {
+            throw new CertificateGenerationException(String.format("Error creating signature operator: %s", e.getMessage()));
+        } catch (CertIOException e) {
+            throw new CertificateGenerationException(String.format("Error processing certificate extensions: %s", e.getMessage()));
+        } catch (CertificateException e) {
+            throw new CertificateGenerationException(String.format("Error converting certificate object: %s", e.getMessage()));
+        }
     }
 }

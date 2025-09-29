@@ -37,9 +37,9 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createCertificate(@RequestBody CreateCertificateDto request) {
-        service.createCertificate(request);
+    @PostMapping("/subordinate")
+    public ResponseEntity<Void> createSubordinateCertificate(@RequestBody CreateCertificateDto request) {
+        service.createSubordinateCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -47,7 +47,6 @@ public class CertificateController {
     public ResponseEntity<CertificateDetailsResponseDto> getCertificate(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getCertificate(id));
     }
-
 
     @GetMapping("/{serialNumber}/download")
     public ResponseEntity<Resource> downloadCertificate(@PathVariable String serialNumber) {
@@ -62,5 +61,4 @@ public class CertificateController {
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
     }
-
 }

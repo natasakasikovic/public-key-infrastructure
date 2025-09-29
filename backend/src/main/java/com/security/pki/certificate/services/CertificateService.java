@@ -5,8 +5,8 @@ import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
 import com.security.pki.certificate.dtos.CreateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
-import com.security.pki.certificate.exceptions.CertificateCreationException;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
+import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
@@ -58,34 +58,35 @@ public class CertificateService {
 
     @Transactional
     public void createRootCertificate(CreateRootCertificateRequest request) {
-        try {
-            final KeyPair keyPair = cryptoService.generateKeyPair();
-            final X500Name x500Name = buildX500Name(request);
-            final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
-            final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
-            certificate.setOwner(authService.getCurrentUser());
-            final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
-            storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
-        } catch (Exception e) {
-            loggerService.warning("Failed to generate certificate: " + e.getMessage());
-            throw new CertificateCreationException("An error occurred while generating the certificate. Please try again later.");
-        }
+        final KeyPair keyPair = cryptoService.generateKeyPair();
+        final X500Name x500Name = buildX500Name(request);
+        final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
+        final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
+        certificate.setOwner(authService.getCurrentUser());
+        final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
+        storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
 
     @Transactional
-    protected void storeCertificate(Certificate certificate, X509Certificate x509Certificate, PrivateKey privateKey) throws GeneralSecurityException {
-        SecretKey dek = cryptoService.generateDek();
-        byte[] encryptedPrivateKey = cryptoService.encrypt(dek, privateKey.getEncoded());
+    protected void storeCertificate(Certificate certificate, X509Certificate x509Certificate, PrivateKey privateKey) {
+        try {
+            SecretKey dek = cryptoService.generateDek();
+            byte[] encryptedPrivateKey = cryptoService.encrypt(dek, privateKey.getEncoded());
 
-        SecretKey wrappingKey = cryptoService.loadMasterKey();
-        byte[] wrappedDek = cryptoService.wrapDek(wrappingKey, dek);
+            SecretKey wrappingKey = cryptoService.loadMasterKey();
+            byte[] wrappedDek = cryptoService.wrapDek(wrappingKey, dek);
 
-        certificate.setEncryptedPrivateKey(encryptedPrivateKey);
-        certificate.setWrappedDek(wrappedDek);
-        certificate.setCertificateData(x509Certificate.getEncoded());
+            certificate.setEncryptedPrivateKey(encryptedPrivateKey);
+            certificate.setWrappedDek(wrappedDek);
+            certificate.setCertificateData(x509Certificate.getEncoded());
 
-        repository.save(certificate);
+            repository.save(certificate);
+
+        } catch (GeneralSecurityException e) {
+            throw new CertificateStorageException(String.format("Failed to store certificate securely: %s", e.getMessage()));
+        }
     }
+
 
     private X500Name buildX500Name(CreateRootCertificateRequest request) {
         final X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
@@ -113,22 +114,18 @@ public class CertificateService {
                 .build();
     }
 
-    // NOTE: method below serves for creating intermediate and end-entity certificates (IN PROGRESS)
-    public void createCertificate(CreateCertificateDto request) {
-
+    public void createSubordinateCertificate(CreateCertificateDto request) {
+        final KeyPair keyPair = cryptoService.generateKeyPair();
         String signingSerialNumber = request.getSigningSerialNumber();
         Certificate signingCertificate = null;
 
         if (signingSerialNumber != null)
-            signingCertificate =findBySerialNumber(signingSerialNumber);
+            signingCertificate = findBySerialNumber(signingSerialNumber);
 
         CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
 
         for (CertificateValidator validator : validators)
             validator.validate(context);
-
-        Certificate certificate = Certificate.builder().build(); // TODO: fill with params
-        // TODO: save certificate
     }
 
     @Transactional
