@@ -1,9 +1,6 @@
 package com.security.pki.certificate.mappers;
 
-import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
-import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.PartyDto;
+import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.enums.CertificateType;
 import com.security.pki.certificate.models.Issuer;
@@ -150,5 +147,18 @@ public class CertificateMapper {
         } else {
             return CertificateType.END_ENTITY;
         }
+    }
+
+    public CaCertificateDto toCaCertificateDto(Certificate cert) {
+        X500Name x500Name = new X500Name(cert.getSubject().getPrincipalName());
+
+        return CaCertificateDto.builder()
+                .id(cert.getId())
+                .commonName(getRdnValue(x500Name, BCStyle.CN))
+                .organization(getRdnValue(x500Name, BCStyle.O))
+                .serialNumber(cert.getSerialNumber())
+                .validFrom(cert.getValidFrom())
+                .validTo(cert.getValidTo())
+                .build();
     }
 }

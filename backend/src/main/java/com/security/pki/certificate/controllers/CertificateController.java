@@ -1,9 +1,6 @@
 package com.security.pki.certificate.controllers;
 
-import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
-import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
 import com.security.pki.shared.models.PagedResponse;
@@ -24,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -77,4 +75,11 @@ public class CertificateController {
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
     }
+
+    @GetMapping("/available-ca")
+    @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
+    public ResponseEntity<List<CaCertificateDto>> getAvailableCaCertificates() {
+        return ResponseEntity.ok(service.getAvailableCaCertificates());
+    }
+
 }

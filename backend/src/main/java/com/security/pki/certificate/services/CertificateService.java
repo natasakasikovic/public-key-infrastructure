@@ -1,10 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
-import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.exceptions.CertificateCreationException;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.mappers.CertificateMapper;
@@ -213,5 +210,14 @@ public class CertificateService {
             content = source.subList(start, end);
         }
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Transactional
+    public List<CaCertificateDto> getAvailableCaCertificates() {
+        return repository
+                .findByCanSignTrueAndStatusAndValidToAfter(Status.ACTIVE, new Date())
+                .stream()
+                .map(mapper::toCaCertificateDto)
+                .toList();
     }
 }
