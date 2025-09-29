@@ -18,26 +18,26 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#-about-the-project">About The Project</a>
+      <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#-built-with">Built With</a></li>
+        <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
     <li>
-      <a href="#-getting-started">Getting Started</a>
+      <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#-installation-steps">Installation Steps</a></li>
+        <li><a href="#installation-steps">Installation Steps</a></li>
       </ul>
     </li>
-    <li><a href="#-available-roles-and-credentials">Available Roles and Credentials</a></li>
+    <li><a href="#available-roles-and-credentials">Available Roles and Credentials</a></li>
   </ol>
 </details>
 
-##  📋 About The Project
+## About The Project
 
 This project implements a **Public Key Infrastructure (PKI)**, which includes security protocols for managing digital certificates, public and private keys, and establishing trust relationships.
 
-## 🔧 Built With
+## Built With
 
 This project is built using the following core technologies:
 
@@ -128,9 +128,22 @@ The frontend application will start on:
 <br/>
 
 
-## 👥 Available Roles and Credentials
+## Available Roles and Credentials
 
-TODO
+The system supports the following roles with corresponding credentials:
+
+- **CA User**
+  - Email: `ca@example.com`
+  - Password: `pera`
+
+- **Regular user**
+  - Email: `verified@example.com`
+  - Password: `pera`
+
+- **Administrator**
+  - Email: `admin@example.com`
+  - Password: `pera`
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
