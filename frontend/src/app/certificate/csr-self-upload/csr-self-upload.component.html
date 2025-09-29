@@ -1,0 +1,78 @@
+<div class="mainContainer">
+  <div class="window">
+    <div class="inside-div">
+      <h2 class="title">Certificate Signing Request (Self-Generated)</h2>
+
+      <div class="container" [formGroup]="csrSelfForm">
+
+        <!-- CA selection -->
+        <div class="row gap">
+          <div class="col">
+            <label>Choose CA*:</label>
+            <table class="ca-table">
+              <thead>
+                <tr>
+                  <th>Select</th>
+                  <th>Common Name</th>
+                  <th>Organization</th>
+                  <th>Serial Number</th>
+                  <th>Valid From</th>
+                  <th>Valid To</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let ca of caList">
+                  <td>
+                    <input
+                      type="radio"
+                      [value]="ca.id"
+                      formControlName="caCertificateId"
+                      name="caCertificateId"
+                    />
+                  </td>
+                  <td>{{ ca.commonName }}</td>
+                  <td>{{ ca.organization || '-' }}</td>
+                  <td>{{ ca.serialNumber }}</td>
+                  <td>{{ ca.validFrom | date: 'yyyy-MM-dd' }}</td>
+                  <td>{{ ca.validTo | date: 'yyyy-MM-dd' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+
+        <!-- expiration date -->
+        <div class="row gap">
+          <div class="col">
+            <label for="validTo">
+              Pick expiration date*:
+              <input type="date" id="validTo" formControlName="validTo" required>
+            </label>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- PEM file upload -->
+        <div class="row gap">
+          <div class="col">
+            <label for="pemFile">
+              Upload CSR (.pem)*:
+              <input type="file" id="pemFile" (change)="onFileChange($event)" accept=".pem" required>
+            </label>
+          </div>
+        </div>
+
+        <!-- confirm button -->
+        <div class="add-button">
+          <button type="button" class="btn custombutton btn-primary" (click)="onSubmit()">
+            Confirm
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
