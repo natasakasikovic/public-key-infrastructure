@@ -14,6 +14,12 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   {
+    path: 'ca-register',
+    component: RegisterComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['ADMIN'] },
+  },
+  {
     path: 'home',
     component: CertificateOverviewComponent,
     canActivate: [AuthGuard],
