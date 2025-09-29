@@ -24,20 +24,16 @@ public class CSRService {
     private final AuthService authService;
 
     public void processCsrUpload(String caId, String until, MultipartFile csrFile) {
-        try {
-            PKCS10CertificationRequest csr = loadCsr(csrFile);
-            User user = authService.getCurrentUser();
-            PublicKey publicKey = extractKey(csr);
+        PKCS10CertificationRequest csr = loadCsr(csrFile);
+        User user = authService.getCurrentUser();
+        PublicKey publicKey = extractKey(csr);
 
-            CertificateRequestDto request = mapper.fromCsr(csr, user, caId, until);
+        CertificateRequestDto request = mapper.fromCsr(csr, user, caId, until);
 
 
-            // invoke certificate creation
-            // certificateService.createEndEntityCertificate(request, publicKey);
-            System.out.println("Certificate request: " + request);
-        } catch (Exception ex) {
-            throw new InvalidCsrException("Failed to upload CSR file");
-        }
+        // invoke certificate creation
+        // certificateService.createEndEntityCertificate(request, publicKey);
+        System.out.println("Certificate request: " + request);
     }
 
     private PKCS10CertificationRequest loadCsr(MultipartFile file) {
