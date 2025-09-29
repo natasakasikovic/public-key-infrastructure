@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { TemplateService } from '../template.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CertificateTemplate } from '../model/certificate-template.model';
@@ -7,6 +7,11 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
 import {regexValidator} from '../validators/regex-validator.validator';
+import {CertificateResponse} from '../../certificate/models/certificate-response.model';
+import {CertificateService} from '../../certificate/certificate.service';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {PagedResponse} from '../../shared/model/paged-response';
 
 @Component({
   selector: 'app-template-form',
@@ -14,9 +19,18 @@ import {regexValidator} from '../validators/regex-validator.validator';
   standalone: false,
   styleUrls: ['./create-template.component.css']
 })
-export class CreateTemplateComponent {
+export class CreateTemplateComponent implements OnInit {
   extendedKeyUsageOptions: string[] = EXTENDED_KEY_USAGE_OPTIONS;
   keyUsageOptions: string[] = KEY_USAGE_OPTIONS;
+  selectedIssuer: CertificateResponse | null = null;
+  certificates: CertificateResponse[] = [];
+  displayedColumns: string[] = ['serialNumber', 'certificateType', 'issuerEmail', 'subjectEmail', 'select'];
+  dataSource = new MatTableDataSource<CertificateResponse>(this.certificates);
+  totalElements = 0;
+  pageSize = 10;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   templateForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
     issuer: new FormControl('', Validators.required),
@@ -30,8 +44,13 @@ export class CreateTemplateComponent {
   constructor(
     private templateService: TemplateService,
     private toasterService: ToastrService,
+    private certificateService: CertificateService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.loadCertificates(0, this.pageSize);
+  }
 
   onCreate(): void {
     if (this.templateForm.invalid) return;
@@ -58,6 +77,11 @@ export class CreateTemplateComponent {
     });
   }
 
+  selectIssuer(cert: CertificateResponse) {
+    this.selectedIssuer = cert;
+    this.templateForm.patchValue({issuer: cert.subjectEmail});
+  }
+
   onCheckboxChange(event: Event, controlName: 'keyUsages' | 'extendedKeyUsages'): void {
     const checkbox = event.target as HTMLInputElement;
     const currentArray = this.templateForm.get(controlName)?.value as string[];
@@ -70,5 +94,18 @@ export class CreateTemplateComponent {
       );
     }
     this.templateForm.get(controlName)?.markAsTouched();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.loadCertificates(event.pageIndex, event.pageSize);
+  }
+
+  private loadCertificates(pageIndex: number, pageSize: number) {
+    this.certificateService.getAll(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<CertificateResponse>) => {
+        this.dataSource.data = response.content;
+        this.totalElements = response.totalElements;
+      }
+    })
   }
 }

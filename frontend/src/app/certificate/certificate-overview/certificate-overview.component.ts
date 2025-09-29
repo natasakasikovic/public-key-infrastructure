@@ -4,7 +4,6 @@ import {CertificateService} from '../certificate.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {CertificateResponse} from '../models/certificate-response.model';
 import {Router} from '@angular/router';
-import {AuthService} from '../../auth/auth.service';
 import {PagedResponse} from '../../shared/model/paged-response';
 
 @Component({
@@ -45,7 +44,7 @@ export class CertificateOverviewComponent implements OnInit {
   }
 
   viewDetails(certificate: CertificateResponse): void {
-    void this.router.navigate(["certificate", certificate.id])
+    void this.router.navigate(["certificate", certificate.id]);
   }
 
   revokeCertificate(cert: CertificateResponse): void {

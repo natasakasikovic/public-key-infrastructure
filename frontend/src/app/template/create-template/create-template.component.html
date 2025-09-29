@@ -10,13 +10,57 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Issuer</mat-label>
-      <input matInput formControlName="issuer" placeholder="Enter issuer name">
-      <mat-error *ngIf="templateForm.get('issuer')?.hasError('required')">
-        Issuer is required
-      </mat-error>
-    </mat-form-field>
+    <div class="issuer-table-container">
+      <h5>Available Issuer Certificates</h5>
+
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1 full-width">
+
+        <ng-container matColumnDef="serialNumber">
+          <th mat-header-cell *matHeaderCellDef>Serial Number</th>
+          <td mat-cell *matCellDef="let cert">{{ cert.serialNumber }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="certificateType">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let cert">{{ cert.certificateType }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="issuerEmail">
+          <th mat-header-cell *matHeaderCellDef >Issuer Mail</th>
+          <td mat-cell *matCellDef="let cert">{{ cert.issuerEmail }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="subjectEmail">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Subject Mail</th>
+          <td mat-cell *matCellDef="let cert">{{ cert.subjectEmail }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef> Select </th>
+          <td mat-cell *matCellDef="let cert">
+            <button mat-button color="primary" (click)="selectIssuer(cert)">
+              {{ selectedIssuer?.serialNumber === cert.serialNumber ? 'Selected' : 'Select' }}
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"
+            [class.selected-row]="selectedIssuer?.serialNumber === row.serialNumber">
+        </tr>
+      </table>
+
+      <mat-paginator [length]="totalElements"
+                     [pageSize]="pageSize"
+                     [pageSizeOptions]="[5, 10, 25]"
+                     (page)="onPageChange($event)">
+      </mat-paginator>
+
+      <div *ngIf="!selectedIssuer" class="issuer-warning">
+        <small>Please select an issuer certificate.</small>
+      </div>
+    </div>
+
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Common Name Regex</mat-label>

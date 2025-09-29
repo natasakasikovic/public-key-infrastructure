@@ -23,6 +23,47 @@
   margin-bottom: 2rem;
 }
 
+.issuer-table-container {
+  margin: 1.5rem 0;
+}
+
+.issuer-table-container h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.issuer-table-container table.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+}
+
+.issuer-table-container table th,
+.issuer-table-container table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.issuer-table-container table thead th {
+  background-color: #f7f9fb;
+  color: #333;
+  font-weight: 600;
+}
+
+.issuer-table-container table tbody tr:hover {
+  background-color: #e6f2ff;
+  cursor: pointer;
+}
+
+.issuer-warning {
+  margin-top: 0.5rem;
+  color: #d9534f;
+}
+
+
 .full-width {
   width: 100%;
 }
