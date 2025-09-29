@@ -5,6 +5,7 @@ import com.security.pki.certificate.converters.KeyUsageConverter;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.exceptions.CertificateGenerationException;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -45,6 +46,8 @@ public class CertificateGenerator {
 
             certBuilder.addExtension(Extension.extendedKeyUsage, false,
                     new ExtendedKeyUsage(ExtendedKeyUsageConverter.convertToExtendedKeyUsages(request.getExtendedKeyUsages())));
+
+            certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 
             final X509CertificateHolder certHolder = certBuilder.build(contentSigner);
             return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
