@@ -1,6 +1,6 @@
 package com.security.pki.certificate.dtos;
 
-import com.security.pki.certificate.CertificateType;
+import com.security.pki.certificate.enums.CertificateType;
 import lombok.*;
 
 import java.time.LocalDate;
