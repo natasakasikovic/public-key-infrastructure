@@ -108,7 +108,6 @@ public class CertificateService {
     // NOTE: method below serves for creating intermediate and end-entity certificates (IN PROGRESS)
     public void createCertificate(CreateCertificateDto request) {
 
-        // TODO: think about removing method in AuthService (getCurrentUserRole) if you don't use it
         String signingSerialNumber = request.getSigningSerialNumber();
         Certificate signingCertificate = null;
 
