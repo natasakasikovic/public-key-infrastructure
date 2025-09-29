@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {
   EXTENDED_KEY_USAGE_OPTIONS,
   KEY_USAGE_OPTIONS,
-  SUBORDINATE_CERTIFICATE_TYPE,
 } from '../../shared/constants/certificate-options';
 import {
   FormArray,
@@ -12,8 +11,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { UserResponse } from '../../auth/model/user-response.model';
-import { CertificateResponse } from '../model/certificate-response.model';
-import { CertificateService } from '../../certificate/certificate.service';
+import { CertificateResponse } from '../../shared/model/certificate-response.model';
+import { CertificateService } from '../certificate.service';
 
 @Component({
   selector: 'app-subordinate-certificate-issuance',

@@ -6,7 +6,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {CertificateTemplate} from '../model/certificate-template.model';
 import {ToastrService} from 'ngx-toastr';
 import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
-import {HttpErrorResponse} from '@angular/common/http';
 import {regexValidator} from '../validators/regex-validator.validator';
 
 @Component({

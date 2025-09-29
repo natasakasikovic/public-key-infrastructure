@@ -3,15 +3,29 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegisterComponent } from './auth/register/register.component';
 import { RootCertificateIssuanceComponent } from './certificate/root-certificate-issuance/root-certificate-issuance.component';
 import { LoginComponent } from './auth/login/login.component';
-import { CreateTemplateComponent } from './certificates/create-template/create-template.component';
-import { TemplateOverviewComponent } from './certificates/template-overview/template-overview.component';
-import { EditTemplateComponent } from './certificates/edit-template/edit-template.component';
 import { AuthGuard } from './auth/auth.guard';
-import { SubordinateCertificateIssuanceComponent } from './certificates/subordinate-certificate-issuance/subordinate-certificate-issuance.component';
+import { SubordinateCertificateIssuanceComponent } from './certificate/subordinate-certificate-issuance/subordinate-certificate-issuance.component';
+import { CertificateOverviewComponent } from './certificate/certificate-overview/certificate-overview.component';
+import { CreateTemplateComponent } from './template/create-template/create-template.component';
+import { EditTemplateComponent } from './template/edit-template/edit-template.component';
+import { TemplateOverviewComponent } from './template/template-overview/template-overview.component';
+import { CertificateDetailsComponent } from './certificate/certificate-details/certificate-details.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
+  {
+    path: 'home',
+    component: CertificateOverviewComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER', 'ADMIN', 'REGULAR_USER'] },
+  },
+  {
+    path: 'certificate/:id',
+    component: CertificateDetailsComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER', 'ADMIN', 'REGULAR_USER'] },
+  },
   {
     path: 'create-template',
     component: CreateTemplateComponent,
