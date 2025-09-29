@@ -7,6 +7,7 @@ import { PagedResponse } from '../shared/model/paged-response';
 import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
+import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,10 @@ export class CertificateService {
     return this.httpClient.post<void>(`${env.apiHost}/certificates/root`, request);
   }
 
+  createSubordinateCertificate(request: CreateSubordinateCertificateRequest): Observable<void> {
+    return this.httpClient.post<void>(`${env.apiHost}/certificates/subordinate`, request);
+  }
+ 
   getCertificate(id: string): Observable<CertificateDetails> {
     return this.httpClient.get<CertificateDetails>(`${env.apiHost}/certificates/${id}`);
   }
@@ -48,5 +53,12 @@ export class CertificateService {
       `${env.apiHost}/certificates/end-entities/`,
       { params: params }
     );
+  }
+
+  getValidCACertificates(page: number, size: number) : Observable<PagedResponse<CertificateResponse>>{
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-cas`, { params: params });
   }
 }

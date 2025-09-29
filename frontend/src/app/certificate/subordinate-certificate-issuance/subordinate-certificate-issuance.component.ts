@@ -10,9 +10,15 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { UserResponse } from '../../auth/model/user-response.model';
-import { CertificateResponse } from '../../shared/model/certificate-response.model';
+import { UserResponse } from '../../user/model/user-response.model';
 import { CertificateService } from '../certificate.service';
+import { MatTableDataSource } from '@angular/material/table';
+import { PagedResponse } from '../../shared/model/paged-response';
+import { PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
+import { CertificateResponse } from '../models/certificate-response.model';
+import { UserService } from '../../user/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-subordinate-certificate-issuance',
@@ -24,22 +30,79 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
   keyUsageOptions = KEY_USAGE_OPTIONS;
   extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
 
-  users: UserResponse[] = [];
-  certificates: CertificateResponse[] = [];
+  // certificates table
+  displayedCertificateColumns: string[] = [
+    'serialNumber',
+    'certificateType',
+    'issuerMail',
+    'subjectMail',
+    'details',
+  ];
+  certificateDataSource = new MatTableDataSource<CertificateResponse>([]);
+
+  // users table
+  displayedUserColumns: string[] = [
+    'firstName',
+    'lastName',
+    'email',
+    'organization',
+  ];
+  userDataSource = new MatTableDataSource<UserResponse>([]);
+
+  totalElements = 0;
+  pageSize = 5;
 
   certificateForm: FormGroup = new FormGroup({
-    user: new FormControl('', Validators.required),
+    commonName: new FormControl('', Validators.required),
+    country: new FormControl('', Validators.required),
+    organizationalUnit: new FormControl(''),
+    state: new FormControl(''),
+    locality: new FormControl(''),
+    userId: new FormControl('', Validators.required),
     dateFrom: new FormControl('', Validators.required),
     dateTo: new FormControl('', Validators.required),
+    certificateId: new FormControl('', Validators.required),
     certificateType: new FormControl('', Validators.required),
-    keyUsages: new FormControl([]),
-    extendedKeyUsages: new FormControl([]),
+    keyUsages: new FormArray([]),
+    extendedKeyUsages: new FormArray([]),
   });
 
-  constructor(private fb: FormBuilder, service: CertificateService) {}
+  constructor(
+    private service: CertificateService,
+    private userService: UserService,
+    private router: Router,
+    private toasterService: ToastrService
+  ) {}
 
   ngOnInit(): void {
-    // TODO: load users and certificates
+    this.fetchUsers(0, this.pageSize);
+    this.fetchCertificates(0, this.pageSize);
+  }
+
+  fetchCertificates(pageIndex: number, pageSize: number): void {
+    this.service.getValidCACertificates(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<CertificateResponse>) => {
+        this.certificateDataSource.data = response.content;
+        this.totalElements = response.totalElements;
+      },
+    });
+  }
+
+  fetchUsers(pageIndex: number, pageSize: number): void {
+    this.userService.getAll(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<UserResponse>) => {
+        this.userDataSource.data = response.content;
+        this.totalElements = response.totalElements;
+      },
+    });
+  }
+
+  onCertificatePageChange(event: PageEvent): void {
+    this.fetchCertificates(event.pageIndex, event.pageSize);
+  }
+
+  onUserPageChanged(event: PageEvent): void {
+    this.fetchUsers(event.pageIndex, event.pageSize);
   }
 
   onCheckboxChange(event: any, formArray: FormArray) {
@@ -53,6 +116,10 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     }
   }
 
+  viewDetails(certificate: CertificateResponse): void {
+    void this.router.navigate(['certificate', certificate.id]);
+  }
+
   get keyUsagesFormArray(): FormArray {
     return this.certificateForm.get('keyUsages') as FormArray;
   }
@@ -61,10 +128,30 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
   }
 
-  // TODO: implement methods below
-  toggleKeyUsage(option: string) {}
-  toggleExtendedKeyUsage(option: string) {}
-  onDateChange() {}
-  selectCertificate(cert: any) {}
-  createCertificate() {}
+  onUserSelected(user: UserResponse) {
+    this.certificateForm.controls['user'].setValue(user.id);
+  }
+
+  onCertificateSelected(certicate: CertificateResponse) {
+    this.certificateForm.controls['certificate'].setValue(certicate);
+  }
+
+  createCertificate() {
+    if (this.certificateForm.invalid) return;
+
+    this.service
+      .createSubordinateCertificate(this.certificateForm.value)
+      .subscribe({
+        next: () => {
+          this.toasterService.success(
+            'Certificate has been created successfully!'
+          );
+          void this.router.navigate(['/home']);
+        },
+        error: () =>
+          this.toasterService.error(
+            'Failed to create certificate. Please try again later.'
+          ),
+      });
+  }
 }
