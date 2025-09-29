@@ -9,6 +9,7 @@ import {CreateTemplateComponent} from './template/create-template/create-templat
 import {EditTemplateComponent} from './template/edit-template/edit-template.component';
 import {TemplateOverviewComponent} from './template/template-overview/template-overview.component';
 import {CertificateDetailsComponent} from './certificate/certificate-details/certificate-details.component';
+import { CsrSelfUploadComponent } from './certificate/csr-self-upload/csr-self-upload.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
@@ -54,6 +55,12 @@ const routes: Routes = [
     component: RootCertificateIssuanceComponent,
     canActivate: [AuthGuard],
     data: { role: ['ADMIN'] },
+  },
+  {
+    path: 'csr-self-upload',
+    component: CsrSelfUploadComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['REGULAR_USER'] },
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login', pathMatch: 'full' },

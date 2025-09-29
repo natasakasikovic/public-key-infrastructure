@@ -1,21 +1,20 @@
 package com.security.pki.certificate.mappers;
 
-import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
-import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.PartyDto;
-import com.security.pki.certificate.models.Certificate;
+import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.enums.CertificateType;
+import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.utils.CertificateUtils;
 import com.security.pki.shared.models.PagedResponse;
+import com.security.pki.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -23,9 +22,11 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -151,4 +152,40 @@ public class CertificateMapper {
             return CertificateType.END_ENTITY;
         }
     }
+
+    public CaCertificateDto toCaCertificateDto(Certificate cert) {
+        X500Name x500Name = new X500Name(cert.getSubject().getPrincipalName());
+
+        return CaCertificateDto.builder()
+                .id(cert.getId())
+                .commonName(getRdnValue(x500Name, BCStyle.CN))
+                .organization(getRdnValue(x500Name, BCStyle.O))
+                .serialNumber(cert.getSerialNumber())
+                .validFrom(cert.getValidFrom())
+                .validTo(cert.getValidTo())
+                .build();
+    }
+
+    public CertificateRequestDto fromCsr(PKCS10CertificationRequest csr,
+                                         User user,
+                                         String caId,
+                                         String until) {
+        X500Name x500 = csr.getSubject();
+
+        return CertificateRequestDto.builder()
+                .commonName(getRdnValue(x500, BCStyle.CN) != null ? getRdnValue(x500, BCStyle.CN) : "unknown")
+                .surname(getRdnValue(x500, BCStyle.SURNAME) != null ? getRdnValue(x500, BCStyle.SURNAME) : user.getLastName())
+                .givenName(getRdnValue(x500, BCStyle.GIVENNAME) != null ? getRdnValue(x500, BCStyle.GIVENNAME) : user.getFirstName())
+                .organization(getRdnValue(x500, BCStyle.O) != null ? getRdnValue(x500, BCStyle.O) : user.getOrganization())
+                .organizationalUnit(getRdnValue(x500, BCStyle.OU))
+                .country(getRdnValue(x500, BCStyle.C))
+                .email(getRdnValue(x500, BCStyle.E))
+                .userId(user.getId())
+                .validFrom(LocalDate.now())
+                .validTo(LocalDate.parse(until))
+                .caCertificateId(UUID.fromString(caId))
+                .certificateType(CertificateType.END_ENTITY)
+                .build();
+    }
+
 }

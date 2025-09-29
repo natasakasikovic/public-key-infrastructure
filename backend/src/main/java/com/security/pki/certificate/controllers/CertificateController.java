@@ -1,9 +1,7 @@
 package com.security.pki.certificate.controllers;
 
-import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
-import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.dtos.*;
+import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
 import com.security.pki.shared.models.PagedResponse;
 import jakarta.validation.Valid;
@@ -19,8 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class CertificateController {
 
     private final CertificateService service;
+    private final CSRService csrService;
 
     @PostMapping("/root")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -58,9 +60,26 @@ public class CertificateController {
                 .body(service.exportAsPkcs12(serialNumber));
     }
 
+    @PostMapping("csr/self-generation")
+    @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
+    public ResponseEntity<Void> createCSRSelfGenerate(
+            @RequestParam String caCertificateId,
+            @RequestParam String validTo,
+            @RequestParam MultipartFile pemFile
+    ) {
+        csrService.processCsrUpload(caCertificateId, validTo, pemFile);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
+    }
+
+    @GetMapping("/available-ca")
+    @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
+    public ResponseEntity<List<CaCertificateDto>> getAvailableCaCertificates() {
+        return ResponseEntity.ok(service.getAvailableCaCertificates());
     }
 
 }
