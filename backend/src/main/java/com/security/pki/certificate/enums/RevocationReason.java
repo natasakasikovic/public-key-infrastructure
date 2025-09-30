@@ -1,14 +1,42 @@
 package com.security.pki.certificate.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+
+@Getter
 public enum RevocationReason {
-    UNSPECIFIED,             // 0 - Reason not specified
-    KEY_COMPROMISE,          // 1 - The private key has been compromised
-    CA_COMPROMISE,           // 2 - The issuing CA's private key has been compromised
-    AFFILIATION_CHANGED,     // 3 - The subject’s affiliation has changed (e.g., organization or role)
-    SUPERSEDED,              // 4 - The certificate has been replaced by a new one
-    CESSATION_OF_OPERATION,  // 5 - The entity no longer uses the certificate (service shut down, org closed, etc.)
-    CERTIFICATE_HOLD,        // 6 - The certificate is temporarily suspended (can be reinstated)
-    REMOVE_FROM_CRL,         // 8 - The certificate was previously on hold and is now removed from the CRL (made valid again)
-    PRIVILEGE_WITHDRAWN,     // 9 - The privileges granted to the subject are withdrawn
-    AA_COMPROMISE            // 10 - The Attribute Authority’s private key has been compromised
+    UNSPECIFIED(0, "Unspecified"),
+    KEY_COMPROMISE(1, "Key Compromise"),
+    CA_COMPROMISE(2, "CA Compromise"),
+    AFFILIATION_CHANGED(3, "Affiliation Changed"),
+    SUPERSEDED(4, "Superseded"),
+    CESSATION_OF_OPERATION(5, "Cessation of Operation"),
+    CERTIFICATE_HOLD(6, "Certificate Hold"),
+    REMOVE_FROM_CRL(8, "Remove from CRL"),
+    PRIVILEGE_WITHDRAWN(9, "Privilege Withdrawn"),
+    AA_COMPROMISE(10, "AA Compromise");
+
+    private final int code;
+    private final String label;
+
+    RevocationReason(int code, String label) {
+        this.code = code;
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+
+    @JsonCreator
+    public static RevocationReason fromLabel(String label) {
+        for (RevocationReason r : values()) {
+            if (r.label.equalsIgnoreCase(label)) {
+                return r;
+            }
+        }
+        throw new IllegalArgumentException("Unknown reason: " + label);
+    }
 }

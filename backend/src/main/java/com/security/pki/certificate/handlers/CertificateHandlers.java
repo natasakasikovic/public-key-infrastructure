@@ -36,4 +36,12 @@ public class CertificateHandlers {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(CrlUpdateException.class)
+    public ResponseEntity<String> handleCrlUpdateException(CrlUpdateException ex) {
+        logger.error("Crl update exception: ", ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
 }

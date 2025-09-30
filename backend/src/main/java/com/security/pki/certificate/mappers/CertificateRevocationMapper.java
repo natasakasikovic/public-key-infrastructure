@@ -1,6 +1,7 @@
 package com.security.pki.certificate.mappers;
 
 import com.security.pki.certificate.dtos.RevocationRequestDto;
+import com.security.pki.certificate.dtos.RevocationResponseDto;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.CertificateRevocation;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,13 @@ public class CertificateRevocationMapper {
                     .certificate(c)
                     .revocationDate(LocalDateTime.now())
                     .build();
+    }
+
+    public RevocationResponseDto toCertificateResponseDto(CertificateRevocation revocation) {
+        return RevocationResponseDto.builder()
+                .revocationReason(revocation.getReason().getLabel())
+                .revocationTime(revocation.getRevocationDate())
+                .build();
     }
 
 }
