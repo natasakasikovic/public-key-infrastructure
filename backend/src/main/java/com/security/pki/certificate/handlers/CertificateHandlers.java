@@ -1,9 +1,6 @@
 package com.security.pki.certificate.handlers;
 
-import com.security.pki.certificate.exceptions.CertificateDownloadException;
-import com.security.pki.certificate.exceptions.CertificateGenerationException;
-import com.security.pki.certificate.exceptions.CertificateNotAllowedToSignException;
-import com.security.pki.certificate.exceptions.KeyGenerationException;
+import com.security.pki.certificate.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,14 @@ public class CertificateHandlers {
         logger.error("Internal server error: ", ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(RevocationException.class)
+    public ResponseEntity<String> handleRevocationException(RevocationException ex) {
+        logger.error("Revocation exception: ", ex);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 }
