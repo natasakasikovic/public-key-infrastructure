@@ -4,8 +4,11 @@ import {CertificateService} from '../certificate.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {CertificateResponse} from '../models/certificate-response.model';
 import {Router} from '@angular/router';
-import {AuthService} from '../../auth/auth.service';
 import {PagedResponse} from '../../shared/model/paged-response';
+import { RevokeDialogComponent } from '../revoke-dialog/revoke-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+import { RevocationResponse } from '../models/revocation-response.model';
 
 @Component({
   selector: 'app-certificate-overview',
@@ -25,6 +28,8 @@ export class CertificateOverviewComponent implements OnInit {
   constructor(
     private certificateService: CertificateService,
     private router: Router,
+    private dialog: MatDialog,
+    private toaster: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +54,23 @@ export class CertificateOverviewComponent implements OnInit {
   }
 
   revokeCertificate(cert: CertificateResponse): void {
-    // TODO
+    const dialogRef = this.dialog.open(RevokeDialogComponent, {
+    width: '400px',
+    data: { certId: cert.id }
+    });
+
+    dialogRef.afterClosed().subscribe(reason => {
+      if (reason) {
+        this.certificateService.revokeCertificate(cert.id, { reason }).subscribe({
+          next: (response: RevocationResponse) => {
+            this.loadCertificates(this.paginator.pageIndex, this.paginator.pageSize);
+            this.toaster.success('Certificate revoked successfully. Reason: ' + response.revocationReason, 'Success');
+          },
+          error: () => {
+            this.toaster.error('Failed to revoke the certificate. Please try again.', 'Error');
+          }
+        });
+      }
+    })
   }
 }

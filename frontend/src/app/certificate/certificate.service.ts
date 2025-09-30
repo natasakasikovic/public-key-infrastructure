@@ -8,6 +8,8 @@ import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
 import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
+import { RevocationRequest } from './models/revocation-reason.model';
+import { RevocationResponse } from './models/revocation-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -61,4 +63,9 @@ export class CertificateService {
       .set('size', size);
     return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-cas`, { params: params });
   }
+
+  revokeCertificate(id: string, reason: RevocationRequest): Observable<RevocationResponse> {
+    return this.httpClient.post<RevocationResponse>(`${env.apiHost}/certificates/${id}/revocation`, reason);
+  }
+  
 }
