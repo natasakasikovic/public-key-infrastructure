@@ -15,6 +15,7 @@ import {
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { CertificateDetailsComponent } from './certificate-details/certificate-details.component';
 import {RouterLink} from '@angular/router';
+import { CaCertificateIssuanceComponent } from './ca-certificate-issuance/ca-certificate-issuance.component';
 
 
 
@@ -22,7 +23,8 @@ import {RouterLink} from '@angular/router';
   declarations: [
     CertificateOverviewComponent,
     RootCertificateIssuanceComponent,
-    CertificateDetailsComponent
+    CertificateDetailsComponent,
+    CaCertificateIssuanceComponent
   ],
   imports: [
     CommonModule,

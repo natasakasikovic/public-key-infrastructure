@@ -10,6 +10,7 @@ import { CreateTemplateComponent } from './template/create-template/create-templ
 import { EditTemplateComponent } from './template/edit-template/edit-template.component';
 import { TemplateOverviewComponent } from './template/template-overview/template-overview.component';
 import { CertificateDetailsComponent } from './certificate/certificate-details/certificate-details.component';
+import { CaCertificateIssuanceComponent } from './certificate/ca-certificate-issuance/ca-certificate-issuance.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
@@ -55,6 +56,12 @@ const routes: Routes = [
     component: SubordinateCertificateIssuanceComponent,
     canActivate: [AuthGuard],
     data: { role: ['ADMIN'] },
+  },
+  {
+    path: 'ca-certificate-issuance',
+    component: CaCertificateIssuanceComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['CA_USER'] },
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login', pathMatch: 'full' },
