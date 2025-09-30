@@ -1,4 +1,4 @@
-package com.security.pki.certificate.validators;
+package com.security.pki.certificate.validators.certificate;
 
 import com.security.pki.certificate.models.Certificate;
 

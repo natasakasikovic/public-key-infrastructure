@@ -59,9 +59,9 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     state: new FormControl(''),
     locality: new FormControl(''),
     userId: new FormControl('', Validators.required),
-    dateFrom: new FormControl('', Validators.required),
-    dateTo: new FormControl('', Validators.required),
-    certificateId: new FormControl('', Validators.required),
+    validFrom: new FormControl('', Validators.required),
+    validTo: new FormControl('', Validators.required),
+    signingCertificateId: new FormControl('', Validators.required),
     certificateType: new FormControl('', Validators.required),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
@@ -129,29 +129,36 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
   }
 
   onUserSelected(user: UserResponse) {
-    this.certificateForm.controls['user'].setValue(user.id);
+    this.certificateForm.controls['userId'].setValue(user.id);
   }
 
   onCertificateSelected(certicate: CertificateResponse) {
-    this.certificateForm.controls['certificate'].setValue(certicate);
+    this.certificateForm.controls['signingCertificateId'].setValue(
+      certicate.id
+    );
   }
 
   createCertificate() {
+    console.log('kliknuto');
     if (this.certificateForm.invalid) return;
 
-    this.service
-      .createSubordinateCertificate(this.certificateForm.value)
-      .subscribe({
-        next: () => {
-          this.toasterService.success(
-            'Certificate has been created successfully!'
-          );
-          void this.router.navigate(['/home']);
-        },
-        error: () =>
-          this.toasterService.error(
-            'Failed to create certificate. Please try again later.'
-          ),
-      });
+    const payload = {
+      ...this.certificateForm.value,
+      canSign:
+        this.certificateForm.get('certificateType')?.value === 'INTERMEDIATE',
+    };
+
+    this.service.createSubordinateCertificate(payload).subscribe({
+      next: () => {
+        this.toasterService.success(
+          'Certificate has been created successfully!'
+        );
+        void this.router.navigate(['/home']);
+      },
+      error: () =>
+        this.toasterService.error(
+          'Failed to create certificate. Please try again later.'
+        ),
+    });
   }
 }
