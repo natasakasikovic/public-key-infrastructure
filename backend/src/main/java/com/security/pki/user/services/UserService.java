@@ -13,6 +13,7 @@ import com.security.pki.user.mappers.UserMapper;
 import com.security.pki.user.models.ActivationToken;
 import com.security.pki.user.models.User;
 import com.security.pki.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,6 +61,11 @@ public class UserService {
 
     public PagedResponse<UserResponseDto> getUsers(Pageable pageable) {
         return mapper.toPagedResponse(repository.findAll(pageable));
+    }
+
+    public User findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User not found with id: %s", id)));
     }
 
     public User findByEmail(String email) {

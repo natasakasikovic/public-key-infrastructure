@@ -2,7 +2,7 @@ package com.security.pki.certificate.mappers;
 
 import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
+import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.dtos.PartyDto;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.enums.CertificateType;
@@ -32,8 +32,7 @@ import java.util.List;
 public class CertificateMapper {
     private final ModelMapper modelMapper;
 
-    // NOTE: refactor method below when you add more attr to CreateCertificateDto
-    public Certificate fromRequest(CreateCertificateDto request) {
+    public Certificate fromRequest(CreateSubordinateCertificateDto request) {
         return modelMapper.map(request, Certificate.class);
     }
 

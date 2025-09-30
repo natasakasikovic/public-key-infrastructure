@@ -1,5 +1,6 @@
 package com.security.pki.certificate.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,12 +16,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateSubordinateCertificateDto {
     @NotNull(message = "User is required")
-    private UUID userId;
+    private Long userId;
 
     @NotNull(message = "Valid-from date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date validFrom;
 
     @NotNull(message = "Valid-to date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date validTo;
 
     @NotNull(message = "Signing certificate is required")

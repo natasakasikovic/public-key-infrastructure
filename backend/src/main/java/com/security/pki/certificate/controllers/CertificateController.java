@@ -2,7 +2,7 @@ package com.security.pki.certificate.controllers;
 
 import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
+import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.services.CertificateService;
 import com.security.pki.shared.models.PagedResponse;
@@ -38,7 +38,7 @@ public class CertificateController {
     }
 
     @PostMapping("/subordinate")
-    public ResponseEntity<Void> createSubordinateCertificate(@RequestBody CreateCertificateDto request) {
+    public ResponseEntity<Void> createSubordinateCertificate(@RequestBody @Valid CreateSubordinateCertificateDto request) {
         service.createSubordinateCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -60,5 +60,10 @@ public class CertificateController {
     @GetMapping
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
+    }
+
+    @GetMapping("valid-cas")
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidSigningCertificates(Pageable pageable) {
+        return ResponseEntity.ok(service.getCertificates(pageable)); // TODO: replace method call
     }
 }

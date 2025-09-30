@@ -3,10 +3,11 @@ package com.security.pki.certificate.services;
 import com.security.pki.auth.services.AuthService;
 import com.security.pki.certificate.dtos.CertificateDetailsResponseDto;
 import com.security.pki.certificate.dtos.CertificateResponseDto;
-import com.security.pki.certificate.dtos.CreateCertificateDto;
+import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateStorageException;
+import com.security.pki.certificate.exceptions.KeyPairRetrievalException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
@@ -16,12 +17,13 @@ import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;
 import com.security.pki.certificate.utils.CertificateUtils;
 import com.security.pki.certificate.utils.KeyStoreService;
-import com.security.pki.certificate.validators.CertificateValidationContext;
-import com.security.pki.certificate.validators.CertificateValidator;
+import com.security.pki.certificate.validators.certificate.CertificateValidationContext;
+import com.security.pki.certificate.validators.certificate.CertificateValidator;
+import com.security.pki.certificate.validators.certificate.CertificateValidityPeriodValidator;
 import com.security.pki.shared.models.PagedResponse;
-import com.security.pki.shared.services.LoggerService;
 import com.security.pki.user.enums.Role;
 import com.security.pki.user.models.User;
+import com.security.pki.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +51,12 @@ public class CertificateService {
 
     private final AuthService authService;
     private final CryptoService cryptoService;
+    private final UserService userService;
     private final CertificateGenerator certificateGenerator;
     private final KeyStoreService keyStoreService;
-    private final LoggerService loggerService;
 
     private final CertificateMapper mapper;
+    private final CertificateValidityPeriodValidator validityPeriodValidator;
     private final List<CertificateValidator> validators;
 
     @Transactional
@@ -87,7 +90,6 @@ public class CertificateService {
         }
     }
 
-
     private X500Name buildX500Name(CreateRootCertificateRequest request) {
         final X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
 
@@ -114,34 +116,65 @@ public class CertificateService {
                 .build();
     }
 
-    public void createSubordinateCertificate(CreateCertificateDto request) {
-        final KeyPair keyPair = cryptoService.generateKeyPair();
-        String signingSerialNumber = request.getSigningSerialNumber();
-        Certificate signingCertificate = null;
+    @Transactional
+    public void createSubordinateCertificate(CreateSubordinateCertificateDto request) {
+        UUID signingCertificateId = request.getSigningCertificateId();
+        Certificate signingCertificate = findById(signingCertificateId);
+        User user =  userService.findById(request.getUserId());
 
-        if (signingSerialNumber != null)
-            signingCertificate = findBySerialNumber(signingSerialNumber);
+        X500Name subjectX500Name = buildX500Name(request, user);
+        X500Name issuerX500Name = signingCertificate.getIssuer().toX500Name();
+
+        final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
+        final KeyPair keyPair = cryptoService.generateKeyPair();
+        final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
 
         CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
 
         for (CertificateValidator validator : validators)
             validator.validate(context);
+
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, keyPair, subjectX500Name, serialNumber, parentKeyPair);
+        Certificate certificate = buildCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
+        storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
+    }
+
+    private X500Name buildX500Name(CreateSubordinateCertificateDto request, User user) {
+        final X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+
+        builder.addRDN(BCStyle.CN, request.getCommonName());
+        builder.addRDN(BCStyle.O, user.getOrganization());
+        builder.addRDN(BCStyle.OU, request.getOrganizationalUnit());
+        builder.addRDN(BCStyle.C, request.getCountry());
+        builder.addRDN(BCStyle.ST, request.getState());
+        builder.addRDN(BCStyle.L, request.getLocality());
+
+        return builder.build();
+    }
+
+    private Certificate buildCertificateEntity(CreateSubordinateCertificateDto request, BigInteger serialNumber,X500Name subjectX500Name, X500Name issuerX500Name, User user, Certificate signingCertificate) {
+        return Certificate.builder()
+                .id(UUID.randomUUID())
+                .serialNumber(serialNumber.toString())
+                .subject(new Subject(subjectX500Name))
+                .issuer(new Issuer(issuerX500Name))
+                .validFrom(request.getValidFrom())
+                .validTo(request.getValidTo())
+                .owner(user)
+                .parent(signingCertificate)
+                .status(Status.ACTIVE)
+                .canSign(request.getCanSign())
+                .build();
     }
 
     @Transactional
     public Resource exportAsPkcs12(String serialNumber) {
         Certificate certificate = findBySerialNumber(serialNumber);
+        KeyPair keyPair = loadKeyPair(certificate);
+
         try {
             X509Certificate cert = mapper.toX509(certificate);
-
-            SecretKey masterKey = cryptoService.loadMasterKey();
-            SecretKey dek = cryptoService.unwrapDek(masterKey, certificate.getWrappedDek());
-
-            byte[] privateKeyBytes = cryptoService.decrypt(dek, certificate.getEncryptedPrivateKey());
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
-            return keyStoreService.generatePkcs12Resource("alias", privateKey, "changeit".toCharArray(), new java.security.cert.Certificate[]{cert});
-
+            return keyStoreService.generatePkcs12Resource("alias", keyPair.getPrivate(), "changeit".toCharArray(), new java.security.cert.Certificate[]{cert});
         } catch (Exception e) {
             throw new CertificateDownloadException("An error occurred while generating the certificate. Please try again later.");
         }
@@ -152,6 +185,10 @@ public class CertificateService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Certificate with serial number '%s' was not found.", serialNumber)
                 ));
+    }
+
+    public Certificate findById(UUID id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found."));
     }
 
     @Transactional
@@ -192,6 +229,25 @@ public class CertificateService {
         List<Certificate> all = new ArrayList<>(collected.values());
         all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
         return mapper.toPagedResponse(toPage(all, pageable));
+    }
+
+
+    private KeyPair loadKeyPair(Certificate certificate) {
+        try {
+            X509Certificate cert = mapper.toX509(certificate);
+
+            SecretKey masterKey = cryptoService.loadMasterKey();
+            SecretKey dek = cryptoService.unwrapDek(masterKey, certificate.getWrappedDek());
+
+            byte[] privateKeyBytes = cryptoService.decrypt(dek, certificate.getEncryptedPrivateKey());
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+
+            PublicKey publicKey = cert.getPublicKey();
+            return new KeyPair(publicKey, privateKey);
+        } catch (Exception e) {
+            throw new KeyPairRetrievalException(String.format("Error while loading key pair: %s", e.getMessage()));
+        }
     }
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {
