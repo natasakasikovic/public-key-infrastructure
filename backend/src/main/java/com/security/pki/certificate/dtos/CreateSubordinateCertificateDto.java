@@ -8,17 +8,23 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CreateRootCertificateRequest {
+public class CreateSubordinateCertificateDto {
+    @NotNull(message = "User is required")
+    private UUID userId;
+
     @NotNull(message = "Valid-from date is required")
     private Date validFrom;
 
     @NotNull(message = "Valid-to date is required")
     private Date validTo;
+
+    @NotNull(message = "Signing certificate is required")
+    private UUID signingCertificateId;
 
     @NotEmpty(message = "Key usages are required")
     private List<String> keyUsages;
@@ -28,9 +34,6 @@ public class CreateRootCertificateRequest {
 
     @NotEmpty(message = "Common Name (CN) is required")
     private String commonName;
-
-    @NotEmpty(message = "Organization (O) is required")
-    private String organization;
 
     @NotEmpty(message = "Country (C) is required")
     @Size(min = 2, max = 2, message = "Country code must be 2 letters (ISO 3166)")
@@ -42,4 +45,7 @@ public class CreateRootCertificateRequest {
     private String state;
 
     private String locality;
+
+    @NotNull
+    private Boolean canSign;
 }
