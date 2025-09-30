@@ -1,10 +1,11 @@
 package com.security.pki.user.services;
 
-import com.security.pki.security.utils.JwtUtil;
+import com.security.pki.shared.models.PagedResponse;
 import com.security.pki.shared.services.EmailService;
 import com.security.pki.shared.services.LoggerService;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
+import com.security.pki.user.dtos.UserResponseDto;
 import com.security.pki.user.exceptions.ActivationTokenAlreadyUsedException;
 import com.security.pki.user.exceptions.ActivationTokenExpiredException;
 import com.security.pki.user.exceptions.EmailAlreadyTakenException;
@@ -13,6 +14,7 @@ import com.security.pki.user.models.ActivationToken;
 import com.security.pki.user.models.User;
 import com.security.pki.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,10 @@ public class UserService {
         } else {
             throw new ActivationTokenExpiredException("Activation token expired.");
         }
+    }
+
+    public PagedResponse<UserResponseDto> getUsers(Pageable pageable) {
+        return mapper.toPagedResponse(repository.findAll(pageable));
     }
 
     public User findByEmail(String email) {
