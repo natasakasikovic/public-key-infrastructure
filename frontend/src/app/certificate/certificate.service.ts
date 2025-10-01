@@ -67,5 +67,11 @@ export class CertificateService {
   revokeCertificate(id: string, reason: RevocationRequest): Observable<RevocationResponse> {
     return this.httpClient.post<RevocationResponse>(`${env.apiHost}/certificates/${id}/revocation`, reason);
   }
+
+  getCrl(serialNumber: string): Observable<Blob> {
+    return this.httpClient.get(`${env.apiHost}/certificates/${serialNumber}/crl`, {
+      responseType: 'blob'
+    });
+  }
   
 }

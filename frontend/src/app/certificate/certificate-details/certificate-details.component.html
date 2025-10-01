@@ -48,6 +48,11 @@
   </mat-card-content>
 
   <mat-card-actions align="end">
-    <button mat-stroked-button color="primary" (click)="onDownload()">Download</button>
-  </mat-card-actions>
+  <button mat-stroked-button color="primary" (click)="onCrlDownload()" class="action-btn">
+    CRL check
+  </button>
+  <button mat-stroked-button color="primary" (click)="onDownload()" class="action-btn">
+    Download
+  </button>
+</mat-card-actions>
 </mat-card>

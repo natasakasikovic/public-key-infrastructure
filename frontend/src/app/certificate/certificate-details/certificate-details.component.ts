@@ -54,4 +54,23 @@ export class CertificateDetailsComponent implements OnInit {
       }
     });
   }
+
+  onCrlDownload(): void {
+    if (!this.data) return;
+    this.certificateService.getCrl(this.data.serialNumber).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a'); 
+        a.href = url;
+        a.download = `cert-${this.data?.serialNumber}.crl`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }, 
+      error: (err) => {
+        this.toasterService.error("Failed to download CRL. Please try again later.");
+      }
+    });
+  }
 }
