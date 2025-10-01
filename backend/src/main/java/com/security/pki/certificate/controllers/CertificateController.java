@@ -62,8 +62,18 @@ public class CertificateController {
     }
 
     @PostMapping("/{id}/revocation")
-    public ResponseEntity<Void> revokeCertificate(@PathVariable UUID id, @Valid @RequestBody RevocationRequestDto request) {
-        revocationService.revoke(id, request);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<RevocationResponseDto> revokeCertificate(
+            @PathVariable UUID id,
+            @Valid @RequestBody RevocationRequestDto request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(revocationService.revoke(id, request));
+    }
+
+    @GetMapping("/{serialNumber}/crl")
+    public ResponseEntity<Resource> getCrl(@PathVariable String serialNumber) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(revocationService.getCrl(serialNumber));
     }
 }

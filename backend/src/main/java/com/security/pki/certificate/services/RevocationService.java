@@ -11,6 +11,7 @@ import com.security.pki.certificate.models.CertificateRevocation;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.repositories.CertificateRevocationRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CRLNumber;
@@ -22,6 +23,8 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CRLConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -114,7 +117,7 @@ public class RevocationService {
             JcaX509CRLConverter converter = new JcaX509CRLConverter().setProvider("BC");
             X509CRL crl = converter.getCRL(crlHolder);
 
-            Path crlPath = Paths.get("src","main", "resources", "crl", caCertEntity.getId() + ".crl");
+            Path crlPath = Paths.get("crl", caCertEntity.getSerialNumber() + ".crl");
             Files.createDirectories(crlPath.getParent());
             Files.write(crlPath, crl.getEncoded());
 
@@ -123,4 +126,20 @@ public class RevocationService {
         }
     }
 
+    @Transactional
+    public Resource getCrl(String serialNumber) {
+        Certificate certificate = certificateRepository.findBySerialNumber(serialNumber).orElse(null);
+
+        if (certificate == null)
+            throw new EntityNotFoundException("Certificate not found.");
+
+        Resource resource = new FileSystemResource(
+                Paths.get("crl", serialNumber + ".crl")
+        );
+
+        if (!resource.exists())
+            throw new EntityNotFoundException("Certificate revocation list not found");
+
+        return resource;
+    }
 }

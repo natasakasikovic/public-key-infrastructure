@@ -16,6 +16,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -29,6 +30,9 @@ import java.util.List;
 
 @Component
 public class CertificateGenerator {
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     public X509Certificate generateRootCertificate(CreateRootCertificateRequest request, KeyPair keyPair, BigInteger serialNumber, X500Name x500Name) {
         try {
@@ -57,7 +61,9 @@ public class CertificateGenerator {
             SubjectKeyIdentifier ski = new JcaX509ExtensionUtils().createSubjectKeyIdentifier(keyPair.getPublic());
             certBuilder.addExtension(Extension.subjectKeyIdentifier, false, ski);
 
-            // TODO: add CRLDistPoint
+            // CRLDistPoint
+            CRLDistPoint distPoint = buildCRLDistPoint(serialNumber);
+            certBuilder.addExtension(Extension.cRLDistributionPoints, false, distPoint);
 
             final X509CertificateHolder certHolder = certBuilder.build(contentSigner);
             return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
@@ -120,7 +126,9 @@ public class CertificateGenerator {
             GeneralNames subjectAltNames = new GeneralNames(sanList.toArray(new GeneralName[0]));
             certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltNames);
 
-            // TODO: add CRLDistPoint - when implementing logic revoked certificates
+            // CRLDistPoint
+            CRLDistPoint distPoint = buildCRLDistPoint(serialNumber);
+            certBuilder.addExtension(Extension.cRLDistributionPoints, false, distPoint);
 
             final X509CertificateHolder certHolder = certBuilder.build(contentSigner);
             return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
@@ -134,5 +142,17 @@ public class CertificateGenerator {
         } catch (NoSuchAlgorithmException e) {
             throw new CertificateGenerationException(String.format("Required cryptographic algorithm not found: %s", e.getMessage()));
         }
+    }
+
+    private CRLDistPoint buildCRLDistPoint(BigInteger serialNumber) {
+        String crlUrl = String.format("%s/%d/crl", baseUrl, serialNumber);
+
+        return new CRLDistPoint(new DistributionPoint[]{
+                new DistributionPoint(
+                        null,
+                        null,
+                        new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, crlUrl))
+                )
+        });
     }
 }
