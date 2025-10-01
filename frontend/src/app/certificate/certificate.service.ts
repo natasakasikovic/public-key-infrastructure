@@ -10,7 +10,6 @@ import {CertificateDetails} from './models/certificate-details-response.model';
 import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
 import { RevocationRequest } from './models/revocation-request.model';
 import { RevocationResponse } from './models/revocation-response.model';
-import { CaCertificate } from './models/ca-certificate.model';
 
 @Injectable({
   providedIn: 'root',
@@ -80,10 +79,6 @@ export class CertificateService {
     .set('page', page)
     .set('size', size);
     return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });  
-  }
-
-  getAvailableCaCertificates(): Observable<CaCertificate[]> {
-    return this.httpClient.get<CaCertificate[]>(`${env.apiHost}/certificates/available-ca`);
   }
 
   createCSRSelfGenerate(caCertificateId: string, validTo: string, pemFile: File): Observable<void> {

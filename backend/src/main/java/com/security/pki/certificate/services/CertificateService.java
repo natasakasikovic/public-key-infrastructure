@@ -117,7 +117,7 @@ public class CertificateService {
     }
 
     @Transactional
-    public void createSubordinateCertificate(CreateSubordinateCertificateDto request) {
+    public void createSubordinateCertificate(CreateSubordinateCertificateDto request, PublicKey publicKey) {
         UUID signingCertificateId = request.getSigningCertificateId();
         Certificate signingCertificate = findById(signingCertificateId);
         User user = null;
@@ -129,6 +129,8 @@ public class CertificateService {
 
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final KeyPair keyPair = cryptoService.generateKeyPair();
+        if (publicKey == null)
+            publicKey = keyPair.getPublic();
         final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
 
         CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
@@ -136,7 +138,7 @@ public class CertificateService {
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, keyPair, subjectX500Name, serialNumber, parentKeyPair);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, parentKeyPair);
         Certificate certificate = buildCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
@@ -294,14 +296,5 @@ public class CertificateService {
             content = source.subList(start, end);
         }
         return new PageImpl<>(content, pageable, total);
-    }
-
-    @Transactional
-    public List<CaCertificateDto> getAvailableCaCertificates() {
-        return repository
-                .findByCanSignTrueAndStatusAndValidToAfter(Status.ACTIVE, new Date())
-                .stream()
-                .map(mapper::toCaCertificateDto)
-                .toList();
     }
 }
