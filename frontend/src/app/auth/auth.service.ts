@@ -22,6 +22,10 @@ export class AuthService {
     return this.http.post<void>(`${env.apiHost}/users/registration`, request);
   }
 
+  registerCaUser(request: RegisterRequest): Observable<void> {
+    return this.http.post<void>(`${env.apiHost}/users/ca-registration`, request);
+  }
+
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${env.apiHost}/auth/login`, request);
   }
@@ -82,4 +86,5 @@ export class AuthService {
       return null;
     }
   }
+
 }

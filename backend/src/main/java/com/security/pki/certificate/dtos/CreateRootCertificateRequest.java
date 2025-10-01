@@ -9,8 +9,7 @@ import lombok.*;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -20,12 +19,6 @@ public class CreateRootCertificateRequest {
 
     @NotNull(message = "Valid-to date is required")
     private Date validTo;
-
-    @NotEmpty(message = "Key usages are required")
-    private List<String> keyUsages;
-
-    @NotEmpty(message = "Extended key usages are required")
-    private List<String> extendedKeyUsages;
 
     @NotEmpty(message = "Common Name (CN) is required")
     private String commonName;

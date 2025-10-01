@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class CertificateTemplateService {
         return mapper.toResponse(repository.save(template));
     }
 
-    public CertificateTemplateDto getTemplate(Long id) {
+    public CertificateTemplateDto getTemplate(UUID id) {
         return mapper.toResponse(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found")));
     }
@@ -43,7 +44,7 @@ public class CertificateTemplateService {
         return repository.findByIssuer(name).stream().map(mapper::toResponse).toList();
     }
 
-    public CertificateTemplateDto updateTemplate(Long id, CertificateTemplateDto request) {
+    public CertificateTemplateDto updateTemplate(UUID id, CertificateTemplateDto request) {
         CertificateTemplate existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found"));
         CertificateTemplate updated = CertificateTemplate.builder()
@@ -59,7 +60,7 @@ public class CertificateTemplateService {
         return mapper.toResponse(repository.save(updated));
     }
 
-    public void deleteTemplate(Long id) {
+    public void deleteTemplate(UUID id) {
         repository.deleteById(id);
     }
 

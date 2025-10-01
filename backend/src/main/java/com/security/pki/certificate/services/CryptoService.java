@@ -1,5 +1,6 @@
 package com.security.pki.certificate.services;
 
+import com.security.pki.certificate.exceptions.KeyGenerationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,15 @@ public class CryptoService {
     @Value("${app.master-key}")
     private String masterPublicKeyBase64;
 
-    public KeyPair generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-        keyGen.initialize(2048, random);
-        return keyGen.generateKeyPair();
+    public KeyPair generateKeyPair() {
+        try {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(2048, random);
+            return keyGen.generateKeyPair();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new KeyGenerationException( String.format("Error while generating key pair: %s", e.getMessage()));
+        }
     }
 
     public byte[] encrypt(SecretKey dek, byte[] plaintext) throws GeneralSecurityException {

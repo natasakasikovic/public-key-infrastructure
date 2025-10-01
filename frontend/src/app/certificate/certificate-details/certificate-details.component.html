@@ -1,6 +1,8 @@
 <mat-card class="certificate-card">
-  <mat-card-header>
+  <mat-card-header class="header-with-badge">
     <mat-card-title>Certificate</mat-card-title>
+
+    <span *ngIf="data?.status === 'REVOKED'" class="revoked-badge">REVOKED</span>
   </mat-card-header>
 
   <mat-card-content>
@@ -48,6 +50,11 @@
   </mat-card-content>
 
   <mat-card-actions align="end">
-    <button mat-stroked-button color="primary" (click)="onDownload()">Download</button>
-  </mat-card-actions>
+  <button mat-stroked-button color="primary" (click)="onCrlDownload()" class="action-btn">
+    CRL check
+  </button>
+  <button mat-stroked-button color="primary" (click)="onDownload()" class="action-btn">
+    Download
+  </button>
+</mat-card-actions>
 </mat-card>

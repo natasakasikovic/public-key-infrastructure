@@ -7,6 +7,10 @@ import { PagedResponse } from '../shared/model/paged-response';
 import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
+import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
+import { RevocationRequest } from './models/revocation-request.model';
+import { RevocationResponse } from './models/revocation-response.model';
+import { CaCertificate } from './models/ca-certificate.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +34,10 @@ export class CertificateService {
     return this.httpClient.post<void>(`${env.apiHost}/certificates/root`, request);
   }
 
+  createSubordinateCertificate(request: CreateSubordinateCertificateRequest): Observable<void> {
+    return this.httpClient.post<void>(`${env.apiHost}/certificates/subordinate`, request);
+  }
+ 
   getCertificate(id: string): Observable<CertificateDetails> {
     return this.httpClient.get<CertificateDetails>(`${env.apiHost}/certificates/${id}`);
   }
@@ -48,5 +56,45 @@ export class CertificateService {
       `${env.apiHost}/certificates/end-entities/`,
       { params: params }
     );
+  }
+
+  getValidCACertificates(page: number, size: number) : Observable<PagedResponse<CertificateResponse>>{
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-cas`, { params: params });
+  }
+
+  revokeCertificate(id: string, reason: RevocationRequest): Observable<RevocationResponse> {
+    return this.httpClient.post<RevocationResponse>(`${env.apiHost}/certificates/${id}/revocation`, reason);
+  }
+
+  getCrl(serialNumber: string): Observable<Blob> {
+    return this.httpClient.get(`${env.apiHost}/certificates/${serialNumber}/crl`, {
+      responseType: 'blob'
+    });
+  }
+  
+  getAuthorizedIssuableCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
+  const params = new HttpParams()
+    .set('page', page)
+    .set('size', size);
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });  
+  }
+
+  getAvailableCaCertificates(): Observable<CaCertificate[]> {
+    return this.httpClient.get<CaCertificate[]>(`${env.apiHost}/certificates/available-ca`);
+  }
+
+  createCSRSelfGenerate(caCertificateId: string, validTo: string, pemFile: File): Observable<void> {
+      const formData = new FormData();
+      formData.append('caCertificateId', caCertificateId);
+      formData.append('validTo', validTo);
+      formData.append('pemFile', pemFile);
+
+      return this.httpClient.post<void>(
+        `${env.apiHost}/certificates/csr/self-generation`, 
+        formData
+      );
   }
 }

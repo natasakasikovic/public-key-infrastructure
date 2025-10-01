@@ -59,4 +59,10 @@ public class Certificate {
 
     @Column(name = "can_sign", nullable = false)
     private boolean canSign = false;
+
+    @Column(name = "crl_distribution_point")
+    private String crlDistributionPoint;
+
+    @Column(name = "path_len_constraint")
+    private Integer pathLenConstraint;
 }

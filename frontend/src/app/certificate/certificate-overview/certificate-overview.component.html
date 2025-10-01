@@ -25,7 +25,12 @@
   <ng-container matColumnDef="revoke">
     <th mat-header-cell *matHeaderCellDef> Revoke Certificate </th>
     <td mat-cell *matCellDef="let cert">
-      <button mat-button color="warn" (click)="revokeCertificate(cert)">Revoke</button>
+      <ng-container *ngIf="cert.status !== 'REVOKED'; else revokedLabel">
+        <button mat-button color="warn" (click)="revokeCertificate(cert)">Revoke</button>
+      </ng-container>
+      <ng-template #revokedLabel>
+        <span class="revoked-label">REVOKED</span>
+      </ng-template>
     </td>
   </ng-container>
 

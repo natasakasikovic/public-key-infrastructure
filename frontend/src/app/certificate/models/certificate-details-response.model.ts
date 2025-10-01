@@ -7,6 +7,7 @@ export interface CertificateDetails {
   validTo: Date;
   keyUsages: string[];
   extendedKeyUsages: string[];
+  status: string
 }
 
 export interface PartyInfo {

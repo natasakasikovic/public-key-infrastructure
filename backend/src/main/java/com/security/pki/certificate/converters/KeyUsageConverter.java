@@ -7,10 +7,14 @@ public class KeyUsageConverter {
 
     private KeyUsageConverter() {}
 
-    public static int convertKeyUsageToInt(List<String> keyUsages) {
+    public static int convertKeyUsageToInt(List<String> keyUsages, boolean isCA) {
         int usage = 0;
-        if(keyUsages == null || keyUsages.isEmpty())
-            return 0;
+
+        if (isCA)
+            usage |= KeyUsage.keyCertSign | KeyUsage.cRLSign;
+
+        if (keyUsages == null || keyUsages.isEmpty())
+           return usage;
 
         for (String ku : keyUsages) {
             switch (ku) {

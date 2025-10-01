@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/templates")
@@ -26,7 +27,7 @@ public class CertificateTemplateController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<CertificateTemplateDto> getTemplate(@PathVariable Long id) {
+    public ResponseEntity<CertificateTemplateDto> getTemplate(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getTemplate(id));
     }
 
@@ -44,7 +45,7 @@ public class CertificateTemplateController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<CertificateTemplateDto> updateTemplate(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody CertificateTemplateDto request
     ) {
         return ResponseEntity.ok(service.updateTemplate(id, request));
@@ -52,7 +53,7 @@ public class CertificateTemplateController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<Void> deleteTemplate(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTemplate(@PathVariable UUID id) {
         service.deleteTemplate(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
