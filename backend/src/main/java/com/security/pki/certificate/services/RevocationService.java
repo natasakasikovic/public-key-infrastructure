@@ -149,6 +149,7 @@ public class RevocationService {
         return resource;
     }
 
+    @Transactional
     public byte[] generateEmptyCrl(PrivateKey caPrivateKey, X509Certificate caCert) {
         try {
             X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(
