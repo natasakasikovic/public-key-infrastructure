@@ -73,8 +73,6 @@ public class TestCertificateSeeder implements CommandLineRunner {
                 .validFrom(new Date())
                 .validTo(Date.from(LocalDate.now().plusYears(2)
                         .atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                .keyUsages(List.of("Digital Signature", "Key Encipherment"))
-                .extendedKeyUsages(List.of("TSL Web Server Authentication"))
                 .build();
 
         X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);

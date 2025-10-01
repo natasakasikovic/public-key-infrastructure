@@ -1,9 +1,7 @@
 package com.security.pki.certificate.dtos;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.Date;
@@ -13,14 +11,14 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CreateSubordinateCertificateDto {
-    @NotNull(message = "User is required")
-    private UUID userId;
-
     @NotNull(message = "Valid-from date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date validFrom;
 
     @NotNull(message = "Valid-to date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date validTo;
 
     @NotNull(message = "Signing certificate is required")
@@ -40,11 +38,15 @@ public class CreateSubordinateCertificateDto {
     @Pattern(regexp = "^[A-Z]{2}$", message = "Country code must be uppercase ISO code")
     private String country;
 
+    private Long userId;
+
     private String organizationalUnit;
 
     private String state;
 
     private String locality;
+
+    private Integer pathLenConstraint;
 
     @NotNull
     private Boolean canSign;

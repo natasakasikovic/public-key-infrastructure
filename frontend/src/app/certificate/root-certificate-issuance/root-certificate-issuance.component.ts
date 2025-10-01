@@ -22,14 +22,12 @@ import { Router } from '@angular/router';
 })
 export class RootCertificateIssuanceComponent implements OnInit {
   rootCertForm!: FormGroup;
-  keyUsageOptions = KEY_USAGE_OPTIONS;
-  extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
 
   constructor(
     private fb: FormBuilder,
     private service: CertificateService,
     private toasterService: ToastrService,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -42,17 +40,7 @@ export class RootCertificateIssuanceComponent implements OnInit {
       locality: [''],
       validFrom: ['', Validators.required],
       validTo: ['', Validators.required],
-      keyUsages: this.fb.array([]),
-      extendedKeyUsages: this.fb.array([]),
     });
-  }
-
-  get keyUsages(): FormArray {
-    return this.rootCertForm.get('keyUsages') as FormArray;
-  }
-
-  get extendedKeyUsages(): FormArray {
-    return this.rootCertForm.get('extendedKeyUsages') as FormArray;
   }
 
   onCheckboxChange(event: any, formArray: FormArray) {

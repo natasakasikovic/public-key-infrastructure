@@ -62,4 +62,7 @@ public class Certificate {
 
     @Column(name = "crl_distribution_point")
     private String crlDistributionPoint;
+
+    @Column(name = "path_len_constraint")
+    private Integer pathLenConstraint;
 }

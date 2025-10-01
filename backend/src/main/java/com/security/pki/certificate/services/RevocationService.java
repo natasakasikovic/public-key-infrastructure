@@ -54,6 +54,7 @@ public class RevocationService {
     private final CertificateRevocationRepository repository;
     private final CertificateRevocationMapper mapper;
 
+    @Transactional
     public RevocationResponseDto revoke(UUID certificateId, RevocationRequestDto request) {
         Certificate certificate = certificateRepository.findById(certificateId).orElse(null);
 

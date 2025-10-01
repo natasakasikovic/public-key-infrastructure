@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -49,10 +48,7 @@ public class CertificateGenerator {
             );
 
             // key usages
-            certBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(request.getKeyUsages(), true)));
-
-            // extended key usages
-            certBuilder.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(ExtendedKeyUsageConverter.convertToExtendedKeyUsages(request.getExtendedKeyUsages())));
+            certBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(null, true)));
 
             // basic constraints
             certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
@@ -79,10 +75,10 @@ public class CertificateGenerator {
         }
     }
 
-    public X509Certificate generateSubordinateCertificate(CreateSubordinateCertificateDto request, Certificate signingCertificate, KeyPair keyPair, X500Name subject, BigInteger serialNumber, PublicKey parentPublicKey) {
+    public X509Certificate generateSubordinateCertificate(CreateSubordinateCertificateDto request, Certificate signingCertificate, KeyPair keyPair, X500Name subject, BigInteger serialNumber, KeyPair parentKeyPair) {
         try {
             final ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
-                    .setProvider("BC").build(keyPair.getPrivate());
+                    .setProvider("BC").build(parentKeyPair.getPrivate());
 
             X500Name issuer = signingCertificate.getSubject().toX500Name();
 
@@ -100,12 +96,12 @@ public class CertificateGenerator {
             certBuilder.addExtension(Extension.subjectKeyIdentifier, false, subjectKeyIdentifier);
 
             // authority key identifier
-            AuthorityKeyIdentifier aki = new JcaX509ExtensionUtils().createAuthorityKeyIdentifier(parentPublicKey);
+            AuthorityKeyIdentifier aki = new JcaX509ExtensionUtils().createAuthorityKeyIdentifier(parentKeyPair.getPublic());
             certBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 
             // basic constraints
             if (request.getCanSign()) // if it is intermediate, set basic constraints to true, otherwise false (end-entity)
-                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(request.getPathLenConstraint()));
             else
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
 
