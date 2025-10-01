@@ -4,6 +4,7 @@ import {switchMap} from 'rxjs';
 import {CertificateService} from '../certificate.service';
 import {ActivatedRoute} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-certificate-details',
@@ -68,8 +69,8 @@ export class CertificateDetailsComponent implements OnInit {
         a.remove();
         window.URL.revokeObjectURL(url);
       }, 
-      error: (err) => {
-        this.toasterService.error("Failed to download CRL. Please try again later.");
+      error: (err: HttpErrorResponse) => {
+        this.toasterService.error(err.error?.message, "Error");
       }
     });
   }
