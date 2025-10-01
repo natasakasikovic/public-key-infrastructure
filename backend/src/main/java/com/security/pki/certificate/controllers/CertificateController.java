@@ -64,6 +64,6 @@ public class CertificateController {
 
     @GetMapping("valid-cas")
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidSigningCertificates(Pageable pageable) {
-        return ResponseEntity.ok(service.getCertificates(pageable)); // TODO: replace method call
+        return ResponseEntity.ok(service.getValidParentCas(pageable));
     }
 }

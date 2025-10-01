@@ -190,13 +190,13 @@
 
         <!-- Intermediate Level (only visible if INTERMEDIATE is selected) -->
         <div class="form-group mt-3" *ngIf="certificateForm.get('certificateType')?.value === 'INTERMEDIATE'">
-          <label for="intermediateLevel">
+          <label for="pathLenConstraint">
             Intermediate Level (max depth of CAs that this cert can issue)*:
             <input
               type="number"
-              id="intermediateLevel"
+              id="pathLenConstraint"
               class="form-control"
-              formControlName="intermediateLevel"
+              formControlName="pathLenConstraint"
               min="0"
               required
             />

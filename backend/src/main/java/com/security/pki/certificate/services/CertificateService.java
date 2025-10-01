@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -55,6 +56,7 @@ public class CertificateService {
     private final CertificateGenerator certificateGenerator;
     private final KeyStoreService keyStoreService;
 
+    private final CertificateValidityPeriodValidator rootValidator;
     private final CertificateMapper mapper;
     private final List<CertificateValidator> validators;
 
@@ -64,6 +66,7 @@ public class CertificateService {
         final X500Name x500Name = buildX500Name(request);
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
+        rootValidator.validate(new CertificateValidationContext(null, certificate));
         certificate.setOwner(authService.getCurrentUser());
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
@@ -112,6 +115,7 @@ public class CertificateService {
                 .validTo(request.getValidTo())
                 .status(Status.ACTIVE)
                 .canSign(true)
+                .pathLenConstraint(null) // for root
                 .build();
     }
 
@@ -163,6 +167,7 @@ public class CertificateService {
                 .parent(signingCertificate)
                 .status(Status.ACTIVE)
                 .canSign(request.getCanSign())
+                .pathLenConstraint(request.getPathLenConstraint() != null ? request.getPathLenConstraint() : signingCertificate.getPathLenConstraint() - 1)
                 .build();
     }
 
@@ -247,6 +252,12 @@ public class CertificateService {
         } catch (Exception e) {
             throw new KeyPairRetrievalException(String.format("Error while loading key pair: %s", e.getMessage()));
         }
+    }
+
+    @Transactional
+    public PagedResponse<CertificateResponseDto> getValidParentCas(Pageable pageable) {
+        Page<Certificate> certificates = repository.findValidParentCas(Status.REVOKED, LocalDateTime.now(), pageable);
+        return mapper.toPagedResponse(certificates);
     }
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {

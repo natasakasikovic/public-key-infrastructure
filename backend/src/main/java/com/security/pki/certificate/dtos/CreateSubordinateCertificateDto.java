@@ -46,7 +46,7 @@ public class CreateSubordinateCertificateDto {
 
     private String locality;
 
-    private Integer intermediateLevel;
+    private Integer pathLenConstraint;
 
     @NotNull
     private Boolean canSign;

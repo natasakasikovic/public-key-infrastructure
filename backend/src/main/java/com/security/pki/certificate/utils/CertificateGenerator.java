@@ -95,7 +95,7 @@ public class CertificateGenerator {
 
             // basic constraints
             if (request.getCanSign()) // if it is intermediate, set basic constraints to true, otherwise false (end-entity)
-                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(request.getIntermediateLevel()));
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(request.getPathLenConstraint()));
             else
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
 
