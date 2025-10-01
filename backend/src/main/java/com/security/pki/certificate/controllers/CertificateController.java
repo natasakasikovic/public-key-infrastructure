@@ -39,9 +39,9 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createCertificate(@RequestBody CreateCertificateDto request) {
-        service.createCertificate(request);
+    @PostMapping("/subordinate")
+    public ResponseEntity<Void> createSubordinateCertificate(@RequestBody @Valid CreateSubordinateCertificateDto request) {
+        service.createSubordinateCertificate(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -49,7 +49,6 @@ public class CertificateController {
     public ResponseEntity<CertificateDetailsResponseDto> getCertificate(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getCertificate(id));
     }
-
 
     @GetMapping("/{serialNumber}/download")
     public ResponseEntity<Resource> downloadCertificate(@PathVariable String serialNumber) {
@@ -76,10 +75,21 @@ public class CertificateController {
         return ResponseEntity.ok(service.getCertificates(pageable));
     }
 
+    @GetMapping("valid-cas")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidSigningCertificates(Pageable pageable) {
+        return ResponseEntity.ok(service.getValidParentCas(pageable));
+    }
+
+    @GetMapping("/valid-authorized-cas")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidAuthorizedCAs(Pageable pageable) {
+        return ResponseEntity.ok(service.getAuthorizedIssuingCertificatesForUser(pageable));
+    }
+
     @GetMapping("/available-ca")
     @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
     public ResponseEntity<List<CaCertificateDto>> getAvailableCaCertificates() {
         return ResponseEntity.ok(service.getAvailableCaCertificates());
     }
-
 }

@@ -7,21 +7,16 @@ import { TemplateCardComponent } from './template-card/template-card.component';
 import { RouterLink } from '@angular/router';
 import { EditTemplateComponent } from './edit-template/edit-template.component';
 import { MaterialModule } from '../infrastructure/material/material.module';
-
-
+import { SubordinateCertificateIssuanceComponent } from '../certificate/subordinate-certificate-issuance/subordinate-certificate-issuance.component';
 
 @NgModule({
   declarations: [
     CreateTemplateComponent,
     TemplateOverviewComponent,
     TemplateCardComponent,
-    EditTemplateComponent
+    EditTemplateComponent,
+    SubordinateCertificateIssuanceComponent,
   ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    RouterLink,
-  ]
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule, RouterLink],
 })
-export class TemplateModule { }
+export class TemplateModule {}
