@@ -8,7 +8,7 @@ import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
 import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
-import { RevocationRequest } from './models/revocation-reason.model';
+import { RevocationRequest } from './models/revocation-request.model';
 import { RevocationResponse } from './models/revocation-response.model';
 
 @Injectable({

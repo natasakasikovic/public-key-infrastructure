@@ -1,6 +1,7 @@
 package com.security.pki.certificate.handlers;
 
 import com.security.pki.certificate.exceptions.*;
+import com.security.pki.shared.models.ExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -30,18 +31,24 @@ public class CertificateHandlers {
     }
 
     @ExceptionHandler(RevocationException.class)
-    public ResponseEntity<String> handleRevocationException(RevocationException ex) {
+    public ResponseEntity<ExceptionResponse> handleRevocationException(RevocationException ex) {
         logger.error("Revocation exception: ", ex);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
     }
 
-    @ExceptionHandler(CrlUpdateException.class)
-    public ResponseEntity<String> handleCrlUpdateException(CrlUpdateException ex) {
+    @ExceptionHandler(CrlException.class)
+    public ResponseEntity<ExceptionResponse> handleCrlUpdateException(CrlException ex) {
         logger.error("Crl update exception: ", ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
     }
 }

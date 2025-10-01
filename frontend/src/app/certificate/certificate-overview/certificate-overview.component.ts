@@ -9,6 +9,7 @@ import { RevokeDialogComponent } from '../revoke-dialog/revoke-dialog.component'
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { RevocationResponse } from '../models/revocation-response.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-certificate-overview',
@@ -66,8 +67,8 @@ export class CertificateOverviewComponent implements OnInit {
             this.loadCertificates(this.paginator.pageIndex, this.paginator.pageSize);
             this.toaster.success('Certificate revoked successfully. Reason: ' + response.revocationReason, 'Success');
           },
-          error: () => {
-            this.toaster.error('Failed to revoke the certificate. Please try again.', 'Error');
+          error: (error: HttpErrorResponse) => {
+            this.toaster.error(error.error?.message, 'Error')
           }
         });
       }

@@ -3,7 +3,7 @@ package com.security.pki.certificate.services;
 import com.security.pki.certificate.dtos.RevocationRequestDto;
 import com.security.pki.certificate.dtos.RevocationResponseDto;
 import com.security.pki.certificate.enums.Status;
-import com.security.pki.certificate.exceptions.CrlUpdateException;
+import com.security.pki.certificate.exceptions.CrlException;
 import com.security.pki.certificate.exceptions.RevocationException;
 import com.security.pki.certificate.mappers.CertificateRevocationMapper;
 import com.security.pki.certificate.models.Certificate;
@@ -23,6 +23,7 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CRLConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -122,7 +124,7 @@ public class RevocationService {
             Files.write(crlPath, crl.getEncoded());
 
         } catch (Exception e) {
-            throw new CrlUpdateException("Failed to update CRL");
+            throw new CrlException("Failed to update CRL");
         }
     }
 
@@ -137,9 +139,45 @@ public class RevocationService {
                 Paths.get("crl", serialNumber + ".crl")
         );
 
-        if (!resource.exists())
-            throw new EntityNotFoundException("Certificate revocation list not found");
+        if (!resource.exists()) {
+            KeyPair keyPair = certificateService.loadKeyPair(certificate);
+            PrivateKey caPrivateKey = keyPair.getPrivate();
+            byte[] emptyCrl = generateEmptyCrl(caPrivateKey, toX509Certificate(certificate));
+            return new ByteArrayResource(emptyCrl);
+        }
 
         return resource;
     }
+
+    public byte[] generateEmptyCrl(PrivateKey caPrivateKey, X509Certificate caCert) {
+        try {
+            X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(
+                    new X500Name(caCert.getSubjectX500Principal().getName()),
+                    new Date()
+            );
+
+            Date nextUpdate = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+            crlBuilder.setNextUpdate(nextUpdate);
+
+            JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+            ContentSigner contentSigner = contentSignerBuilder.build(caPrivateKey);
+
+            X509CRLHolder crlHolder = crlBuilder.build(contentSigner);
+            return new JcaX509CRLConverter().getCRL(crlHolder).getEncoded();
+        } catch (Exception e) {
+            throw new CrlException("Failed to generate empty crl");
+        }
+    }
+
+    private X509Certificate toX509Certificate(Certificate certEntity) {
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) cf.generateCertificate(
+                    new ByteArrayInputStream(certEntity.getCertificateData())
+            );
+        } catch (CertificateException e) {
+            throw new CrlException("Failed to convert certificate");
+        }
+    }
+
 }
