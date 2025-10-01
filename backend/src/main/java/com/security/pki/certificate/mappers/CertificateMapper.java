@@ -23,10 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -175,26 +172,20 @@ public class CertificateMapper {
         .build();
   }
 
-  public CertificateRequestDto fromCsr(PKCS10CertificationRequest csr,
+  public CreateSubordinateCertificateDto fromCsr(PKCS10CertificationRequest csr,
       User user,
       String caId,
       String until) {
     X500Name x500 = csr.getSubject();
 
-    return CertificateRequestDto.builder()
+    // TODO: set all attributes
+    return CreateSubordinateCertificateDto.builder()
         .commonName(getRdnValue(x500, BCStyle.CN) != null ? getRdnValue(x500, BCStyle.CN) : "unknown")
-        .surname(getRdnValue(x500, BCStyle.SURNAME) != null ? getRdnValue(x500, BCStyle.SURNAME) : user.getLastName())
-        .givenName(
-            getRdnValue(x500, BCStyle.GIVENNAME) != null ? getRdnValue(x500, BCStyle.GIVENNAME) : user.getFirstName())
-        .organization(getRdnValue(x500, BCStyle.O) != null ? getRdnValue(x500, BCStyle.O) : user.getOrganization())
         .organizationalUnit(getRdnValue(x500, BCStyle.OU))
         .country(getRdnValue(x500, BCStyle.C))
-        .email(getRdnValue(x500, BCStyle.E))
         .userId(user.getId())
-        .validFrom(LocalDate.now())
-        .validTo(LocalDate.parse(until))
-        .caCertificateId(UUID.fromString(caId))
-        .certificateType(CertificateType.END_ENTITY)
+        .validFrom(new Date())
+        .validTo(new Date(until)) // TODO: convert
         .build();
   }
 

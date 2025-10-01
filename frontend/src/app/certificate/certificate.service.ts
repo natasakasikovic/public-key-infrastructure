@@ -8,6 +8,8 @@ import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
 import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
+import { RevocationRequest } from './models/revocation-request.model';
+import { RevocationResponse } from './models/revocation-response.model';
 import { CaCertificate } from './models/ca-certificate.model';
 
 @Injectable({
@@ -63,6 +65,16 @@ export class CertificateService {
     return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-cas`, { params: params });
   }
 
+  revokeCertificate(id: string, reason: RevocationRequest): Observable<RevocationResponse> {
+    return this.httpClient.post<RevocationResponse>(`${env.apiHost}/certificates/${id}/revocation`, reason);
+  }
+
+  getCrl(serialNumber: string): Observable<Blob> {
+    return this.httpClient.get(`${env.apiHost}/certificates/${serialNumber}/crl`, {
+      responseType: 'blob'
+    });
+  }
+  
   getAuthorizedIssuableCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
   const params = new HttpParams()
     .set('page', page)

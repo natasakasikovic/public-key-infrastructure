@@ -125,7 +125,7 @@ public class CertificateService {
         user = (request.getUserId() == null) ? authService.getCurrentUser() : userService.findById(request.getUserId());
 
         X500Name subjectX500Name = buildX500Name(request, user);
-        X500Name issuerX500Name = signingCertificate.getIssuer().toX500Name();
+        X500Name issuerX500Name = signingCertificate.getSubject().toX500Name();
 
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final KeyPair keyPair = cryptoService.generateKeyPair();

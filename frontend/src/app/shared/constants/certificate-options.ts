@@ -12,3 +12,16 @@ export const EXTENDED_KEY_USAGE_OPTIONS: string[] = [
   'Sign Executable Code',
   'Email Protection',
 ];
+
+export const REVOCATION_REASONS: string[] = [
+  'Unspecified',
+  'Key Compromise',
+  'CA Compromise',
+  'Affiliation Changed',
+  'Superseded',
+  'Cessation of Operation',
+  'Certificate Hold',
+  'Remove from CRL',
+  'Privilege Withdrawn',
+  'AA Compromise'
+];

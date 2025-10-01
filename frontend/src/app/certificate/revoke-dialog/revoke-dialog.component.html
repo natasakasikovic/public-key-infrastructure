@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Revoke Certificate</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Reason</mat-label>
+    <mat-select [(value)]="selectedReason">
+      <mat-option *ngFor="let reason of reasons" [value]="reason">
+        {{ reason }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="warn" [disabled]="!selectedReason" (click)="onConfirm()">Revoke</button>
+</mat-dialog-actions>

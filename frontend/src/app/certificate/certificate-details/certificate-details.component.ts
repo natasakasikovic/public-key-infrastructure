@@ -4,6 +4,7 @@ import {switchMap} from 'rxjs';
 import {CertificateService} from '../certificate.service';
 import {ActivatedRoute} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-certificate-details',
@@ -51,6 +52,25 @@ export class CertificateDetailsComponent implements OnInit {
       },
       error: (err) => {
         this.toasterService.error("Failed to download certificate. Please try again later.");
+      }
+    });
+  }
+
+  onCrlDownload(): void {
+    if (!this.data) return;
+    this.certificateService.getCrl(this.data.serialNumber).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a'); 
+        a.href = url;
+        a.download = `cert-${this.data?.serialNumber}.crl`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }, 
+      error: (err: HttpErrorResponse) => {
+        this.toasterService.error(err.error?.message, "Error");
       }
     });
   }

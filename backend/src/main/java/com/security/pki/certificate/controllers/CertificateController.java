@@ -3,6 +3,7 @@ package com.security.pki.certificate.controllers;
 import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
+import com.security.pki.certificate.services.RevocationService;
 import com.security.pki.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import java.util.UUID;
 public class CertificateController {
 
     private final CertificateService service;
+    private final RevocationService revocationService;
     private final CSRService csrService;
 
     @PostMapping("/root")
@@ -73,6 +75,22 @@ public class CertificateController {
     @GetMapping
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getCertificates(pageable));
+    }
+
+    @PostMapping("/{id}/revocation")
+    public ResponseEntity<RevocationResponseDto> revokeCertificate(
+            @PathVariable UUID id,
+            @Valid @RequestBody RevocationRequestDto request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(revocationService.revoke(id, request));
+    }
+
+    @GetMapping("/{serialNumber}/crl")
+    public ResponseEntity<Resource> getCrl(@PathVariable String serialNumber) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(revocationService.getCrl(serialNumber));
     }
 
     @GetMapping("valid-cas")

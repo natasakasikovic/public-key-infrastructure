@@ -1,7 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.CertificateRequestDto;
+import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.exceptions.InvalidCsrException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.user.models.User;
@@ -28,7 +28,7 @@ public class CSRService {
         User user = authService.getCurrentUser();
         PublicKey publicKey = extractKey(csr);
 
-        CertificateRequestDto request = mapper.fromCsr(csr, user, caId, until);
+        CreateSubordinateCertificateDto request = mapper.fromCsr(csr, user, caId, until);
 
 
         // invoke certificate creation

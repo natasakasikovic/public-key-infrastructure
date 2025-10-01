@@ -4,4 +4,5 @@ export interface CertificateResponse {
   certificateType: string;
   issuerEmail: string;
   subjectEmail: string;
+  status: string;
 }
