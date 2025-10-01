@@ -61,4 +61,11 @@ export class CertificateService {
       .set('size', size);
     return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-cas`, { params: params });
   }
+
+  getAuthorizedIssuableCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
+  const params = new HttpParams()
+    .set('page', page)
+    .set('size', size);
+  return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });
+  }
 }

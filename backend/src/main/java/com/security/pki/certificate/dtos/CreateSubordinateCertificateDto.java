@@ -12,9 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateSubordinateCertificateDto {
-    @NotNull(message = "User is required")
-    private Long userId;
-
     @NotNull(message = "Valid-from date is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date validFrom;
@@ -39,6 +36,8 @@ public class CreateSubordinateCertificateDto {
     @Size(min = 2, max = 2, message = "Country code must be 2 letters (ISO 3166)")
     @Pattern(regexp = "^[A-Z]{2}$", message = "Country code must be uppercase ISO code")
     private String country;
+
+    private Long userId;
 
     private String organizationalUnit;
 

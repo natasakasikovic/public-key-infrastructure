@@ -34,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -123,7 +124,9 @@ public class CertificateService {
     public void createSubordinateCertificate(CreateSubordinateCertificateDto request) {
         UUID signingCertificateId = request.getSigningCertificateId();
         Certificate signingCertificate = findById(signingCertificateId);
-        User user =  userService.findById(request.getUserId());
+        User user = null;
+
+        user = (request.getUserId() == null) ? authService.getCurrentUser() : userService.findById(request.getUserId());
 
         X500Name subjectX500Name = buildX500Name(request, user);
         X500Name issuerX500Name = signingCertificate.getIssuer().toX500Name();
@@ -212,7 +215,15 @@ public class CertificateService {
         if (caCerts.isEmpty())
             return mapper.toPagedResponse(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
-        // BFS
+        LinkedHashMap<String, Certificate> collected = getIssuableCertificateChain(caCerts);
+
+        List<Certificate> all = new ArrayList<>(collected.values());
+        all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
+        return mapper.toPagedResponse(toPage(all, pageable));
+    }
+
+
+    private LinkedHashMap<String, Certificate> getIssuableCertificateChain(List<Certificate> caCerts) {
         LinkedHashMap<String, Certificate> collected = new LinkedHashMap<>();
         Deque<Certificate> stack = new ArrayDeque<>(caCerts);
         for (Certificate ca : caCerts)
@@ -229,10 +240,7 @@ public class CertificateService {
                 }
             }
         }
-
-        List<Certificate> all = new ArrayList<>(collected.values());
-        all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
-        return mapper.toPagedResponse(toPage(all, pageable));
+        return collected;
     }
 
 
@@ -258,6 +266,21 @@ public class CertificateService {
     public PagedResponse<CertificateResponseDto> getValidParentCas(Pageable pageable) {
         Page<Certificate> certificates = repository.findValidParentCas(Status.REVOKED, LocalDateTime.now(), pageable);
         return mapper.toPagedResponse(certificates);
+    }
+
+    @Transactional
+    public PagedResponse<CertificateResponseDto> getAuthorizedIssuingCertificatesForUser(Pageable pageable) {
+        User user = authService.getCurrentUser();
+        List<Certificate> certificates = repository.findValidCertificatesByOwner(Status.REVOKED, LocalDateTime.now(), user.getId());
+        LinkedHashMap<String, Certificate> issuableChain = getIssuableCertificateChain(certificates);
+        List<Certificate> collectedCertificates = new ArrayList<>(issuableChain.values());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), collectedCertificates.size());
+        List<Certificate> pageContent = collectedCertificates.subList(start, end);
+        Page<Certificate> pagedResult = new PageImpl<>(pageContent, pageable, collectedCertificates.size());
+
+        return mapper.toPagedResponse(pagedResult);
     }
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {

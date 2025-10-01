@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +64,14 @@ public class CertificateController {
     }
 
     @GetMapping("valid-cas")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidSigningCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getValidParentCas(pageable));
+    }
+
+    @GetMapping("/valid-authorized-cas")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
+    public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidAuthorizedCAs(Pageable pageable) {
+        return ResponseEntity.ok(service.getAuthorizedIssuingCertificatesForUser(pageable));
     }
 }

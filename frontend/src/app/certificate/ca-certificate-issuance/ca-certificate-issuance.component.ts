@@ -41,7 +41,6 @@ export class CaCertificateIssuanceComponent {
     organizationalUnit: new FormControl(''),
     state: new FormControl(''),
     locality: new FormControl(''),
-    userId: new FormControl('4'), // TODO: just for testing - delete after testing
     validFrom: new FormControl('', Validators.required),
     validTo: new FormControl('', Validators.required),
     signingCertificateId: new FormControl('', Validators.required),
@@ -62,8 +61,7 @@ export class CaCertificateIssuanceComponent {
   }
 
   fetchCertificates(pageIndex: number, pageSize: number): void {
-    this.service.getValidCACertificates(pageIndex, pageSize).subscribe({
-      // TODO: replace method call
+    this.service.getAuthorizedIssuableCertificates(pageIndex, pageSize).subscribe({
       next: (response: PagedResponse<CertificateResponse>) => {
         this.certificateDataSource.data = response.content;
         this.totalElements = response.totalElements;

@@ -21,4 +21,7 @@ public interface CertificateRepository extends JpaRepository<Certificate, UUID> 
 
     @Query("SELECT c FROM Certificate c WHERE c.canSign = true AND c.status <> :revokedStatus AND :now BETWEEN c.validFrom AND c.validTo")
     Page<Certificate> findValidParentCas(@Param("revokedStatus") Status revokedStatus, @Param("now") LocalDateTime now, Pageable pageable);
+
+    @Query("SELECT c FROM Certificate c  WHERE c.canSign = true AND c.status <> :revokedStatus AND :now BETWEEN c.validFrom AND c.validTo AND c.owner.id = :ownerId")
+    List<Certificate> findValidCertificatesByOwner(@Param("revokedStatus") Status revokedStatus, @Param("now") LocalDateTime now, @Param("ownerId") Long ownerId);
 }
