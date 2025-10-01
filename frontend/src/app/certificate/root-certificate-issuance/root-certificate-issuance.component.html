@@ -73,36 +73,6 @@
           </div>
         </div>
 
-        <hr>
-
-          <!-- key usages -->
-        <div class="usage-row">
-          <div class="usage-col">
-            <h5>Key Usages</h5>
-            <div *ngFor="let option of keyUsageOptions" class="form-check">
-              <input 
-                class="form-check-input"
-                type="checkbox" 
-                [value]="option"
-                (change)="onCheckboxChange($event, keyUsages)">
-              <label class="form-check-label">{{ option }}</label>
-            </div>
-          </div>
-
-          <!-- extended key usages -->
-          <div class="usage-col">
-            <h5>Extended Key Usages</h5>
-            <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
-              <input 
-                class="form-check-input"
-                type="checkbox" 
-                [value]="option"
-                (change)="onCheckboxChange($event, extendedKeyUsages)">
-              <label class="form-check-label">{{ option }}</label>
-            </div>
-          </div>
-        </div>
-
         <!-- confirm button -->
         <div class="add-button">
           <button type="button" class="btn custombutton btn-primary" (click)="onSubmit()">

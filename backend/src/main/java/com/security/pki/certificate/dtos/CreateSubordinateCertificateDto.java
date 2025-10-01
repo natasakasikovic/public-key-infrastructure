@@ -1,10 +1,7 @@
 package com.security.pki.certificate.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.Date;
@@ -48,6 +45,8 @@ public class CreateSubordinateCertificateDto {
     private String state;
 
     private String locality;
+
+    private Integer intermediateLevel;
 
     @NotNull
     private Boolean canSign;

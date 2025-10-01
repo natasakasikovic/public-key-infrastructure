@@ -44,10 +44,7 @@ public class CertificateGenerator {
             );
 
             // key usages
-            certBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(request.getKeyUsages(), true)));
-
-            // extended key usages
-            certBuilder.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(ExtendedKeyUsageConverter.convertToExtendedKeyUsages(request.getExtendedKeyUsages())));
+            certBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsageConverter.convertKeyUsageToInt(null, true)));
 
             // basic constraints
             certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
@@ -98,7 +95,7 @@ public class CertificateGenerator {
 
             // basic constraints
             if (request.getCanSign()) // if it is intermediate, set basic constraints to true, otherwise false (end-entity)
-                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(request.getIntermediateLevel()));
             else
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
 

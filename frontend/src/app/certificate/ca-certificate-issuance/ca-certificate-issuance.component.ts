@@ -45,6 +45,7 @@ export class CaCertificateIssuanceComponent {
     validFrom: new FormControl('', Validators.required),
     validTo: new FormControl('', Validators.required),
     signingCertificateId: new FormControl('', Validators.required),
+    intermediateLevel: new FormControl('', Validators.required),
     certificateType: new FormControl('', Validators.required),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),

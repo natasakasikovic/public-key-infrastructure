@@ -56,7 +56,6 @@ public class CertificateService {
     private final KeyStoreService keyStoreService;
 
     private final CertificateMapper mapper;
-    private final CertificateValidityPeriodValidator validityPeriodValidator;
     private final List<CertificateValidator> validators;
 
     @Transactional
@@ -232,7 +231,7 @@ public class CertificateService {
     }
 
 
-    private KeyPair loadKeyPair(Certificate certificate) {
+    public KeyPair loadKeyPair(Certificate certificate) {
         try {
             X509Certificate cert = mapper.toX509(certificate);
 
