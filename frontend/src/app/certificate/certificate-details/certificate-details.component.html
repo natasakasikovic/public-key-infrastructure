@@ -1,6 +1,8 @@
 <mat-card class="certificate-card">
-  <mat-card-header>
+  <mat-card-header class="header-with-badge">
     <mat-card-title>Certificate</mat-card-title>
+
+    <span *ngIf="data?.status === 'REVOKED'" class="revoked-badge">REVOKED</span>
   </mat-card-header>
 
   <mat-card-content>

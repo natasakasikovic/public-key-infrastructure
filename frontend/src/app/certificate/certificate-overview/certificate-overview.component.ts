@@ -64,6 +64,8 @@ export class CertificateOverviewComponent implements OnInit {
       if (reason) {
         this.certificateService.revokeCertificate(cert.id, { reason }).subscribe({
           next: (response: RevocationResponse) => {
+            cert.status = 'REVOKED';
+            this.dataSource._updateChangeSubscription();
             this.loadCertificates(this.paginator.pageIndex, this.paginator.pageSize);
             this.toaster.success('Certificate revoked successfully. Reason: ' + response.revocationReason, 'Success');
           },
