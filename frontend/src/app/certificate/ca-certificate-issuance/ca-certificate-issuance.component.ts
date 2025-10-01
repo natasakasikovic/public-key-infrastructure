@@ -44,7 +44,7 @@ export class CaCertificateIssuanceComponent {
     validFrom: new FormControl('', Validators.required),
     validTo: new FormControl('', Validators.required),
     signingCertificateId: new FormControl('', Validators.required),
-    intermediateLevel: new FormControl('', Validators.required),
+    pathLenConstraint: new FormControl('', Validators.required),
     certificateType: new FormControl('', Validators.required),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
@@ -61,12 +61,14 @@ export class CaCertificateIssuanceComponent {
   }
 
   fetchCertificates(pageIndex: number, pageSize: number): void {
-    this.service.getAuthorizedIssuableCertificates(pageIndex, pageSize).subscribe({
-      next: (response: PagedResponse<CertificateResponse>) => {
-        this.certificateDataSource.data = response.content;
-        this.totalElements = response.totalElements;
-      },
-    });
+    this.service
+      .getAuthorizedIssuableCertificates(pageIndex, pageSize)
+      .subscribe({
+        next: (response: PagedResponse<CertificateResponse>) => {
+          this.certificateDataSource.data = response.content;
+          this.totalElements = response.totalElements;
+        },
+      });
   }
 
   onCertificatePageChange(event: PageEvent): void {

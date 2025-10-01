@@ -8,6 +8,7 @@ import { CertificateResponse } from './models/certificate-response.model';
 import { CreateRootCertificateRequest } from './models/create-root-certificate.model';
 import {CertificateDetails} from './models/certificate-details-response.model';
 import { CreateSubordinateCertificateRequest } from './models/create-subordinate-certificate.model';
+import { CaCertificate } from './models/ca-certificate.model';
 
 @Injectable({
   providedIn: 'root',
@@ -66,6 +67,22 @@ export class CertificateService {
   const params = new HttpParams()
     .set('page', page)
     .set('size', size);
-  return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });  
+  }
+
+  getAvailableCaCertificates(): Observable<CaCertificate[]> {
+    return this.httpClient.get<CaCertificate[]>(`${env.apiHost}/certificates/available-ca`);
+  }
+
+  createCSRSelfGenerate(caCertificateId: string, validTo: string, pemFile: File): Observable<void> {
+      const formData = new FormData();
+      formData.append('caCertificateId', caCertificateId);
+      formData.append('validTo', validTo);
+      formData.append('pemFile', pemFile);
+
+      return this.httpClient.post<void>(
+        `${env.apiHost}/certificates/csr/self-generation`, 
+        formData
+      );
   }
 }

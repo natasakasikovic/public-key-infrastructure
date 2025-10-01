@@ -55,17 +55,37 @@ export class RegisterComponent implements OnInit {
   onSubmit() {
     if (this.registerForm.valid) {
       const request: RegisterRequest = this.registerForm.value;
-      this.authService.register(request).subscribe({
-        next: () => {
-          this.toasterService.success("Registration successful! Please check your email to activate your account.");
-        },
-        error: (err) => {
-          this.toasterService.error(err?.error?.message, "Failed to register");
-        }
-      });
+      if (!this.authService.getRole())
+        this.registerUser(request);
+      else
+        this.registerCaUser(request);
     } else {
       this.registerForm.markAllAsTouched();
     }
   }
+
+  registerUser(request: RegisterRequest): void {
+    this.authService.register(request).subscribe({
+      next: () => {
+        this.toasterService.success("Registration successful! Please check your email to activate your account.");
+      },
+      error: (err) => {
+        this.toasterService.error(err?.error?.message, "Failed to register");
+      }
+    });
+  }
+
+  registerCaUser(request: RegisterRequest): void {
+    this.authService.registerCaUser(request).subscribe({
+      next: () => {
+        this.toasterService.success("Registration successful! Activation email is sent.");
+      },
+      error: (err) => {
+        this.toasterService.error(err?.error?.message, "Failed to register");
+      }
+    });
+  }
+
+
 
 }

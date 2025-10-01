@@ -6,6 +6,7 @@ import com.security.pki.shared.services.LoggerService;
 import com.security.pki.user.dtos.RegistrationRequestDto;
 import com.security.pki.user.dtos.RegistrationResponseDto;
 import com.security.pki.user.dtos.UserResponseDto;
+import com.security.pki.user.enums.Role;
 import com.security.pki.user.exceptions.ActivationTokenAlreadyUsedException;
 import com.security.pki.user.exceptions.ActivationTokenExpiredException;
 import com.security.pki.user.exceptions.EmailAlreadyTakenException;
@@ -32,12 +33,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final LoggerService loggerService;
 
-    public RegistrationResponseDto register(RegistrationRequestDto request) {
+    public RegistrationResponseDto register(RegistrationRequestDto request, Role role) {
         if (Boolean.TRUE.equals(repository.existsByEmail(request.getEmail())))
             throw new EmailAlreadyTakenException("This email is already taken. Please log in or activate your account via the email we sent you.");
 
         User user = mapper.fromRequest(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(role);
         repository.save(user);
         String token = activationTokenService.generateToken(user);
         emailService.sendVerificationEmail(request.getEmail(), token);
