@@ -3,6 +3,15 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.log*
+
+# Local SSL certificates
+ssl/
+*.p12
+*.pem
+*.key
+*.crt
+
 
 ### STS ###
 .apt_generated

@@ -1,0 +1,86 @@
+<div class="mainContainer">
+  <div class="window">
+    <div class="inside-div">
+      <h2 class="title">Add Root Certificate</h2>
+
+      <div class="container" [formGroup]="rootCertForm">
+
+        <!-- subject fields -->
+        <div class="row gap">
+          <div class="col">
+            <label for="commonName">
+              Common Name (CN)*:
+              <input type="text" id="commonName" formControlName="commonName" required>
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="organization">
+              Organization (O)*:
+              <input type="text" id="organization" formControlName="organization" required>
+            </label>
+          </div>
+        </div>
+
+        <div class="row gap">
+          <div class="col">
+            <label for="country">
+              Country (C)*:
+              <input type="text" id="country" formControlName="country" maxlength="2" required>
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="organizationalUnit">
+              Organizational Unit (OU):
+              <input type="text" id="organizationalUnit" formControlName="organizationalUnit">
+            </label>
+          </div>
+        </div>
+
+        <div class="row gap">
+          <div class="col">
+            <label for="state">
+              State (ST):
+              <input type="text" id="state" formControlName="state">
+            </label>
+          </div>
+
+          <div class="col">
+            <label for="locality">
+              Locality (L):
+              <input type="text" id="locality" formControlName="locality">
+            </label>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- date selection -->
+        <div class="row gap date-row">
+          <div class="date-col">
+            <label for="validFrom">
+              Pick start date:
+              <input type="date" id="validFrom" formControlName="validFrom">
+            </label>
+          </div>
+
+          <div class="date-col">
+            <label for="validTo">
+              Pick expiration date:
+              <input type="date" id="validTo" formControlName="validTo">
+            </label>
+          </div>
+        </div>
+
+        <!-- confirm button -->
+        <div class="add-button">
+          <button type="button" class="btn custombutton btn-primary" (click)="onSubmit()">
+            Confirm
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

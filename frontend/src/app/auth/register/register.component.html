@@ -1,0 +1,90 @@
+<div class="register-container">
+  <h2 class="register-title">Register</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" placeholder="Enter your email">
+      <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
+        Invalid email format
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password" placeholder="Enter password">
+      <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+        Password is required
+      </mat-error>
+      <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+        Password must be at least 8 characters
+      </mat-error>
+      <mat-error *ngIf="registerForm.get('password')?.hasError('maxlength')">
+        The maximum password length is 64
+      </mat-error>
+    </mat-form-field>
+
+    <div class="password-strength" *ngIf="!!registerForm.get('password')?.value">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="registerForm.get('password')?.value ? (passwordScore + 1) * 20 : 0"
+        [color]="passwordScore < 2 ? 'warn' : passwordScore === 2 ? 'accent' : 'primary'">
+      </mat-progress-bar>
+
+      <span class="strength-label">
+        {{ registerForm.get('password')?.value
+          ? (passwordScore === 0 ? 'Very Weak' :
+              passwordScore === 1 ? 'Weak' :
+              passwordScore === 2 ? 'Fair' :
+              passwordScore === 3 ? 'Good' : 'Strong')
+          : '' }}
+      </span>
+    </div>
+
+
+    <div class="feedback" *ngIf="passwordFeedback.length > 0">
+      <p *ngFor="let msg of passwordFeedback">{{ msg }}</p>
+    </div>
+
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirm Password</mat-label>
+      <input matInput type="password" formControlName="passwordConfirmation" placeholder="Confirm password">
+      <mat-error *ngIf="registerForm.get('passwordConfirmation')?.hasError('required')">
+        Confirmation is required
+      </mat-error>
+      <mat-error *ngIf="registerForm.hasError('passwordMismatch')">Passwords do not match</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName" placeholder="Enter first name">
+      <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">
+        First name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName" placeholder="Enter last name">
+      <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">
+        Last name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Organization</mat-label>
+      <input matInput formControlName="organization" placeholder="Enter organization">
+      <mat-error *ngIf="registerForm.get('organization')?.hasError('required')">
+        Organization is required
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
+      Register
+    </button>
+  </form>
+</div>
