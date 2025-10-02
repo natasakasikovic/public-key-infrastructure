@@ -2,9 +2,9 @@
   <div class="ct-header">
     <div class="ct-title">
       <h3 class="name" [title]="template.name">{{ template.name }}</h3>
-      <div class="issuer" aria-hidden="true">by {{ template.issuer.principalName }}</div>
+      <div class="issuer" aria-hidden="true">by {{ template.issuerEmail }}</div>
     </div>
-    <div class="ct-actions">
+    <div class="ct-actions" *ngIf="!issuer">
       <button mat-icon-button aria-label="Edit certificate template" (click)="edit.emit(template)" (keydown)="$event.stopPropagation()">
         <mat-icon>edit</mat-icon>
       </button>

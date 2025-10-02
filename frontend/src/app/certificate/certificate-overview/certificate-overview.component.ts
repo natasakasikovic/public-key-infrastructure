@@ -51,7 +51,7 @@ export class CertificateOverviewComponent implements OnInit {
   }
 
   viewDetails(certificate: CertificateResponse): void {
-    void this.router.navigate(["certificate", certificate.id])
+    void this.router.navigate(["certificate", certificate.id]);
   }
 
   revokeCertificate(cert: CertificateResponse): void {

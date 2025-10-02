@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   EXTENDED_KEY_USAGE_OPTIONS,
   KEY_USAGE_OPTIONS,
@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PagedResponse } from '../../shared/model/paged-response';
 import { PageEvent } from '@angular/material/paginator';
+import {CertificateTemplate} from '../../template/model/certificate-template.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-ca-certificate-issuance',
@@ -18,10 +20,11 @@ import { PageEvent } from '@angular/material/paginator';
   templateUrl: './ca-certificate-issuance.component.html',
   styleUrl: './ca-certificate-issuance.component.css',
 })
-export class CaCertificateIssuanceComponent {
+export class CaCertificateIssuanceComponent implements OnInit {
   keyUsageOptions = KEY_USAGE_OPTIONS;
   extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
-
+  selectedCertificate: CertificateResponse | null = null;
+  template: CertificateTemplate | null = null;
   // certificates table
   displayedCertificateColumns: string[] = [
     'serialNumber',
@@ -48,6 +51,7 @@ export class CaCertificateIssuanceComponent {
     certificateType: new FormControl('', Validators.required),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
+    subjectAlternativeNames: new FormArray([]),
   });
 
   constructor(
@@ -58,6 +62,11 @@ export class CaCertificateIssuanceComponent {
 
   ngOnInit(): void {
     this.fetchCertificates(0, this.pageSize);
+    const state = history.state;
+    if (state?.template) {
+      this.template = state.template as CertificateTemplate;
+      this.applyTemplate(this.template);
+    }
   }
 
   fetchCertificates(pageIndex: number, pageSize: number): void {
@@ -67,6 +76,8 @@ export class CaCertificateIssuanceComponent {
         next: (response: PagedResponse<CertificateResponse>) => {
           this.certificateDataSource.data = response.content;
           this.totalElements = response.totalElements;
+          this.selectedCertificate =
+            this.certificateDataSource.data.find(c => c.id === this.template?.signingCertificateId) ?? null;
         },
       });
   }
@@ -98,10 +109,36 @@ export class CaCertificateIssuanceComponent {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
   }
 
-  onCertificateSelected(certicate: CertificateResponse) {
+  get subjectAlternativeNames(): FormArray {
+    return this.certificateForm.get('subjectAlternativeNames') as FormArray;
+  }
+
+  addSAN(): void {
+    const sanGroup = new FormGroup({
+      type: new FormControl('DNS', Validators.required),
+      value: new FormControl('', Validators.required),
+    });
+    if(this.template) {
+      sanGroup.setValidators([
+        Validators.required,
+        Validators.pattern(this.template?.sanRegex)
+      ]);
+    }
+    this.subjectAlternativeNames.push(sanGroup);
+  }
+
+  removeSAN(index: number): void {
+    this.subjectAlternativeNames.removeAt(index);
+  }
+
+  onCertificateSelected(certificate: CertificateResponse) {
+    if(this.template) return;
     this.certificateForm.controls['signingCertificateId'].setValue(
-      certicate.id
+      certificate.id
     );
+    this.selectedCertificate = certificate;
+    this.certificateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
   }
 
   createCertificate() {
@@ -120,10 +157,61 @@ export class CaCertificateIssuanceComponent {
         );
         void this.router.navigate(['/home']);
       },
-      error: () =>
+      error: (error: HttpErrorResponse) =>
         this.toasterService.error(
+          error?.error?.message,
           'Failed to create certificate. Please try again later.'
         ),
+    });
+  }
+
+  applyTemplate(template: CertificateTemplate): void {
+    this.certificateForm.patchValue({
+      signingCertificateId: template.signingCertificateId,
+      commonName: template.commonNameRegex,
+      pathLenConstraint: 0,
+    });
+
+    this.certificateForm.get('commonName')?.setValidators([
+      Validators.required,
+      Validators.pattern(template.commonNameRegex),
+    ]);
+
+    this.subjectAlternativeNames.push(
+      new FormGroup({
+        type: new FormControl('DNS'),
+        value: new FormControl(template.sanRegex),
+      })
+    );
+
+    this.keyUsagesFormArray.clear();
+    template.keyUsages.forEach(usage => {
+      this.keyUsagesFormArray.push(new FormControl(usage));
+    });
+
+    this.extendedKeyUsagesFormArray.clear();
+    template.extendedKeyUsages.forEach(usage => {
+      this.extendedKeyUsagesFormArray.push(new FormControl(usage));
+    });
+
+    this.addValidToCalculation();
+  }
+
+  private addValidToCalculation(): void {
+    this.certificateForm.get('validFrom')?.valueChanges.subscribe((start: string) => {
+      if (start && this.template?.ttlDays) {
+        const startDate = new Date(start);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + this.template.ttlDays);
+
+        this.certificateForm.get('validTo')?.setValue(endDate.toISOString().split('T')[0]);
+      }
+    });
+  }
+
+  findTemplates(): void {
+    void this.router.navigate(['/templates'], {
+      state: { issuer: this.selectedCertificate?.id }
     });
   }
 }

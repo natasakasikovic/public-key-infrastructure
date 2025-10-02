@@ -1,4 +1,4 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.certificate;
 
 import com.security.pki.certificate.enums.CertificateType;
 import lombok.AllArgsConstructor;

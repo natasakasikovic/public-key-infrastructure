@@ -34,9 +34,10 @@ export class CertificateService {
   }
 
   createSubordinateCertificate(request: CreateSubordinateCertificateRequest): Observable<void> {
+    console.log(request);
     return this.httpClient.post<void>(`${env.apiHost}/certificates/subordinate`, request);
   }
- 
+
   getCertificate(id: string): Observable<CertificateDetails> {
     return this.httpClient.get<CertificateDetails>(`${env.apiHost}/certificates/${id}`);
   }
@@ -73,12 +74,12 @@ export class CertificateService {
       responseType: 'blob'
     });
   }
-  
+
   getAuthorizedIssuableCertificates(page: number, size: number): Observable<PagedResponse<CertificateResponse>> {
   const params = new HttpParams()
     .set('page', page)
     .set('size', size);
-    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });  
+    return this.httpClient.get<PagedResponse<CertificateResponse>>(`${env.apiHost}/certificates/valid-authorized-cas`, { params });
   }
 
   createCSRSelfGenerate(caCertificateId: string, validTo: string, pemFile: File): Observable<void> {
@@ -88,7 +89,7 @@ export class CertificateService {
       formData.append('pemFile', pemFile);
 
       return this.httpClient.post<void>(
-        `${env.apiHost}/certificates/csr/self-generation`, 
+        `${env.apiHost}/certificates/csr/self-generation`,
         formData
       );
   }

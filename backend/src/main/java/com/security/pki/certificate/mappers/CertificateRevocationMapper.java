@@ -1,7 +1,7 @@
 package com.security.pki.certificate.mappers;
 
-import com.security.pki.certificate.dtos.RevocationRequestDto;
-import com.security.pki.certificate.dtos.RevocationResponseDto;
+import com.security.pki.certificate.dtos.revocation.RevocationRequestDto;
+import com.security.pki.certificate.dtos.revocation.RevocationResponseDto;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.CertificateRevocation;
 import lombok.RequiredArgsConstructor;

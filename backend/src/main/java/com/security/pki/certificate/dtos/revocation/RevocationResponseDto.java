@@ -1,4 +1,4 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.revocation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

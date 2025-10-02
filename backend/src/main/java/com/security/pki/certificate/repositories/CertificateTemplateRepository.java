@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface CertificateTemplateRepository extends JpaRepository<CertificateTemplate, UUID> {
     List<CertificateTemplate> findByCreatedBy(User createdBy);
-    List<CertificateTemplate> findByIssuer(String issuer);
+    List<CertificateTemplate> findBySigningCertificateId(UUID id);
 }

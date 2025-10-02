@@ -22,8 +22,7 @@ public class CertificateTemplate {
 
     private String name;
 
-    @Embedded
-    private Issuer issuer;
+    private UUID signingCertificateId;
 
     private String commonNameRegex;
 

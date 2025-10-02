@@ -3,7 +3,7 @@
     <span>Certificate Templates</span>
     <span class="spacer"></span>
 
-    <button mat-flat-button color="accent" [routerLink]="['/create-template']">
+    <button mat-flat-button color="accent" [routerLink]="['/create-template']" *ngIf="!issuerId">
       <mat-icon>add</mat-icon>
       New Template
     </button>
@@ -13,6 +13,7 @@
     <app-template-card
       *ngFor="let tmpl of templates"
       [template]="tmpl"
+      [issuer]="issuerId ?? ''"
       (edit)="editTemplate($event)"
       (delete)="openDeleteConfirmation($event)"
       (use)="useTemplate($event)">

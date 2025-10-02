@@ -1,4 +1,4 @@
-package com.security.pki.certification.validators.template;
+package com.security.pki.certificate.validators.template;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

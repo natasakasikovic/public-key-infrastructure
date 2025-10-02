@@ -1,9 +1,8 @@
-import {Issuer} from './issuer.model';
-
 export interface CertificateTemplate {
-  id?: number;
+  id?: string;
   name: string;
-  issuer: Issuer;
+  signingCertificateId: string;
+  issuerEmail: string;
   commonNameRegex: string;
   sanRegex: string;
   ttlDays: number;

@@ -1,6 +1,8 @@
 package com.security.pki.certificate.controllers;
 
-import com.security.pki.certificate.dtos.*;
+import com.security.pki.certificate.dtos.certificate.*;
+import com.security.pki.certificate.dtos.revocation.RevocationRequestDto;
+import com.security.pki.certificate.dtos.revocation.RevocationResponseDto;
 import com.security.pki.certificate.services.CSRService;
 import com.security.pki.certificate.services.CertificateService;
 import com.security.pki.certificate.services.RevocationService;

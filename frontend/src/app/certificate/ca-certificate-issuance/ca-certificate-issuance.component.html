@@ -1,7 +1,7 @@
 <div class="mainContainer">
   <div class="window">
     <div class="inside-div">
-      <h2 class="title"> Issue certificates for your organization</h2>
+      <h2 class="title">Issue certificates for your organization</h2>
 
       <div class="container" [formGroup]="certificateForm">
 
@@ -67,45 +67,55 @@
         <table mat-table [dataSource]="certificateDataSource" class="mat-elevation-z8">
 
           <ng-container matColumnDef="serialNumber">
-            <th mat-header-cell *matHeaderCellDef> Serial Number </th>
-            <td mat-cell *matCellDef="let cert"> {{cert.serialNumber}} </td>
+            <th mat-header-cell *matHeaderCellDef>Serial Number</th>
+            <td mat-cell *matCellDef="let cert">{{ cert.serialNumber }}</td>
           </ng-container>
 
           <ng-container matColumnDef="certificateType">
-            <th mat-header-cell *matHeaderCellDef> Certificate Type </th>
-            <td mat-cell *matCellDef="let cert">
-              {{cert.certificateType}}
-            </td>
+            <th mat-header-cell *matHeaderCellDef>Certificate Type</th>
+            <td mat-cell *matCellDef="let cert">{{ cert.certificateType }}</td>
           </ng-container>
 
           <ng-container matColumnDef="issuerMail">
-            <th mat-header-cell *matHeaderCellDef> Issuer Email </th>
-            <td mat-cell *matCellDef="let cert"> {{cert.issuerEmail}} </td>
+            <th mat-header-cell *matHeaderCellDef>Issuer Email</th>
+            <td mat-cell *matCellDef="let cert">{{ cert.issuerEmail }}</td>
           </ng-container>
 
           <ng-container matColumnDef="subjectMail">
-            <th mat-header-cell *matHeaderCellDef> Subject Email </th>
-            <td mat-cell *matCellDef="let cert"> {{cert.subjectEmail}} </td>
+            <th mat-header-cell *matHeaderCellDef>Subject Email</th>
+            <td mat-cell *matCellDef="let cert">{{ cert.subjectEmail }}</td>
           </ng-container>
 
           <ng-container matColumnDef="details">
-            <th mat-header-cell *matHeaderCellDef> Details </th>
+            <th mat-header-cell *matHeaderCellDef>Details</th>
             <td mat-cell *matCellDef="let cert">
               <button mat-stroked-button color="primary" (click)="viewDetails(cert)">Details</button>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedCertificateColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedCertificateColumns;" (click)="onCertificateSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedCertificateColumns;"
+            (click)="onCertificateSelected(row)"
+            [class.selected]="row === selectedCertificate">
+          </tr>
         </table>
 
-        <mat-paginator [length]="totalElements"
-                      [pageSize]="pageSize"
-                      (page)="onCertificatePageChange($event)">
+        <mat-paginator
+          [length]="totalElements"
+          [pageSize]="pageSize"
+          (page)="onCertificatePageChange($event)">
         </mat-paginator>
+        <div class="add-button">
+          <button mat-raised-button color="primary" type="submit"
+                  (click)="findTemplates()"
+                  [disabled]="!selectedCertificate">
+            Search Templates
+          </button>
+        </div>
 
         <hr>
-
         <!-- key usages -->
         <div class="usage-row">
           <div class="usage-col">
@@ -115,7 +125,9 @@
                 type="checkbox"
                 class="form-check-input"
                 [value]="option"
-                (change)="onCheckboxChange($event, keyUsagesFormArray)">
+                (change)="onCheckboxChange($event, keyUsagesFormArray)"
+                [checked]="keyUsagesFormArray.value.includes(option)"
+                [disabled]="template?.keyUsages?.includes(option)" />
               <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
@@ -127,7 +139,9 @@
                 type="checkbox"
                 class="form-check-input"
                 [value]="option"
-                (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)">
+                (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)"
+                [checked]="extendedKeyUsagesFormArray.value.includes(option)"
+                [disabled]="template?.extendedKeyUsages?.includes(option)" />
               <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
@@ -140,17 +154,27 @@
           <div class="col">
             <h5>Select Certificate Type</h5>
             <div class="form-check">
-              <input class="form-check-input" type="radio" formControlName="certificateType" id="intermediate" value="INTERMEDIATE">
+              <input
+                class="form-check-input"
+                type="radio"
+                formControlName="certificateType"
+                id="intermediate"
+                value="INTERMEDIATE">
               <label class="form-check-label" for="intermediate">Intermediate Certificate</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" formControlName="certificateType" id="endEntity" value="END_ENTITY">
+              <input
+                class="form-check-input"
+                type="radio"
+                formControlName="certificateType"
+                id="endEntity"
+                value="END_ENTITY">
               <label class="form-check-label" for="endEntity">End Entity Certificate</label>
             </div>
           </div>
         </div>
 
-        <!-- Intermediate Level (only visible if INTERMEDIATE is selected) -->
+        <!-- Intermediate Level -->
         <div class="form-group mt-3" *ngIf="certificateForm.get('certificateType')?.value === 'INTERMEDIATE'">
           <label for="pathLenConstraint">
             Intermediate Level (max depth of CAs that this cert can issue)*:
@@ -160,15 +184,58 @@
               class="form-control"
               formControlName="pathLenConstraint"
               min="0"
-              required
-            />
+              required>
           </label>
         </div>
 
-        <div class="add-button">
-          <button type="button" class="btn custombutton btn-primary" [disabled]="certificateForm.invalid" (click)="createCertificate()">
-            Confirm
-          </button>
+        <hr>
+
+        <!-- SANs -->
+        <div class="row gap">
+          <div class="col">
+            <h5 class="san">Subject Alternative Names (SANs)</h5>
+
+            <div formArrayName="subjectAlternativeNames">
+              <mat-card *ngFor="let san of subjectAlternativeNames.controls; let i = index"
+                        [formGroupName]="i"
+                        class="san-card">
+                <div class="san-row">
+                  <mat-form-field appearance="outline" class="san-col">
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="type">
+                      <mat-option value="DNS">DNS</mat-option>
+                      <mat-option value="IP">IP</mat-option>
+                      <mat-option value="EMAIL">Email</mat-option>
+                      <mat-option value="URI">URI</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="san-col">
+                    <mat-label>Value</mat-label>
+                    <input matInput formControlName="value" placeholder="Enter SAN value">
+                  </mat-form-field>
+
+                  <div class="remove-btn">
+                    <button mat-icon-button color="warn" (click)="removeSAN(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+
+            <div class="add-button">
+              <button mat-raised-button color="primary" (click)="addSAN()">Add SAN</button>
+            </div>
+
+            <div class="add-button">
+              <button mat-raised-button color="primary" type="submit"
+                      (click)="createCertificate()"
+                      class="save-button" [disabled]="certificateForm.invalid">
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
