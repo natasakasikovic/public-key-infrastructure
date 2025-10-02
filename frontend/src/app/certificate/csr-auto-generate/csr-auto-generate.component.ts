@@ -106,8 +106,7 @@ export class CsrAutoGenerateComponent implements OnInit {
 
     const payload = {
       ...this.certificateForm.value,
-      canSign:
-        this.certificateForm.get('certificateType')?.value === 'INTERMEDIATE',
+      canSign: false,
       pathLenConstraint: 0
     };
 
