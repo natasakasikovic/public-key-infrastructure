@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -65,4 +66,11 @@ public class Certificate {
 
     @Column(name = "path_len_constraint")
     private Integer pathLenConstraint;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "certificate_san",
+            joinColumns = @JoinColumn(name = "certificate_id")
+    )
+    private List<SAN> subjectAlternativeNames;
 }

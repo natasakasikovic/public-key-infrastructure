@@ -1,7 +1,7 @@
 package com.security.pki.certificate.services;
 
-import com.security.pki.certificate.dtos.RevocationRequestDto;
-import com.security.pki.certificate.dtos.RevocationResponseDto;
+import com.security.pki.certificate.dtos.revocation.RevocationRequestDto;
+import com.security.pki.certificate.dtos.revocation.RevocationResponseDto;
 import com.security.pki.certificate.enums.Status;
 import com.security.pki.certificate.exceptions.CrlException;
 import com.security.pki.certificate.exceptions.RevocationException;

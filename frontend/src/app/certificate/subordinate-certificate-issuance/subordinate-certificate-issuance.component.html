@@ -48,7 +48,7 @@
         <hr>
 
         <!-- user selection -->
-        
+
         <table mat-table [dataSource]="userDataSource" class="mat-elevation-z8">
 
           <ng-container matColumnDef="firstName">
@@ -74,8 +74,12 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedUserColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedUserColumns;" 
-            (click)="onUserSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedUserColumns;"
+            (click)="onUserSelected(row)"
+            [class.selected]="row === selectedUser">
+          </tr>
         </table>
 
         <mat-paginator [length]="totalElements"
@@ -134,7 +138,12 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedCertificateColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedCertificateColumns;" (click)="onCertificateSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedCertificateColumns;"
+            (click)="onCertificateSelected(row)"
+            [class.selected]="row === selectedCertificate">
+          </tr>
         </table>
 
         <mat-paginator [length]="totalElements"
@@ -203,11 +212,53 @@
           </label>
         </div>
 
-        <div class="add-button">
-          <button type="button" class="btn custombutton btn-primary" [disabled]="certificateForm.invalid" (click)="createCertificate()">
-            Confirm
-          </button>
+        <div class="row gap">
+          <div class="col">
+            <h5 class="san">Subject Alternative Names (SANs)</h5>
+
+            <div formArrayName="subjectAlternativeNames">
+              <mat-card *ngFor="let san of subjectAlternativeNames.controls; let i = index"
+                        [formGroupName]="i"
+                        class="san-card">
+                <div class="san-row">
+                  <mat-form-field appearance="outline" class="san-col">
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="type">
+                      <mat-option value="DNS">DNS</mat-option>
+                      <mat-option value="IP">IP</mat-option>
+                      <mat-option value="EMAIL">Email</mat-option>
+                      <mat-option value="URI">URI</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="san-col">
+                    <mat-label>Value</mat-label>
+                    <input matInput formControlName="value" placeholder="Enter SAN value">
+                  </mat-form-field>
+
+                  <div class="remove-btn">
+                    <button mat-icon-button color="warn" (click)="removeSAN(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+
+            <div class="add-button">
+              <button mat-raised-button color="primary" (click)="addSAN()">Add SAN</button>
+            </div>
+
+            <div class="add-button">
+              <button mat-raised-button color="primary" type="submit"
+                      (click)="createCertificate()"
+                      class="save-button" [disabled]="certificateForm.invalid">
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
+
 
       </div>
     </div>

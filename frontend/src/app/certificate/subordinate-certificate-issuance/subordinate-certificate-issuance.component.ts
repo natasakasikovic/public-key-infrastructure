@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { CertificateResponse } from '../models/certificate-response.model';
 import { UserService } from '../../user/user.service';
 import { ToastrService } from 'ngx-toastr';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-subordinate-certificate-issuance',
@@ -35,7 +36,6 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     'certificateType',
     'issuerMail',
     'subjectMail',
-    'details',
   ];
   certificateDataSource = new MatTableDataSource<CertificateResponse>([]);
 
@@ -47,6 +47,8 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     'organization',
   ];
   userDataSource = new MatTableDataSource<UserResponse>([]);
+  selectedCertificate: CertificateResponse | null = null;
+  selectedUser: UserResponse | null = null;
 
   totalElements = 0;
   pageSize = 5;
@@ -65,6 +67,7 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     pathLenConstraint: new FormControl(''),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
+    subjectAlternativeNames: new FormArray([]),
   });
 
   constructor(
@@ -128,14 +131,24 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
   }
 
-  onUserSelected(user: UserResponse) {
-    this.certificateForm.controls['userId'].setValue(user.id);
+  get subjectAlternativeNames(): FormArray {
+    return this.certificateForm.get('subjectAlternativeNames') as FormArray;
   }
 
-  onCertificateSelected(certicate: CertificateResponse) {
+  onUserSelected(user: UserResponse) {
+    this.certificateForm.controls['userId'].setValue(user.id);
+    this.selectedUser = user;
+    this.certificateForm.controls['userId']
+      .setValue(user.id);
+  }
+
+  onCertificateSelected(certificate: CertificateResponse) {
     this.certificateForm.controls['signingCertificateId'].setValue(
-      certicate.id
+      certificate.id
     );
+    this.selectedCertificate = certificate;
+    this.certificateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
   }
 
   createCertificate() {
@@ -154,10 +167,23 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
         );
         void this.router.navigate(['/home']);
       },
-      error: () =>
+      error: (error: HttpErrorResponse) =>
         this.toasterService.error(
-          'Failed to create certificate. Please try again later.'
+          error?.error?.message,
+          'Failed to create certificate.'
         ),
     });
+  }
+
+  addSAN(): void {
+    const sanGroup = new FormGroup({
+      type: new FormControl('DNS', Validators.required),
+      value: new FormControl('', Validators.required),
+    });
+    this.subjectAlternativeNames.push(sanGroup);
+  }
+
+  removeSAN(index: number): void {
+    this.subjectAlternativeNames.removeAt(index);
   }
 }

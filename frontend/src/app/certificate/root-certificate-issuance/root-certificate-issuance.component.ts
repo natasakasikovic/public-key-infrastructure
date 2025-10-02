@@ -13,6 +13,7 @@ import {
 } from '../../shared/constants/certificate-options';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   standalone: false,
@@ -64,8 +65,9 @@ export class RootCertificateIssuanceComponent implements OnInit {
         );
         void this.router.navigate(['/home']);
       },
-      error: () =>
+      error: (error: HttpErrorResponse) =>
         this.toasterService.error(
+          error?.error?.message,
           'Failed to create certificate. Please try again later.'
         ),
     });

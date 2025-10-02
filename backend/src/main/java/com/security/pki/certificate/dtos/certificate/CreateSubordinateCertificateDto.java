@@ -1,6 +1,8 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.certificate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.security.pki.certificate.models.SAN;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -50,4 +52,10 @@ public class CreateSubordinateCertificateDto {
 
     @NotNull
     private Boolean canSign;
+
+    private List<SAN> subjectAlternativeNames;
+
+    private String commonNameRegex;
+    private String sanRegex;
+    private Integer ttlDays;
 }

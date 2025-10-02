@@ -55,7 +55,7 @@
 .usage-row {
   display: flex;
   gap: 2rem;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   margin-top: 1.5rem;
 }
 
@@ -65,6 +65,13 @@
 }
 
 .usage-col h5 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.san {
   margin-bottom: 1rem;
   font-size: 1rem;
   font-weight: 600;
@@ -158,6 +165,41 @@ table.table tbody tr:hover {
   background-color: #e6f2ff;
 }
 
+table.mat-elevation-z8 tr.selected {
+  background-color: #cce5ff !important;
+}
+
 .selected {
   background-color: #cce5ff !important;
 }
+
+tr.selected:hover {
+  background-color: #b8daff !important;
+}
+
+.san-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.san-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.san-col {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+}
+
+

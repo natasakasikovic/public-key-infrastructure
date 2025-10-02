@@ -1,3 +1,5 @@
+import {SAN} from '../../shared/model/san.model';
+
 export interface CreateSubordinateCertificateRequest {
   userId: number; // you will get organization from user on backend
   commonName: string;
@@ -11,4 +13,8 @@ export interface CreateSubordinateCertificateRequest {
   keyUsages: string[];
   extendedKeyUsages: string[];
   canSign: boolean;
+  subjectAlternativeNames: SAN[];
+  commonNameRegex?: string;
+  sanRegex?: string;
+  ttlDays?: number;
 }

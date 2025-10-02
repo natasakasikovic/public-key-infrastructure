@@ -1,15 +1,13 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.*;
+import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.exceptions.KeyPairRetrievalException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
-import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.enums.Status;
-import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;
 import com.security.pki.certificate.utils.CertificateUtils;
@@ -62,8 +60,8 @@ public class CertificateService {
         final KeyPair keyPair = cryptoService.generateKeyPair();
         final X500Name x500Name = buildX500Name(request);
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
-        final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
-        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null));
+        final Certificate certificate = mapper.toCertificateEntity(request, x500Name, serialNumber);
+        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null, null, null, null));
         certificate.setOwner(authService.getCurrentUser());
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
@@ -102,20 +100,6 @@ public class CertificateService {
         return builder.build();
     }
 
-    private Certificate buildCertificateEntity(CreateRootCertificateRequest request, X500Name x500Name, BigInteger serialNumber) {
-        return Certificate.builder()
-                .id(UUID.randomUUID())
-                .serialNumber(serialNumber.toString())
-                .subject(new Subject(x500Name))
-                .issuer(new Issuer(x500Name))
-                .validFrom(request.getValidFrom())
-                .validTo(request.getValidTo())
-                .status(Status.ACTIVE)
-                .canSign(true)
-                .pathLenConstraint(null) // for root
-                .build();
-    }
-
     @Transactional
     public void createSubordinateCertificate(CreateSubordinateCertificateDto request, PublicKey publicKey) {
         UUID signingCertificateId = request.getSigningCertificateId();
@@ -134,15 +118,23 @@ public class CertificateService {
             publicKey = keyPair.getPublic();
 
         final KeyPair signingCertificateKeyPair = loadKeyPair(signingCertificate); // needed for extensions
-        final  KeyPair signingCertificateParentKeyPair = loadKeyPair(signingCertificate.getParent());
+        final KeyPair signingCertificateParentKeyPair = loadKeyPair(signingCertificate.getParent());
 
-        CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request), signingCertificateKeyPair, signingCertificateParentKeyPair);
+        CertificateValidationContext context = new CertificateValidationContext(
+            signingCertificate,
+            mapper.fromRequest(request),
+            signingCertificateKeyPair,
+            signingCertificateParentKeyPair,
+            request.getCommonNameRegex(),
+            request.getSanRegex(),
+            request.getTtlDays()
+        );
 
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateKeyPair);
-        Certificate certificate = buildCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateParentKeyPair);
+        Certificate certificate = mapper.toCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
 
@@ -157,22 +149,6 @@ public class CertificateService {
         builder.addRDN(BCStyle.L, request.getLocality());
 
         return builder.build();
-    }
-
-    private Certificate buildCertificateEntity(CreateSubordinateCertificateDto request, BigInteger serialNumber,X500Name subjectX500Name, X500Name issuerX500Name, User user, Certificate signingCertificate) {
-        return Certificate.builder()
-                .id(UUID.randomUUID())
-                .serialNumber(serialNumber.toString())
-                .subject(new Subject(subjectX500Name))
-                .issuer(new Issuer(issuerX500Name))
-                .validFrom(request.getValidFrom())
-                .validTo(request.getValidTo())
-                .owner(user)
-                .parent(signingCertificate)
-                .status(Status.ACTIVE)
-                .canSign(request.getCanSign())
-                .pathLenConstraint(request.getPathLenConstraint() != null ? request.getPathLenConstraint() : signingCertificate.getPathLenConstraint() - 1)
-                .build();
     }
 
     @Transactional
@@ -220,7 +196,7 @@ public class CertificateService {
 
         List<Certificate> all = new ArrayList<>(collected.values());
         all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
-        return mapper.toPagedResponse(toPage(all, pageable));
+        return mapper.toPagedResponse(mapper.toPage(all, pageable));
     }
 
 
@@ -286,18 +262,5 @@ public class CertificateService {
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {
         return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
-    }
-
-    private Page<Certificate> toPage(List<Certificate> source, Pageable pageable) {
-        int total = source.size();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), total);
-        List<Certificate> content;
-        if (start >= end) {
-            content = Collections.emptyList();
-        } else {
-            content = source.subList(start, end);
-        }
-        return new PageImpl<>(content, pageable, total);
     }
 }
