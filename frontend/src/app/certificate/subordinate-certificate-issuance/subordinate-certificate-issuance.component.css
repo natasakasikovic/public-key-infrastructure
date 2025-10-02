@@ -55,7 +55,7 @@
 .usage-row {
   display: flex;
   gap: 2rem;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   margin-top: 1.5rem;
 }
 
@@ -69,6 +69,10 @@
   font-size: 1rem;
   font-weight: 600;
   color: #222;
+}
+
+table.mat-elevation-z8 tr.selected {
+  background-color: #cce5ff !important;
 }
 
 .form-check {

@@ -137,7 +137,7 @@ public class CertificateService {
             validator.validate(context);
 
         final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, keyPair, subjectX500Name, serialNumber, parentKeyPair);
-        Certificate certificate = buildCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
+        Certificate certificate = mapper.toCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
 
@@ -152,22 +152,6 @@ public class CertificateService {
         builder.addRDN(BCStyle.L, request.getLocality());
 
         return builder.build();
-    }
-
-    private Certificate buildCertificateEntity(CreateSubordinateCertificateDto request, BigInteger serialNumber,X500Name subjectX500Name, X500Name issuerX500Name, User user, Certificate signingCertificate) {
-        return Certificate.builder()
-                .id(UUID.randomUUID())
-                .serialNumber(serialNumber.toString())
-                .subject(new Subject(subjectX500Name))
-                .issuer(new Issuer(issuerX500Name))
-                .validFrom(request.getValidFrom())
-                .validTo(request.getValidTo())
-                .owner(user)
-                .parent(signingCertificate)
-                .status(Status.ACTIVE)
-                .canSign(request.getCanSign())
-                .pathLenConstraint(request.getPathLenConstraint() != null ? request.getPathLenConstraint() : signingCertificate.getPathLenConstraint() - 1)
-                .build();
     }
 
     @Transactional
@@ -215,7 +199,7 @@ public class CertificateService {
 
         List<Certificate> all = new ArrayList<>(collected.values());
         all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
-        return mapper.toPagedResponse(toPage(all, pageable));
+        return mapper.toPagedResponse(mapper.toPage(all, pageable));
     }
 
 
@@ -281,19 +265,6 @@ public class CertificateService {
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {
         return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
-    }
-
-    private Page<Certificate> toPage(List<Certificate> source, Pageable pageable) {
-        int total = source.size();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), total);
-        List<Certificate> content;
-        if (start >= end) {
-            content = Collections.emptyList();
-        } else {
-            content = source.subList(start, end);
-        }
-        return new PageImpl<>(content, pageable, total);
     }
 
     @Transactional

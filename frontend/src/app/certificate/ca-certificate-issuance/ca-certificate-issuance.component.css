@@ -55,7 +55,7 @@
 .usage-row {
   display: flex;
   gap: 2rem;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   margin-top: 1.5rem;
 }
 
@@ -158,6 +158,14 @@ table.table tbody tr:hover {
   background-color: #e6f2ff;
 }
 
+table.mat-elevation-z8 tr.selected {
+  background-color: #cce5ff !important;
+}
+
 .selected {
   background-color: #cce5ff !important;
+}
+
+tr.selected:hover {
+  background-color: #b8daff !important;
 }

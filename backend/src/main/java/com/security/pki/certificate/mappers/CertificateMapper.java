@@ -1,5 +1,6 @@
 package com.security.pki.certificate.mappers;
 
+import com.security.pki.certificate.enums.Status;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.enums.CertificateType;
@@ -17,9 +18,12 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
@@ -67,6 +71,35 @@ public class CertificateMapper {
     }
 
     return response;
+  }
+
+  public Certificate toCertificateEntity(CreateSubordinateCertificateDto request, BigInteger serialNumber, X500Name subjectX500Name, X500Name issuerX500Name, User user, Certificate signingCertificate) {
+    return Certificate.builder()
+            .id(UUID.randomUUID())
+            .serialNumber(serialNumber.toString())
+            .subject(new Subject(subjectX500Name))
+            .issuer(new Issuer(issuerX500Name))
+            .validFrom(request.getValidFrom())
+            .validTo(request.getValidTo())
+            .owner(user)
+            .parent(signingCertificate)
+            .status(Status.ACTIVE)
+            .canSign(request.getCanSign())
+            .pathLenConstraint(request.getPathLenConstraint() != null ? request.getPathLenConstraint() : signingCertificate.getPathLenConstraint() - 1)
+            .build();
+  }
+
+  public Page<Certificate> toPage(List<Certificate> source, Pageable pageable) {
+    int total = source.size();
+    int start = (int) pageable.getOffset();
+    int end = Math.min(start + pageable.getPageSize(), total);
+    List<Certificate> content;
+    if (start >= end) {
+      content = Collections.emptyList();
+    } else {
+      content = source.subList(start, end);
+    }
+    return new PageImpl<>(content, pageable, total);
   }
 
   private PartyDto toPartyDto(Object party) {

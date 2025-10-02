@@ -19,6 +19,7 @@ import { Router } from '@angular/router';
 import { CertificateResponse } from '../models/certificate-response.model';
 import { UserService } from '../../user/user.service';
 import { ToastrService } from 'ngx-toastr';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-subordinate-certificate-issuance',
@@ -48,6 +49,8 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     'organization',
   ];
   userDataSource = new MatTableDataSource<UserResponse>([]);
+  selectedCertificate: CertificateResponse | null = null;
+  selectedUser: UserResponse | null = null;
 
   totalElements = 0;
   pageSize = 5;
@@ -131,12 +134,18 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
 
   onUserSelected(user: UserResponse) {
     this.certificateForm.controls['userId'].setValue(user.id);
+    this.selectedUser = user;
+    this.certificateForm.controls['signingCertificateId']
+      .setValue(user.id);
   }
 
-  onCertificateSelected(certicate: CertificateResponse) {
+  onCertificateSelected(certificate: CertificateResponse) {
     this.certificateForm.controls['signingCertificateId'].setValue(
-      certicate.id
+      certificate.id
     );
+    this.selectedCertificate = certificate;
+    this.certificateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
   }
 
   createCertificate() {
@@ -155,9 +164,10 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
         );
         void this.router.navigate(['/home']);
       },
-      error: () =>
+      error: (error: HttpErrorResponse) =>
         this.toasterService.error(
-          'Failed to create certificate. Please try again later.'
+          error?.error?.message,
+          'Failed to create certificate.'
         ),
     });
   }

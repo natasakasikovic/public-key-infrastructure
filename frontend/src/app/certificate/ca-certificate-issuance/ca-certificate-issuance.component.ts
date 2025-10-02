@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   EXTENDED_KEY_USAGE_OPTIONS,
   KEY_USAGE_OPTIONS,
@@ -18,9 +18,10 @@ import { PageEvent } from '@angular/material/paginator';
   templateUrl: './ca-certificate-issuance.component.html',
   styleUrl: './ca-certificate-issuance.component.css',
 })
-export class CaCertificateIssuanceComponent {
+export class CaCertificateIssuanceComponent implements OnInit {
   keyUsageOptions = KEY_USAGE_OPTIONS;
   extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
+  selectedCertificate: CertificateResponse | null = null;
 
   // certificates table
   displayedCertificateColumns: string[] = [
@@ -65,6 +66,7 @@ export class CaCertificateIssuanceComponent {
       .getAuthorizedIssuableCertificates(pageIndex, pageSize)
       .subscribe({
         next: (response: PagedResponse<CertificateResponse>) => {
+          console.log(response);
           this.certificateDataSource.data = response.content;
           this.totalElements = response.totalElements;
         },
@@ -98,10 +100,13 @@ export class CaCertificateIssuanceComponent {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
   }
 
-  onCertificateSelected(certicate: CertificateResponse) {
+  onCertificateSelected(certificate: CertificateResponse) {
     this.certificateForm.controls['signingCertificateId'].setValue(
-      certicate.id
+      certificate.id
     );
+    this.selectedCertificate = certificate;
+    this.certificateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
   }
 
   createCertificate() {

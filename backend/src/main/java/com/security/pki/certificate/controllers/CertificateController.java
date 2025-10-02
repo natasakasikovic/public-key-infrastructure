@@ -61,7 +61,7 @@ public class CertificateController {
                 .body(service.exportAsPkcs12(serialNumber));
     }
 
-    @PostMapping("csr/self-generation")
+    @PostMapping("/csr/self-generation")
     @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
     public ResponseEntity<Void> createCSRSelfGenerate(
             @RequestParam String caCertificateId,
@@ -93,8 +93,7 @@ public class CertificateController {
                 .body(revocationService.getCrl(serialNumber));
     }
 
-    @GetMapping("valid-cas")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/valid-cas")
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidSigningCertificates(Pageable pageable) {
         return ResponseEntity.ok(service.getValidParentCas(pageable));
     }

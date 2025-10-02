@@ -96,7 +96,12 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedCertificateColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedCertificateColumns;" (click)="onCertificateSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedCertificateColumns;"
+            (click)="onCertificateSelected(row)"
+            [class.selected]="row === selectedCertificate">
+          </tr>
         </table>
 
         <mat-paginator [length]="totalElements"

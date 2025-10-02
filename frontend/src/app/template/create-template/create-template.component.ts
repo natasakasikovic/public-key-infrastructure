@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import { TemplateService } from '../template.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import { CertificateTemplate } from '../model/certificate-template.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
@@ -24,16 +24,17 @@ export class CreateTemplateComponent implements OnInit {
   keyUsageOptions: string[] = KEY_USAGE_OPTIONS;
   selectedIssuer: CertificateResponse | null = null;
   certificates: CertificateResponse[] = [];
-  displayedColumns: string[] = ['serialNumber', 'certificateType', 'issuerEmail', 'subjectEmail', 'select'];
+  displayedCertificateColumns: string[] = ['serialNumber', 'certificateType', 'issuerEmail', 'subjectEmail'];
   dataSource = new MatTableDataSource<CertificateResponse>(this.certificates);
   totalElements = 0;
   pageSize = 10;
+  selectedCertificate: CertificateResponse | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   templateForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
-    issuer: new FormControl('', Validators.required),
+    signingCertificateId: new FormControl('', Validators.required),
     commonNameRegex: new FormControl('.*\\.example\\.com', [Validators.required, regexValidator()]),
     sanRegex: new FormControl('.*', [Validators.required, regexValidator()]),
     ttlDays: new FormControl(365, [Validators.required, Validators.min(1)]),
@@ -49,7 +50,15 @@ export class CreateTemplateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCertificates(0, this.pageSize);
+    this.fetchCertificates(0, this.pageSize);
+  }
+
+  get keyUsagesFormArray(): FormArray {
+    return this.templateForm.get('keyUsages') as FormArray;
+  }
+
+  get extendedKeyUsagesFormArray(): FormArray {
+    return this.templateForm.get('extendedKeyUsages') as FormArray;
   }
 
   onCreate(): void {
@@ -77,35 +86,41 @@ export class CreateTemplateComponent implements OnInit {
     });
   }
 
-  selectIssuer(cert: CertificateResponse) {
-    this.selectedIssuer = cert;
-    this.templateForm.patchValue({issuer: cert.subjectEmail});
-  }
-
-  onCheckboxChange(event: Event, controlName: 'keyUsages' | 'extendedKeyUsages'): void {
-    const checkbox = event.target as HTMLInputElement;
-    const currentArray = this.templateForm.get(controlName)?.value as string[];
-
-    if (checkbox.checked) {
-      this.templateForm.get(controlName)?.setValue([...currentArray, checkbox.value]);
-    } else {
-      this.templateForm.get(controlName)?.setValue(
-        currentArray.filter(item => item !== checkbox.value)
+  onCheckboxChange(event: any, formArray: FormArray) {
+    if (event.target.checked)
+      formArray.push(new FormControl(event.target.value));
+    else {
+      const index = formArray.controls.findIndex(
+        (x) => x.value === event.target.value
       );
+      formArray.removeAt(index);
     }
-    this.templateForm.get(controlName)?.markAsTouched();
   }
 
   onPageChange(event: PageEvent): void {
-    this.loadCertificates(event.pageIndex, event.pageSize);
+    this.fetchCertificates(event.pageIndex, event.pageSize);
   }
 
-  private loadCertificates(pageIndex: number, pageSize: number) {
-    this.certificateService.getAll(pageIndex, pageSize).subscribe({
+  private fetchCertificates(pageIndex: number, pageSize: number): void {
+    this.certificateService.getValidCACertificates(pageIndex, pageSize).subscribe({
       next: (response: PagedResponse<CertificateResponse>) => {
+        console.log(response);
         this.dataSource.data = response.content;
         this.totalElements = response.totalElements;
-      }
-    })
+      },
+    });
+  }
+
+  onCertificateSelected(certificate: CertificateResponse) {
+    this.templateForm.controls['signingCertificateId'].setValue(
+      certificate.id
+    );
+    this.selectedCertificate = certificate;
+    this.templateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
+  }
+
+  viewDetails(certificate: CertificateResponse): void {
+    void this.router.navigate(['certificate', certificate.id]);
   }
 }

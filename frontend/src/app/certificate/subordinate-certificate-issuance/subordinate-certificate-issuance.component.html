@@ -48,7 +48,7 @@
         <hr>
 
         <!-- user selection -->
-        
+
         <table mat-table [dataSource]="userDataSource" class="mat-elevation-z8">
 
           <ng-container matColumnDef="firstName">
@@ -74,8 +74,12 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedUserColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedUserColumns;" 
-            (click)="onUserSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedUserColumns;"
+            (click)="onUserSelected(row)"
+            [class.selected]="row === selectedUser">
+          </tr>
         </table>
 
         <mat-paginator [length]="totalElements"
@@ -134,7 +138,12 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedCertificateColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedCertificateColumns;" (click)="onCertificateSelected(row)"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedCertificateColumns;"
+            (click)="onCertificateSelected(row)"
+            [class.selected]="row === selectedCertificate">
+          </tr>
         </table>
 
         <mat-paginator [length]="totalElements"
