@@ -60,7 +60,7 @@ public class CertificateController {
                 .body(service.exportAsPkcs12(serialNumber));
     }
 
-    @PostMapping("csr/self-generation")
+    @PostMapping("/csr/self-generation")
     @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
     public ResponseEntity<Void> createCSRSelfGenerate(
             @RequestParam UUID caCertificateId,
