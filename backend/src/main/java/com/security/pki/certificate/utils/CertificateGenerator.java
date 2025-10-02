@@ -117,7 +117,6 @@ public class CertificateGenerator {
 
             // subject alternative names
             List<GeneralName> sanList = new ArrayList<>();
-
             for (SAN san : request.getSubjectAlternativeNames()) {
                 switch (san.getType()) {
                     case DNS -> sanList.add(new GeneralName(GeneralName.dNSName, san.getValue()));

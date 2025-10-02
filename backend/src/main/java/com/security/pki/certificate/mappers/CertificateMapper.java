@@ -2,6 +2,7 @@ package com.security.pki.certificate.mappers;
 
 import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.enums.Status;
+import com.security.pki.certificate.exceptions.CertificateParsingException;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.enums.CertificateType;
 import com.security.pki.certificate.models.Issuer;
@@ -167,7 +168,7 @@ public class CertificateMapper {
           CertificateFactory cf = CertificateFactory.getInstance("X.509");
           return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert.getCertificateData()));
       } catch (CertificateException e) {
-          throw new RuntimeException(e);
+          throw new CertificateParsingException("Failed to parse certificate");
       }
   }
 
@@ -234,6 +235,7 @@ public class CertificateMapper {
             .signingCertificateId(caId)
             .keyUsages(new ArrayList<>())
             .extendedKeyUsages(new ArrayList<>())
+            .subjectAlternativeNames(new ArrayList<>())
             .state(getRdnValue(x500, BCStyle.ST))
             .locality(getRdnValue(x500, BCStyle.L))
             .pathLenConstraint(0)
