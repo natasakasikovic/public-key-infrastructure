@@ -37,7 +37,6 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     'certificateType',
     'issuerMail',
     'subjectMail',
-    'details',
   ];
   certificateDataSource = new MatTableDataSource<CertificateResponse>([]);
 
@@ -69,6 +68,7 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     pathLenConstraint: new FormControl(''),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
+    subjectAlternativeNames: new FormArray([]),
   });
 
   constructor(
@@ -132,6 +132,10 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
   }
 
+  get subjectAlternativeNames(): FormArray {
+    return this.certificateForm.get('subjectAlternativeNames') as FormArray;
+  }
+
   onUserSelected(user: UserResponse) {
     this.certificateForm.controls['userId'].setValue(user.id);
     this.selectedUser = user;
@@ -170,5 +174,17 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
           'Failed to create certificate.'
         ),
     });
+  }
+
+  addSAN(): void {
+    const sanGroup = new FormGroup({
+      type: new FormControl('DNS', Validators.required),
+      value: new FormControl('', Validators.required),
+    });
+    this.subjectAlternativeNames.push(sanGroup);
+  }
+
+  removeSAN(index: number): void {
+    this.subjectAlternativeNames.removeAt(index);
   }
 }

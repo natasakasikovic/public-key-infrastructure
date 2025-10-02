@@ -49,6 +49,7 @@ export class CaCertificateIssuanceComponent implements OnInit {
     certificateType: new FormControl('', Validators.required),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
+    subjectAlternativeNames: new FormArray([]),
   });
 
   constructor(
@@ -98,6 +99,22 @@ export class CaCertificateIssuanceComponent implements OnInit {
 
   get extendedKeyUsagesFormArray(): FormArray {
     return this.certificateForm.get('extendedKeyUsages') as FormArray;
+  }
+
+  get subjectAlternativeNames(): FormArray {
+    return this.certificateForm.get('subjectAlternativeNames') as FormArray;
+  }
+
+  addSAN(): void {
+    const sanGroup = new FormGroup({
+      type: new FormControl('DNS', Validators.required),
+      value: new FormControl('', Validators.required),
+    });
+    this.subjectAlternativeNames.push(sanGroup);
+  }
+
+  removeSAN(index: number): void {
+    this.subjectAlternativeNames.removeAt(index);
   }
 
   onCertificateSelected(certificate: CertificateResponse) {

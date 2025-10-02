@@ -96,7 +96,7 @@ export class CreateTemplateComponent implements OnInit {
   }
 
   private fetchCertificates(pageIndex: number, pageSize: number): void {
-    this.certificateService.getValidCACertificates(pageIndex, pageSize).subscribe({
+    this.certificateService.getAuthorizedIssuableCertificates(pageIndex, pageSize).subscribe({
       next: (response: PagedResponse<CertificateResponse>) => {
         this.dataSource.data = response.content;
         this.totalElements = response.totalElements;

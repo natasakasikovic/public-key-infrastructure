@@ -3,7 +3,6 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {TemplateService} from '../template.service';
 import {forkJoin, switchMap} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
-import {CertificateTemplate} from '../model/certificate-template.model';
 import {ToastrService} from 'ngx-toastr';
 import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
 import {regexValidator} from '../validators/regex-validator.validator';
@@ -127,7 +126,7 @@ export class EditTemplateComponent implements OnInit {
   }
 
   private fetchCertificates(pageIndex: number, pageSize: number): void {
-    this.certificateService.getValidCACertificates(pageIndex, pageSize).subscribe({
+    this.certificateService.getAuthorizedIssuableCertificates(pageIndex, pageSize).subscribe({
       next: (response: PagedResponse<CertificateResponse>) => {
         this.dataSource.data = response.content;
         this.totalElements = response.totalElements;

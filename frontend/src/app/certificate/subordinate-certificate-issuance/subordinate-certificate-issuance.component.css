@@ -165,3 +165,35 @@ table.table tbody tr:hover {
 .selected {
   background-color: #cce5ff !important;
 }
+
+.san {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.san-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.san-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.san-col {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+}
