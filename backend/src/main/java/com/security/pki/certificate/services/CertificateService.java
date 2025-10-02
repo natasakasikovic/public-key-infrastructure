@@ -256,10 +256,16 @@ public class CertificateService {
         LinkedHashMap<String, Certificate> issuableChain = getIssuableCertificateChain(certificates);
         List<Certificate> collectedCertificates = new ArrayList<>(issuableChain.values());
 
+        Date now = new Date();
+        List<Certificate> result = collectedCertificates.stream().filter(Certificate::isCanSign)
+                                    .filter(cert -> cert.getStatus() != Status.REVOKED)
+                                    .filter(cert -> !now.before(cert.getValidFrom()) && !now.after(cert.getValidTo()))
+                                    .toList();
+
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), collectedCertificates.size());
-        List<Certificate> pageContent = collectedCertificates.subList(start, end);
-        Page<Certificate> pagedResult = new PageImpl<>(pageContent, pageable, collectedCertificates.size());
+        int end = Math.min((start + pageable.getPageSize()), result.size());
+        List<Certificate> pageContent = result.subList(start, end);
+        Page<Certificate> pagedResult = new PageImpl<>(pageContent, pageable, result.size());
 
         return mapper.toPagedResponse(pagedResult);
     }
