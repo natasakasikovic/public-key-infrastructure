@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -161,10 +162,13 @@ public class CertificateMapper {
     return null;
   }
 
-  public X509Certificate toX509(Certificate cert) throws Exception {
-    CertificateFactory cf = CertificateFactory.getInstance("X.509");
-    return (X509Certificate) cf.generateCertificate(
-        new ByteArrayInputStream(cert.getCertificateData()));
+  public X509Certificate toX509(Certificate cert)  {
+      try {
+          CertificateFactory cf = CertificateFactory.getInstance("X.509");
+          return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert.getCertificateData()));
+      } catch (CertificateException e) {
+          throw new RuntimeException(e);
+      }
   }
 
   private List<String> extractKeyUsages(X509Certificate x509) {

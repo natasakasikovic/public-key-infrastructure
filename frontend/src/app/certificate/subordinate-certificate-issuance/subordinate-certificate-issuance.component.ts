@@ -138,7 +138,7 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
   onUserSelected(user: UserResponse) {
     this.certificateForm.controls['userId'].setValue(user.id);
     this.selectedUser = user;
-    this.certificateForm.controls['signingCertificateId']
+    this.certificateForm.controls['userId']
       .setValue(user.id);
   }
 

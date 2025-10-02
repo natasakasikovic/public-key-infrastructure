@@ -61,7 +61,7 @@ public class CertificateService {
         final X500Name x500Name = buildX500Name(request);
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final Certificate certificate = mapper.toCertificateEntity(request, x500Name, serialNumber);
-        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null, null));
+        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null, null, null, null));
         certificate.setOwner(authService.getCurrentUser());
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
@@ -113,13 +113,22 @@ public class CertificateService {
 
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final KeyPair keyPair = cryptoService.generateKeyPair();
+
         if (publicKey == null)
             publicKey = keyPair.getPublic();
-        final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
+
+        final Certificate signingCertificateParent = signingCertificate.getParent();
+        final KeyPair signingCertificateKeyPair = loadKeyPair(signingCertificate); // needed for extensions
+        KeyPair signingCertificateParentKeyPair = null;
+
+        if (signingCertificateParent != null)
+            signingCertificateParentKeyPair = loadKeyPair(signingCertificateParent);
 
         CertificateValidationContext context = new CertificateValidationContext(
             signingCertificate,
             mapper.fromRequest(request),
+            signingCertificateKeyPair,
+            signingCertificateParentKeyPair,
             request.getCommonNameRegex(),
             request.getSanRegex(),
             request.getTtlDays()
@@ -128,7 +137,7 @@ public class CertificateService {
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, parentKeyPair);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateKeyPair);
         Certificate certificate = mapper.toCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
@@ -247,10 +256,16 @@ public class CertificateService {
         LinkedHashMap<String, Certificate> issuableChain = getIssuableCertificateChain(certificates);
         List<Certificate> collectedCertificates = new ArrayList<>(issuableChain.values());
 
+        Date now = new Date();
+        List<Certificate> result = collectedCertificates.stream().filter(Certificate::isCanSign)
+                                    .filter(cert -> cert.getStatus() != Status.REVOKED)
+                                    .filter(cert -> !now.before(cert.getValidFrom()) && !now.after(cert.getValidTo()))
+                                    .toList();
+
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), collectedCertificates.size());
-        List<Certificate> pageContent = collectedCertificates.subList(start, end);
-        Page<Certificate> pagedResult = new PageImpl<>(pageContent, pageable, collectedCertificates.size());
+        int end = Math.min((start + pageable.getPageSize()), result.size());
+        List<Certificate> pageContent = result.subList(start, end);
+        Page<Certificate> pagedResult = new PageImpl<>(pageContent, pageable, result.size());
 
         return mapper.toPagedResponse(pagedResult);
     }
