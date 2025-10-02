@@ -117,8 +117,12 @@ public class CertificateService {
         if (publicKey == null)
             publicKey = keyPair.getPublic();
 
+        final Certificate signingCertificateParent = signingCertificate.getParent();
         final KeyPair signingCertificateKeyPair = loadKeyPair(signingCertificate); // needed for extensions
-        final KeyPair signingCertificateParentKeyPair = loadKeyPair(signingCertificate.getParent());
+        KeyPair signingCertificateParentKeyPair = null;
+
+        if (signingCertificateParent != null)
+            signingCertificateParentKeyPair = loadKeyPair(signingCertificateParent);
 
         CertificateValidationContext context = new CertificateValidationContext(
             signingCertificate,
@@ -133,7 +137,7 @@ public class CertificateService {
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateParentKeyPair);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateKeyPair);
         Certificate certificate = mapper.toCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }
