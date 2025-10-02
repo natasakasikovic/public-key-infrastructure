@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -159,34 +161,32 @@ public class CertificateMapper {
     }
   }
 
-  public CaCertificateDto toCaCertificateDto(Certificate cert) {
-    X500Name x500Name = new X500Name(cert.getSubject().getPrincipalName());
-
-    return CaCertificateDto.builder()
-        .id(cert.getId())
-        .commonName(getRdnValue(x500Name, BCStyle.CN))
-        .organization(getRdnValue(x500Name, BCStyle.O))
-        .serialNumber(cert.getSerialNumber())
-        .validFrom(cert.getValidFrom())
-        .validTo(cert.getValidTo())
-        .build();
-  }
 
   public CreateSubordinateCertificateDto fromCsr(PKCS10CertificationRequest csr,
       User user,
-      String caId,
+      UUID caId,
       String until) {
     X500Name x500 = csr.getSubject();
 
-    // TODO: set all attributes
     return CreateSubordinateCertificateDto.builder()
-        .commonName(getRdnValue(x500, BCStyle.CN) != null ? getRdnValue(x500, BCStyle.CN) : "unknown")
-        .organizationalUnit(getRdnValue(x500, BCStyle.OU))
-        .country(getRdnValue(x500, BCStyle.C))
-        .userId(user.getId())
-        .validFrom(new Date())
-        .validTo(new Date(until)) // TODO: convert
-        .build();
+            .commonName(getRdnValue(x500, BCStyle.CN) != null ? getRdnValue(x500, BCStyle.CN) : "unknown")
+            .organizationalUnit(getRdnValue(x500, BCStyle.OU))
+            .country(getRdnValue(x500, BCStyle.C))
+            .signingCertificateId(caId)
+            .userId(user.getId())
+            .validFrom(new Date())
+            .validTo(Date.from(
+                    LocalDate.parse(until, DateTimeFormatter.ISO_LOCAL_DATE)
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()))
+            .signingCertificateId(caId)
+            .keyUsages(new ArrayList<>())
+            .extendedKeyUsages(new ArrayList<>())
+            .state(getRdnValue(x500, BCStyle.ST))
+            .locality(getRdnValue(x500, BCStyle.L))
+            .pathLenConstraint(0)
+            .canSign(false)
+            .build();
   }
 
 }

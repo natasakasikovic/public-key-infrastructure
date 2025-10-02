@@ -9,6 +9,7 @@ import {RouterLink} from '@angular/router';
 import { RevokeDialogComponent } from './revoke-dialog/revoke-dialog.component';
 import { CaCertificateIssuanceComponent } from './ca-certificate-issuance/ca-certificate-issuance.component';
 import { CsrSelfUploadComponent } from './csr-self-upload/csr-self-upload.component';
+import { CsrAutoGenerateComponent } from './csr-auto-generate/csr-auto-generate.component';
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { CsrSelfUploadComponent } from './csr-self-upload/csr-self-upload.compon
     RevokeDialogComponent,
     CaCertificateIssuanceComponent,
     CsrSelfUploadComponent,
+    CsrAutoGenerateComponent,
   ],
   imports: [
     CommonModule,

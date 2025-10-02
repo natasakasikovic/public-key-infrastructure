@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CaCertificate } from '../models/ca-certificate.model';
 import { CertificateService } from '../certificate.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
+import { CertificateResponse } from '../models/certificate-response.model';
+import { PagedResponse } from '../../shared/model/paged-response';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-csr-self-upload',
@@ -14,7 +17,18 @@ import { Router } from '@angular/router';
 export class CsrSelfUploadComponent implements OnInit {
   csrSelfForm: FormGroup;
   selectedFile: File | null = null;
-  caList: CaCertificate[] = [];
+    displayedCertificateColumns: string[] = [
+    'serialNumber',
+    'certificateType',
+    'issuerMail',
+    'subjectMail',
+    'details',
+  ];
+  selectedCertificate: CertificateResponse | null = null;
+  certificateDataSource = new MatTableDataSource<CertificateResponse>([]);
+
+  totalElements = 0;
+  pageSize = 5;
 
   constructor(
     private fb: FormBuilder, 
@@ -30,14 +44,31 @@ export class CsrSelfUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCaCertificates();
+    this.fetchCertificates(0, this.pageSize);
   }
 
-  loadCaCertificates(): void {
-    this.service.getAvailableCaCertificates().subscribe({
-      next: (data) => this.caList = data,
-      error: (err) => console.error('Error loading CA certificates', err)
+  fetchCertificates(pageIndex: number, pageSize: number): void {
+    this.service.getValidCACertificates(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<CertificateResponse>) => {
+        this.certificateDataSource.data = response.content;
+        this.totalElements = response.totalElements;
+      },
     });
+  }
+
+  viewDetails(certificate: CertificateResponse): void {
+    void this.router.navigate(['certificate', certificate.id]);
+  }
+
+  onCertificateSelected(certificate: CertificateResponse) {
+    this.selectedCertificate = certificate;
+    this.csrSelfForm.controls['caCertificateId'].setValue(
+      certificate.id
+    );
+  }
+
+  onCertificatePageChange(event: PageEvent): void {
+    this.fetchCertificates(event.pageIndex, event.pageSize);
   }
 
   onFileChange(event: any) {
