@@ -2,7 +2,6 @@ package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
 import com.security.pki.certificate.dtos.certificate.*;
-import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.exceptions.KeyPairRetrievalException;
@@ -258,14 +257,5 @@ public class CertificateService {
 
     public CertificateDetailsResponseDto getCertificate(UUID id) {
         return mapper.toDetailsResponse(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Certificate not found.")));
-    }
-
-    @Transactional
-    public List<CaCertificateDto> getAvailableCaCertificates() {
-        return repository
-                .findByCanSignTrueAndStatusAndValidToAfter(Status.ACTIVE, new Date())
-                .stream()
-                .map(mapper::toCaCertificateDto)
-                .toList();
     }
 }
