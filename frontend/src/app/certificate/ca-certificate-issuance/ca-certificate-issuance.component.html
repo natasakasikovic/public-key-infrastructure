@@ -119,7 +119,9 @@
                 type="checkbox"
                 class="form-check-input"
                 [value]="option"
-                (change)="onCheckboxChange($event, keyUsagesFormArray)">
+                (change)="onCheckboxChange($event, keyUsagesFormArray)"
+                [checked]="keyUsagesFormArray.value.includes(option)"
+                [disabled]="template?.keyUsages?.includes(option)" />
               <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
@@ -131,7 +133,9 @@
                 type="checkbox"
                 class="form-check-input"
                 [value]="option"
-                (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)">
+                (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)"
+                [checked]="extendedKeyUsagesFormArray.value.includes(option)"
+                [disabled]="template?.extendedKeyUsages?.includes(option)" />
               <label class="form-check-label">{{ option }}</label>
             </div>
           </div>
@@ -219,11 +223,9 @@
             </div>
 
             <div class="add-button">
-              <button
-                type="button"
-                class="btn custombutton btn-primary"
-                [disabled]="certificateForm.invalid"
-                (click)="createCertificate()">
+              <button mat-raised-button color="primary" type="submit"
+                      (click)="createCertificate()"
+                      class="save-button" [disabled]="certificateForm.invalid">
                 Confirm
               </button>
             </div>

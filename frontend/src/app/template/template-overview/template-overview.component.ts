@@ -54,10 +54,13 @@ export class TemplateOverviewComponent implements OnInit {
       error: () => this.toasterService.error("Failed to delete template."),
     });
   }
-  useTemplate(template: CertificateTemplate) { /* create cert from template */ }
+  useTemplate(template: CertificateTemplate) {
+    void this.router.navigate(['/ca-certificate-issuance'], {
+      state: { template }
+    });
+  }
 
   editTemplate(template: CertificateTemplate) {
-    console.log(template);
     void this.router.navigate(['edit-template', template.id]);
   }
 }

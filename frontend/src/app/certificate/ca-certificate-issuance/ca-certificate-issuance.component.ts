@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PagedResponse } from '../../shared/model/paged-response';
 import { PageEvent } from '@angular/material/paginator';
+import {CertificateTemplate} from '../../template/model/certificate-template.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-ca-certificate-issuance',
@@ -22,7 +24,7 @@ export class CaCertificateIssuanceComponent implements OnInit {
   keyUsageOptions = KEY_USAGE_OPTIONS;
   extendedKeyUsageOptions = EXTENDED_KEY_USAGE_OPTIONS;
   selectedCertificate: CertificateResponse | null = null;
-
+  template: CertificateTemplate | null = null;
   // certificates table
   displayedCertificateColumns: string[] = [
     'serialNumber',
@@ -60,6 +62,11 @@ export class CaCertificateIssuanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchCertificates(0, this.pageSize);
+    const state = history.state;
+    if (state?.template) {
+      this.template = state.template as CertificateTemplate;
+      this.applyTemplate(this.template);
+    }
   }
 
   fetchCertificates(pageIndex: number, pageSize: number): void {
@@ -67,9 +74,10 @@ export class CaCertificateIssuanceComponent implements OnInit {
       .getAuthorizedIssuableCertificates(pageIndex, pageSize)
       .subscribe({
         next: (response: PagedResponse<CertificateResponse>) => {
-          console.log(response);
           this.certificateDataSource.data = response.content;
           this.totalElements = response.totalElements;
+          this.selectedCertificate =
+            this.certificateDataSource.data.find(c => c.id === this.template?.signingCertificateId) ?? null;
         },
       });
   }
@@ -110,6 +118,12 @@ export class CaCertificateIssuanceComponent implements OnInit {
       type: new FormControl('DNS', Validators.required),
       value: new FormControl('', Validators.required),
     });
+    if(this.template) {
+      sanGroup.setValidators([
+        Validators.required,
+        Validators.pattern(this.template?.sanRegex)
+      ]);
+    }
     this.subjectAlternativeNames.push(sanGroup);
   }
 
@@ -118,6 +132,7 @@ export class CaCertificateIssuanceComponent implements OnInit {
   }
 
   onCertificateSelected(certificate: CertificateResponse) {
+    if(this.template) return;
     this.certificateForm.controls['signingCertificateId'].setValue(
       certificate.id
     );
@@ -142,10 +157,56 @@ export class CaCertificateIssuanceComponent implements OnInit {
         );
         void this.router.navigate(['/home']);
       },
-      error: () =>
+      error: (error: HttpErrorResponse) =>
         this.toasterService.error(
+          error?.error?.message,
           'Failed to create certificate. Please try again later.'
         ),
     });
   }
+
+  applyTemplate(template: CertificateTemplate): void {
+    this.certificateForm.patchValue({
+      signingCertificateId: template.signingCertificateId,
+      commonName: template.commonNameRegex,
+      pathLenConstraint: 0,
+    });
+
+    this.certificateForm.get('commonName')?.setValidators([
+      Validators.required,
+      Validators.pattern(template.commonNameRegex),
+    ]);
+
+    this.subjectAlternativeNames.push(
+      new FormGroup({
+        type: new FormControl('DNS'),
+        value: new FormControl(template.sanRegex),
+      })
+    );
+
+    this.keyUsagesFormArray.clear();
+    template.keyUsages.forEach(usage => {
+      this.keyUsagesFormArray.push(new FormControl(usage));
+    });
+
+    this.extendedKeyUsagesFormArray.clear();
+    template.extendedKeyUsages.forEach(usage => {
+      this.extendedKeyUsagesFormArray.push(new FormControl(usage));
+    });
+
+    this.addValidToCalculation();
+  }
+
+  private addValidToCalculation(): void {
+    this.certificateForm.get('validFrom')?.valueChanges.subscribe((start: string) => {
+      if (start && this.template?.ttlDays) {
+        const startDate = new Date(start);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + this.template.ttlDays);
+
+        this.certificateForm.get('validTo')?.setValue(endDate.toISOString().split('T')[0]);
+      }
+    });
+  }
+
 }

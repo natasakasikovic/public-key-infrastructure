@@ -63,7 +63,7 @@ export class EditTemplateComponent implements OnInit {
           if (!id) throw new Error('Template ID is required in the route.');
           this.id = id;
           return forkJoin({
-            certificates: this.certificateService.getValidCACertificates(0, this.pageSize),
+            certificates: this.certificateService.getAuthorizedIssuableCertificates(0, this.pageSize),
             template: this.templateService.getTemplate(id)
           });
         })

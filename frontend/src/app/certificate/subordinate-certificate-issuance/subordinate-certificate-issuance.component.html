@@ -250,11 +250,9 @@
             </div>
 
             <div class="add-button">
-              <button
-                type="button"
-                class="btn custombutton btn-primary"
-                [disabled]="certificateForm.invalid"
-                (click)="createCertificate()">
+              <button mat-raised-button color="primary" type="submit"
+                      (click)="createCertificate()"
+                      class="save-button" [disabled]="certificateForm.invalid">
                 Confirm
               </button>
             </div>

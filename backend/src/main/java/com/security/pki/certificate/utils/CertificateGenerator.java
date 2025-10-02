@@ -6,6 +6,7 @@ import com.security.pki.certificate.dtos.certificate.CreateRootCertificateReques
 import com.security.pki.certificate.dtos.certificate.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.exceptions.CertificateGenerationException;
 import com.security.pki.certificate.models.Certificate;
+import com.security.pki.certificate.models.SAN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
@@ -115,10 +116,15 @@ public class CertificateGenerator {
 
             // subject alternative names
             List<GeneralName> sanList = new ArrayList<>();
-            sanList.add(new GeneralName(GeneralName.dNSName, "localhost"));
-            sanList.add(new GeneralName(GeneralName.iPAddress, "127.0.0.1"));
-            sanList.add(new GeneralName(GeneralName.iPAddress, "::1"));
 
+            for (SAN san : request.getSubjectAlternativeNames()) {
+                switch (san.getType()) {
+                    case DNS -> sanList.add(new GeneralName(GeneralName.dNSName, san.getValue()));
+                    case IP -> sanList.add(new GeneralName(GeneralName.iPAddress, san.getValue()));
+                    case EMAIL -> sanList.add(new GeneralName(GeneralName.rfc822Name, san.getValue()));
+                    case URI -> sanList.add(new GeneralName(GeneralName.uniformResourceIdentifier, san.getValue()));
+                }
+            }
             GeneralNames subjectAltNames = new GeneralNames(sanList.toArray(new GeneralName[0]));
             certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltNames);
 

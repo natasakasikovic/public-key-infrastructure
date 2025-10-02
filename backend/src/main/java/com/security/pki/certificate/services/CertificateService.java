@@ -7,9 +7,7 @@ import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.exceptions.KeyPairRetrievalException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.certificate.models.Certificate;
-import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.enums.Status;
-import com.security.pki.certificate.models.Subject;
 import com.security.pki.certificate.repositories.CertificateRepository;
 import com.security.pki.certificate.utils.CertificateGenerator;
 import com.security.pki.certificate.utils.CertificateUtils;
@@ -62,8 +60,8 @@ public class CertificateService {
         final KeyPair keyPair = cryptoService.generateKeyPair();
         final X500Name x500Name = buildX500Name(request);
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
-        final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
-        rootValidator.validate(new CertificateValidationContext(null, certificate));
+        final Certificate certificate = mapper.toCertificateEntity(request, x500Name, serialNumber);
+        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null, null));
         certificate.setOwner(authService.getCurrentUser());
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
@@ -102,20 +100,6 @@ public class CertificateService {
         return builder.build();
     }
 
-    private Certificate buildCertificateEntity(CreateRootCertificateRequest request, X500Name x500Name, BigInteger serialNumber) {
-        return Certificate.builder()
-                .id(UUID.randomUUID())
-                .serialNumber(serialNumber.toString())
-                .subject(new Subject(x500Name))
-                .issuer(new Issuer(x500Name))
-                .validFrom(request.getValidFrom())
-                .validTo(request.getValidTo())
-                .status(Status.ACTIVE)
-                .canSign(true)
-                .pathLenConstraint(null) // for root
-                .build();
-    }
-
     @Transactional
     public void createSubordinateCertificate(CreateSubordinateCertificateDto request) {
         UUID signingCertificateId = request.getSigningCertificateId();
@@ -131,7 +115,13 @@ public class CertificateService {
         final KeyPair keyPair = cryptoService.generateKeyPair();
         final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
 
-        CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
+        CertificateValidationContext context = new CertificateValidationContext(
+            signingCertificate,
+            mapper.fromRequest(request),
+            request.getCommonNameRegex(),
+            request.getSanRegex(),
+            request.getTtlDays()
+        );
 
         for (CertificateValidator validator : validators)
             validator.validate(context);

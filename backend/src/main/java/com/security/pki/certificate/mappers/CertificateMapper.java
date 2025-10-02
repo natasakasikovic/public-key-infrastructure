@@ -81,10 +81,25 @@ public class CertificateMapper {
             .validFrom(request.getValidFrom())
             .validTo(request.getValidTo())
             .owner(user)
+            .subjectAlternativeNames(request.getSubjectAlternativeNames())
             .parent(signingCertificate)
             .status(Status.ACTIVE)
             .canSign(request.getCanSign())
             .pathLenConstraint(request.getPathLenConstraint() != null ? request.getPathLenConstraint() : signingCertificate.getPathLenConstraint() - 1)
+            .build();
+  }
+
+  public Certificate toCertificateEntity(CreateRootCertificateRequest request, X500Name x500Name, BigInteger serialNumber) {
+    return Certificate.builder()
+            .id(UUID.randomUUID())
+            .serialNumber(serialNumber.toString())
+            .subject(new Subject(x500Name))
+            .issuer(new Issuer(x500Name))
+            .validFrom(request.getValidFrom())
+            .validTo(request.getValidTo())
+            .status(Status.ACTIVE)
+            .canSign(true)
+            .pathLenConstraint(null) // for root
             .build();
   }
 
