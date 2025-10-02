@@ -65,4 +65,11 @@ public class CertificateHandlers {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(CertificateParsingException.class)
+    public ResponseEntity<String> handleCertificateParsingException(CertificateParsingException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }

@@ -63,7 +63,7 @@ public class CertificateService {
         final X500Name x500Name = buildX500Name(request);
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final Certificate certificate = buildCertificateEntity(request, x500Name, serialNumber);
-        rootValidator.validate(new CertificateValidationContext(null, certificate));
+        rootValidator.validate(new CertificateValidationContext(null, certificate, null, null));
         certificate.setOwner(authService.getCurrentUser());
         final X509Certificate x509Certificate = certificateGenerator.generateRootCertificate(request, keyPair, serialNumber, x500Name);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
@@ -129,16 +129,19 @@ public class CertificateService {
 
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final KeyPair keyPair = cryptoService.generateKeyPair();
+
         if (publicKey == null)
             publicKey = keyPair.getPublic();
-        final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
 
-        CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request));
+        final KeyPair signingCertificateKeyPair = loadKeyPair(signingCertificate); // needed for extensions
+        final  KeyPair signingCertificateParentKeyPair = loadKeyPair(signingCertificate.getParent());
+
+        CertificateValidationContext context = new CertificateValidationContext(signingCertificate, mapper.fromRequest(request), signingCertificateKeyPair, signingCertificateParentKeyPair);
 
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, parentKeyPair);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, signingCertificateKeyPair);
         Certificate certificate = buildCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }

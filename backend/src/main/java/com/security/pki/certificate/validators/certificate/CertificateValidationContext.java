@@ -2,4 +2,6 @@ package com.security.pki.certificate.validators.certificate;
 
 import com.security.pki.certificate.models.Certificate;
 
-public record CertificateValidationContext(Certificate signingCertificate, Certificate childCertificate ) {}
+import java.security.KeyPair;
+
+public record CertificateValidationContext(Certificate signingCertificate, Certificate childCertificate, KeyPair signingCertificateKeyPair, KeyPair signingCertificateParentKeyPair) {}
