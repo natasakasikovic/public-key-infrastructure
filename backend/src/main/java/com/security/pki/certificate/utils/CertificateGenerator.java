@@ -2,8 +2,8 @@ package com.security.pki.certificate.utils;
 
 import com.security.pki.certificate.converters.ExtendedKeyUsageConverter;
 import com.security.pki.certificate.converters.KeyUsageConverter;
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
-import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
+import com.security.pki.certificate.dtos.certificate.CreateRootCertificateRequest;
+import com.security.pki.certificate.dtos.certificate.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.exceptions.CertificateGenerationException;
 import com.security.pki.certificate.models.Certificate;
 import org.bouncycastle.asn1.x500.X500Name;

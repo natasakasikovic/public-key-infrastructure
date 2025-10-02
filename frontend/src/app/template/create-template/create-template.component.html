@@ -109,7 +109,7 @@
             type="checkbox"
             class="form-check-input"
             [value]="option"
-            (change)="onCheckboxChange($event, keyUsagesFormArray)">
+            (change)="onCheckboxChange($event, 'keyUsages')">
           <label class="form-check-label">{{ option }}</label>
         </div>
       </div>
@@ -121,7 +121,7 @@
             type="checkbox"
             class="form-check-input"
             [value]="option"
-            (change)="onCheckboxChange($event, extendedKeyUsagesFormArray)">
+            (change)="onCheckboxChange($event, 'extendedKeyUsages')">
           <label class="form-check-label">{{ option }}</label>
         </div>
       </div>

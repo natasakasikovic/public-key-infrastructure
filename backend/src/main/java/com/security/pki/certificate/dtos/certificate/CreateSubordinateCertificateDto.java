@@ -1,4 +1,4 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.certificate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;

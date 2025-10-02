@@ -1,7 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.CreateSubordinateCertificateDto;
+import com.security.pki.certificate.dtos.certificate.CreateSubordinateCertificateDto;
 import com.security.pki.certificate.exceptions.InvalidCsrException;
 import com.security.pki.certificate.mappers.CertificateMapper;
 import com.security.pki.user.models.User;

@@ -1,4 +1,4 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.revocation;
 
 import com.security.pki.certificate.enums.RevocationReason;
 import jakarta.validation.constraints.NotNull;

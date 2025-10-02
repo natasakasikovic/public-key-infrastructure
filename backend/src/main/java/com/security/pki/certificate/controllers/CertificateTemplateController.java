@@ -1,6 +1,7 @@
 package com.security.pki.certificate.controllers;
 
-import com.security.pki.certificate.dtos.CertificateTemplateDto;
+import com.security.pki.certificate.dtos.template.CertificateTemplateRequestDto;
+import com.security.pki.certificate.dtos.template.CertificateTemplateResponseDto;
 import com.security.pki.certificate.services.CertificateTemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,32 +22,32 @@ public class CertificateTemplateController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<CertificateTemplateDto> createTemplate(@Valid @RequestBody CertificateTemplateDto request) {
+    public ResponseEntity<CertificateTemplateResponseDto> createTemplate(@Valid @RequestBody CertificateTemplateRequestDto request) {
         return new ResponseEntity<>(service.createTemplate(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<CertificateTemplateDto> getTemplate(@PathVariable UUID id) {
+    public ResponseEntity<CertificateTemplateResponseDto> getTemplate(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getTemplate(id));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<List<CertificateTemplateDto>> getTemplates() {
+    public ResponseEntity<List<CertificateTemplateResponseDto>> getTemplates() {
         return ResponseEntity.ok(service.getTemplates());
     }
 
     @GetMapping("/issuer/{name}")
-    public ResponseEntity<List<CertificateTemplateDto>> getByIssuer(@PathVariable String name) {
+    public ResponseEntity<List<CertificateTemplateResponseDto>> getByIssuer(@PathVariable String name) {
         return ResponseEntity.ok(service.getTemplatesByIssuer(name));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_CA_USER')")
-    public ResponseEntity<CertificateTemplateDto> updateTemplate(
+    public ResponseEntity<CertificateTemplateResponseDto> updateTemplate(
             @PathVariable UUID id,
-            @Valid @RequestBody CertificateTemplateDto request
+            @Valid @RequestBody CertificateTemplateRequestDto request
     ) {
         return ResponseEntity.ok(service.updateTemplate(id, request));
     }

@@ -1,4 +1,4 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.certificate;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

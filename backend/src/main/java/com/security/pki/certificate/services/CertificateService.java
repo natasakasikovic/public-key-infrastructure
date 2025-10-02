@@ -1,7 +1,7 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.*;
+import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.exceptions.KeyPairRetrievalException;

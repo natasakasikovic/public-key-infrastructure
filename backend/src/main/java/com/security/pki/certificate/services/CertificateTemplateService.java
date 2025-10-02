@@ -1,7 +1,8 @@
 package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
-import com.security.pki.certificate.dtos.CertificateTemplateDto;
+import com.security.pki.certificate.dtos.template.CertificateTemplateRequestDto;
+import com.security.pki.certificate.dtos.template.CertificateTemplateResponseDto;
 import com.security.pki.certificate.mappers.CertificateTemplateMapper;
 import com.security.pki.certificate.models.CertificateTemplate;
 import com.security.pki.certificate.repositories.CertificateTemplateRepository;
@@ -22,35 +23,36 @@ public class CertificateTemplateService {
 
     private final CertificateTemplateMapper mapper;
 
-    public CertificateTemplateDto createTemplate(CertificateTemplateDto request) {
+    public CertificateTemplateResponseDto createTemplate(CertificateTemplateRequestDto request) {
         CertificateTemplate template = mapper.fromRequest(request);
+        template.setId(UUID.randomUUID());
         template.setCreatedBy(authService.getCurrentUser());
         return mapper.toResponse(repository.save(template));
     }
 
-    public CertificateTemplateDto getTemplate(UUID id) {
+    public CertificateTemplateResponseDto getTemplate(UUID id) {
         return mapper.toResponse(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found")));
     }
 
-    public List<CertificateTemplateDto> getTemplates() {
+    public List<CertificateTemplateResponseDto> getTemplates() {
         return repository.findByCreatedBy(authService.getCurrentUser())
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
-    public List<CertificateTemplateDto> getTemplatesByIssuer(String name) {
-        return repository.findByIssuer(name).stream().map(mapper::toResponse).toList();
+    public List<CertificateTemplateResponseDto> getTemplatesByIssuer(String name) {
+        return null;
     }
 
-    public CertificateTemplateDto updateTemplate(UUID id, CertificateTemplateDto request) {
+    public CertificateTemplateResponseDto updateTemplate(UUID id, CertificateTemplateRequestDto request) {
         CertificateTemplate existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found"));
         CertificateTemplate updated = CertificateTemplate.builder()
                 .id(existing.getId())
                 .name(request.getName())
-                .issuer(request.getIssuer())
+                .signingCertificateId(request.getSigningCertificateId())
                 .commonNameRegex(request.getCommonNameRegex())
                 .sanRegex(request.getSanRegex())
                 .ttlDays(request.getTtlDays())

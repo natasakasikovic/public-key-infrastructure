@@ -1,8 +1,8 @@
 package com.security.pki.certificate.mappers;
 
+import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.enums.Status;
 import com.security.pki.certificate.models.Certificate;
-import com.security.pki.certificate.dtos.*;
 import com.security.pki.certificate.enums.CertificateType;
 import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.models.Subject;
@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.time.LocalDate;
 import java.util.*;
 
 @Component

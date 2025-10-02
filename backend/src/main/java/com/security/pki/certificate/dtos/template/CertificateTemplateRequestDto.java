@@ -1,6 +1,5 @@
-package com.security.pki.certificate.dtos;
+package com.security.pki.certificate.dtos.template;
 
-import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certification.validators.template.ValidRegex;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,19 +11,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CertificateTemplateDto {
-    private Long id;
-
+public class CertificateTemplateRequestDto {
     @NotEmpty(message = "Name is mandatory")
     private String name;
 
-    @NotNull(message = "Issuer is mandatory")
-    private Issuer issuer;
+    @NotNull(message = "Signing certificate is required")
+    private UUID signingCertificateId;
 
     @ValidRegex(message = "Common name regex must be valid")
     private String commonNameRegex;

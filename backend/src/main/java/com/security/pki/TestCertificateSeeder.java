@@ -1,6 +1,6 @@
 package com.security.pki;
 
-import com.security.pki.certificate.dtos.CreateRootCertificateRequest;
+import com.security.pki.certificate.dtos.certificate.CreateRootCertificateRequest;
 import com.security.pki.certificate.models.Certificate;
 import com.security.pki.certificate.models.Issuer;
 import com.security.pki.certificate.enums.Status;
@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +46,7 @@ public class TestCertificateSeeder implements CommandLineRunner {
         createTestCertificate("Test Root 2", "OrgB", owner1);
     }
 
-    private void createTestCertificate(String cn, String org, User owner) throws GeneralSecurityException, OperatorCreationException, CertIOException {
+    private void createTestCertificate(String cn, String org, User owner) throws GeneralSecurityException {
         KeyPair keyPair = cryptoService.generateKeyPair();
 
         X500Name x500Name = new X500NameBuilder(BCStyle.INSTANCE)
