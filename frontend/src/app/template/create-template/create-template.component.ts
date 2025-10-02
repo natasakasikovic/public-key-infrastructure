@@ -90,6 +90,7 @@ export class CreateTemplateComponent implements OnInit {
     }
     this.templateForm.get(controlName)?.markAsTouched();
   }
+
   onPageChange(event: PageEvent): void {
     this.fetchCertificates(event.pageIndex, event.pageSize);
   }

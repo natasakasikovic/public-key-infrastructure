@@ -1,5 +1,5 @@
 export interface CertificateTemplate {
-  id?: number;
+  id?: string;
   name: string;
   signingCertificateId: string;
   issuerEmail: string;

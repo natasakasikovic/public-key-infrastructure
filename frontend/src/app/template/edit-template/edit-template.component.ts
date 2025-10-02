@@ -1,12 +1,17 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {TemplateService} from '../template.service';
-import {switchMap} from 'rxjs';
+import {forkJoin, switchMap} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CertificateTemplate} from '../model/certificate-template.model';
 import {ToastrService} from 'ngx-toastr';
 import {EXTENDED_KEY_USAGE_OPTIONS, KEY_USAGE_OPTIONS} from '../../shared/constants/certificate-options';
 import {regexValidator} from '../validators/regex-validator.validator';
+import {CertificateResponse} from '../../certificate/models/certificate-response.model';
+import {MatTableDataSource} from '@angular/material/table';
+import {PagedResponse} from '../../shared/model/paged-response';
+import {CertificateService} from '../../certificate/certificate.service';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-edit-template',
@@ -15,12 +20,19 @@ import {regexValidator} from '../validators/regex-validator.validator';
   styleUrl: './edit-template.component.css'
 })
 export class EditTemplateComponent implements OnInit {
-  id?: number;
+  id?: string;
   extendedKeyUsageOptions: string[] = EXTENDED_KEY_USAGE_OPTIONS;
   keyUsageOptions: string[] = KEY_USAGE_OPTIONS;
+  certificates: CertificateResponse[] = [];
+  dataSource = new MatTableDataSource<CertificateResponse>(this.certificates);
+  totalElements = 0;
+  pageSize = 10;
+  selectedCertificate: CertificateResponse | null = null;
+  displayedCertificateColumns: string[] = ['serialNumber', 'certificateType', 'issuerEmail', 'subjectEmail'];
+
   editTemplateForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
-    issuer: new FormControl('', Validators.required),
+    signingCertificateId: new FormControl('', Validators.required),
     commonNameRegex: new FormControl('', [Validators.required, regexValidator()]),
     sanRegex: new FormControl('', [Validators.required, regexValidator()]),
     ttlDays: new FormControl(0, [Validators.required, Validators.min(1)]),
@@ -31,6 +43,7 @@ export class EditTemplateComponent implements OnInit {
   constructor(
     private templateService: TemplateService,
     private toasterService: ToastrService,
+    private certificateService: CertificateService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -47,17 +60,27 @@ export class EditTemplateComponent implements OnInit {
     this.route.paramMap
       .pipe(
         switchMap(paramMap => {
-          const id = Number(paramMap.get('id'));
+          const id = paramMap.get('id');
+          if (!id) throw new Error('Template ID is required in the route.');
           this.id = id;
-          return this.templateService.getTemplate(id);
+          return forkJoin({
+            certificates: this.certificateService.getValidCACertificates(0, this.pageSize),
+            template: this.templateService.getTemplate(id)
+          });
         })
       )
       .subscribe({
-        next: (template: CertificateTemplate) => {
-          this.editTemplateForm.patchValue({...template});
+        next: ({ certificates, template }) => {
+          this.dataSource.data = certificates.content;
+          this.totalElements = certificates.totalElements;
+
+          this.editTemplateForm.patchValue({ ...template });
+          this.selectedCertificate =
+            certificates.content.find(c => c.id === template.signingCertificateId) ?? null;
         }
       });
   }
+
 
   onUpdate(): void {
     if(this.editTemplateForm.invalid) return;
@@ -70,6 +93,10 @@ export class EditTemplateComponent implements OnInit {
       },
       error: () => this.toasterService.error("Failed to update template.")
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.fetchCertificates(event.pageIndex, event.pageSize);
   }
 
   onCheckboxChange(event: Event, controlName: 'keyUsages' | 'extendedKeyUsages'): void {
@@ -85,4 +112,27 @@ export class EditTemplateComponent implements OnInit {
     }
     this.editTemplateForm.get(controlName)?.markAsTouched();
   }
+
+  onCertificateSelected(certificate: CertificateResponse) {
+    this.editTemplateForm.controls['signingCertificateId'].setValue(
+      certificate.id
+    );
+    this.selectedCertificate = certificate;
+    this.editTemplateForm.controls['signingCertificateId']
+      .setValue(certificate.id);
+  }
+
+  viewDetails(certificate: CertificateResponse): void {
+    void this.router.navigate(['certificate', certificate.id]);
+  }
+
+  private fetchCertificates(pageIndex: number, pageSize: number): void {
+    this.certificateService.getValidCACertificates(pageIndex, pageSize).subscribe({
+      next: (response: PagedResponse<CertificateResponse>) => {
+        this.dataSource.data = response.content;
+        this.totalElements = response.totalElements;
+      },
+    });
+  }
+
 }

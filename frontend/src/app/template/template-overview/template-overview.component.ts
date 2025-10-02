@@ -57,6 +57,7 @@ export class TemplateOverviewComponent implements OnInit {
   useTemplate(template: CertificateTemplate) { /* create cert from template */ }
 
   editTemplate(template: CertificateTemplate) {
+    console.log(template);
     void this.router.navigate(['edit-template', template.id]);
   }
 }

@@ -15,7 +15,7 @@ export class TemplateService {
     return this.httpClient.post<CertificateTemplate>(`${env.apiHost}/templates`, request);
   }
 
-  getTemplate(id: number): Observable<CertificateTemplate> {
+  getTemplate(id: string): Observable<CertificateTemplate> {
     return this.httpClient.get<CertificateTemplate>(`${env.apiHost}/templates/${id}`);
   }
 
@@ -27,11 +27,11 @@ export class TemplateService {
     return this.httpClient.get<CertificateTemplate[]>(`${env.apiHost}/templates/issuer/${issuer}`);
   }
 
-  updateTemplate(id: number, request: CertificateTemplate): Observable<CertificateTemplate> {
+  updateTemplate(id: string, request: CertificateTemplate): Observable<CertificateTemplate> {
     return this.httpClient.put<CertificateTemplate>(`${env.apiHost}/templates/${id}`, request);
   }
 
-  deleteTemplate(id: number): Observable<void> {
+  deleteTemplate(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${env.apiHost}/templates/${id}`);
   }
 }

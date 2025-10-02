@@ -49,17 +49,14 @@ public class CertificateTemplateService {
     public CertificateTemplateResponseDto updateTemplate(UUID id, CertificateTemplateRequestDto request) {
         CertificateTemplate existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Template not found"));
-        CertificateTemplate updated = CertificateTemplate.builder()
-                .id(existing.getId())
-                .name(request.getName())
-                .signingCertificateId(request.getSigningCertificateId())
-                .commonNameRegex(request.getCommonNameRegex())
-                .sanRegex(request.getSanRegex())
-                .ttlDays(request.getTtlDays())
-                .keyUsages(request.getKeyUsages())
-                .extendedKeyUsages(request.getExtendedKeyUsages())
-                .build();
-        return mapper.toResponse(repository.save(updated));
+        existing.setName(request.getName());
+        existing.setSigningCertificateId(request.getSigningCertificateId());
+        existing.setCommonNameRegex(request.getCommonNameRegex());
+        existing.setSanRegex(request.getSanRegex());
+        existing.setTtlDays(request.getTtlDays());
+        existing.setKeyUsages(request.getKeyUsages());
+        existing.setExtendedKeyUsages(request.getExtendedKeyUsages());
+        return mapper.toResponse(repository.save(existing));
     }
 
     public void deleteTemplate(UUID id) {
