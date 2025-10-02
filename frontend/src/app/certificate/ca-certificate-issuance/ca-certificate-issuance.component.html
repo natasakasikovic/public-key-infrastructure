@@ -107,9 +107,15 @@
           [pageSize]="pageSize"
           (page)="onCertificatePageChange($event)">
         </mat-paginator>
+        <div class="add-button">
+          <button mat-raised-button color="primary" type="submit"
+                  (click)="findTemplates()"
+                  [disabled]="!selectedCertificate">
+            Search Templates
+          </button>
+        </div>
 
         <hr>
-
         <!-- key usages -->
         <div class="usage-row">
           <div class="usage-col">

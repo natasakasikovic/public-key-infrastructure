@@ -209,4 +209,9 @@ export class CaCertificateIssuanceComponent implements OnInit {
     });
   }
 
+  findTemplates(): void {
+    void this.router.navigate(['/templates'], {
+      state: { issuer: this.selectedCertificate?.id }
+    });
+  }
 }

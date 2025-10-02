@@ -23,15 +23,15 @@ export class TemplateService {
     return this.httpClient.get<CertificateTemplate[]>(`${env.apiHost}/templates`);
   }
 
-  getTemplatesByIssuer(issuer: string): Observable<CertificateTemplate[]> {
-    return this.httpClient.get<CertificateTemplate[]>(`${env.apiHost}/templates/issuer/${issuer}`);
-  }
-
   updateTemplate(id: string, request: CertificateTemplate): Observable<CertificateTemplate> {
     return this.httpClient.put<CertificateTemplate>(`${env.apiHost}/templates/${id}`, request);
   }
 
   deleteTemplate(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${env.apiHost}/templates/${id}`);
+  }
+
+  getIssuerTemplates(issuerId: string): Observable<CertificateTemplate[]> {
+    return this.httpClient.get<CertificateTemplate[]>(`${env.apiHost}/templates/issuer/${issuerId}`);
   }
 }

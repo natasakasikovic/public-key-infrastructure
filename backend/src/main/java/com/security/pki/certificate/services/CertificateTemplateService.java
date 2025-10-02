@@ -42,8 +42,8 @@ public class CertificateTemplateService {
                 .toList();
     }
 
-    public List<CertificateTemplateResponseDto> getTemplatesByIssuer(String name) {
-        return null;
+    public List<CertificateTemplateResponseDto> getTemplatesByIssuer(UUID id) {
+        return repository.findBySigningCertificateId(id).stream().map(mapper::toResponse).toList();
     }
 
     public CertificateTemplateResponseDto updateTemplate(UUID id, CertificateTemplateRequestDto request) {

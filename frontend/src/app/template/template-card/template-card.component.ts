@@ -12,6 +12,7 @@ export class TemplateCardComponent {
   @Output() edit = new EventEmitter<CertificateTemplate>();
   @Output() delete = new EventEmitter<CertificateTemplate>();
   @Output() use = new EventEmitter<CertificateTemplate>();
+  @Input() issuer!: string;
 
   onCardClick(): void {
     this.use.emit(this.template);

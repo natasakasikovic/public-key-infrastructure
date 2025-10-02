@@ -38,9 +38,10 @@ public class CertificateTemplateController {
         return ResponseEntity.ok(service.getTemplates());
     }
 
-    @GetMapping("/issuer/{name}")
-    public ResponseEntity<List<CertificateTemplateResponseDto>> getByIssuer(@PathVariable String name) {
-        return ResponseEntity.ok(service.getTemplatesByIssuer(name));
+    @GetMapping("/issuer/{id}")
+    @PreAuthorize("hasRole('ROLE_CA_USER')")
+    public ResponseEntity<List<CertificateTemplateResponseDto>> getByIssuer(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.getTemplatesByIssuer(id));
     }
 
     @PutMapping("/{id}")
