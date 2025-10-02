@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,8 +16,8 @@ import java.util.UUID;
 public interface CertificateRepository extends JpaRepository<Certificate, UUID> {
     Optional<Certificate> findBySerialNumber(String serialNumber);
     Page<Certificate> findByOwner_Id(Long id, Pageable pageable);
+    List<Certificate> findByOwner_Id(Long id);
     List<Certificate> findByParent_SerialNumber(String serialNumber);
-    List<Certificate> findByOwner_IdAndCanSignTrue(Long ownerId);
 
     @Query("SELECT c FROM Certificate c WHERE c.canSign = true AND c.status <> :revokedStatus AND :now BETWEEN c.validFrom AND c.validTo")
     Page<Certificate> findValidParentCas(@Param("revokedStatus") Status revokedStatus, @Param("now") LocalDateTime now, Pageable pageable);
