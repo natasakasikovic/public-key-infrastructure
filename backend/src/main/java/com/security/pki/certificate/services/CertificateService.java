@@ -117,6 +117,9 @@ public class CertificateService {
         if (publicKey == null)
             publicKey = keyPair.getPublic();
 
+        if(request.getSubjectAlternativeNames() == null)
+            request.setSubjectAlternativeNames(new ArrayList<>());
+
         final Certificate signingCertificateParent = signingCertificate.getParent();
         final KeyPair signingCertificateKeyPair = loadKeyPair(signingCertificate); // needed for extensions
         KeyPair signingCertificateParentKeyPair = null;

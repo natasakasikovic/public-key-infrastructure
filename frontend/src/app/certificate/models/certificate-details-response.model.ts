@@ -11,7 +11,6 @@ export interface CertificateDetails {
 }
 
 export interface PartyInfo {
-  email: string;
   country: string;
   organizationUnit: string;
   organizationName: string;
