@@ -1,0 +1,60 @@
+<mat-card class="certificate-card">
+  <mat-card-header class="header-with-badge">
+    <mat-card-title>Certificate</mat-card-title>
+
+    <span *ngIf="data?.status === 'REVOKED'" class="revoked-badge">REVOKED</span>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="party-section">
+      <div class="party">
+        <h3>Subject</h3>
+        <div class="info"><strong>Email:</strong> {{data?.subject?.email}}</div>
+        <div class="info"><strong>Country:</strong> {{data?.subject?.country}}</div>
+        <div class="info"><strong>Organization Unit:</strong> {{data?.subject?.organizationUnit}}</div>
+        <div class="info"><strong>Organization Name:</strong> {{data?.subject?.organizationName}}</div>
+        <div class="info"><strong>Common Name:</strong> {{data?.subject?.commonName}}</div>
+      </div>
+
+      <div class="party">
+        <h3>Issuer</h3>
+        <div class="info"><strong>Email:</strong> {{data?.issuer?.email}}</div>
+        <div class="info"><strong>Country:</strong> {{data?.issuer?.country}}</div>
+        <div class="info"><strong>Organization Unit:</strong> {{data?.issuer?.organizationUnit}}</div>
+        <div class="info"><strong>Organization Name:</strong> {{data?.issuer?.organizationName}}</div>
+        <div class="info"><strong>Common Name:</strong> {{data?.issuer?.commonName}}</div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div><strong>Certificate Type:</strong> {{data?.certificateType}}</div>
+      <div><strong>Serial Number:</strong> {{data?.serialNumber}}</div>
+      <div><strong>Start Date:</strong> {{data?.validFrom | date:'medium'}}</div>
+      <div><strong>End Date:</strong> {{data?.validTo | date:'medium'}}</div>
+    </div>
+
+    <div class="usages">
+      <div class="usage">
+        <h4>Key Usages</h4>
+        <ul>
+          <li *ngFor="let k of data?.keyUsages">{{k}}</li>
+        </ul>
+      </div>
+      <div class="usage">
+        <h4>Extended Key Usages</h4>
+        <ul>
+          <li *ngFor="let e of data?.extendedKeyUsages">{{e}}</li>
+        </ul>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+  <button mat-stroked-button color="primary" (click)="onCrlDownload()" class="action-btn">
+    CRL check
+  </button>
+  <button mat-stroked-button color="primary" (click)="onDownload()" class="action-btn">
+    Download
+  </button>
+</mat-card-actions>
+</mat-card>

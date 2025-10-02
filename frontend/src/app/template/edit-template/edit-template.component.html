@@ -1,0 +1,137 @@
+<div class="register-container">
+  <form class="register-form" [formGroup]="editTemplateForm" (ngSubmit)="onUpdate()">
+    <h2 class="register-title">Certificate Template</h2>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter template name">
+      <mat-error *ngIf="editTemplateForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="issuer-table-container">
+      <h5>Available Issuer Certificates</h5>
+
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="serialNumber">
+          <th mat-header-cell *matHeaderCellDef> Serial Number </th>
+          <td mat-cell *matCellDef="let cert"> {{cert.serialNumber}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="certificateType">
+          <th mat-header-cell *matHeaderCellDef> Certificate Type </th>
+          <td mat-cell *matCellDef="let cert">
+            {{cert.certificateType}}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="issuerEmail">
+          <th mat-header-cell *matHeaderCellDef> Issuer Email </th>
+          <td mat-cell *matCellDef="let cert"> {{cert.issuerEmail}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="subjectEmail">
+          <th mat-header-cell *matHeaderCellDef> Subject Email </th>
+          <td mat-cell *matCellDef="let cert"> {{cert.subjectEmail}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef> Details </th>
+          <td mat-cell *matCellDef="let cert">
+            <button mat-stroked-button color="primary" (click)="viewDetails(cert)">Details</button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedCertificateColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedCertificateColumns;"
+          (click)="onCertificateSelected(row)"
+          [class.selected]="row === selectedCertificate">
+        </tr>
+      </table>
+
+      <mat-paginator [length]="totalElements"
+                     [pageSize]="pageSize"
+                     [pageSizeOptions]="[5, 10, 25]"
+                     (page)="onPageChange($event)">
+      </mat-paginator>
+
+      <div *ngIf="!selectedCertificate" class="issuer-warning">
+        <small>Please select an issuer certificate.</small>
+      </div>
+    </div>
+
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Common Name Regex</mat-label>
+      <input matInput formControlName="commonNameRegex" placeholder="e.g. .*\.example\.com">
+      <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('required')">
+        Common Name Regex is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('commonNameRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>SAN Regex</mat-label>
+      <input matInput formControlName="sanRegex" placeholder="e.g. .*">
+      <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('required')">
+        SAN Regex is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('sanRegex')?.hasError('invalidRegex')">
+        Invalid regular expression
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>TTL (Days)</mat-label>
+      <input matInput type="number" formControlName="ttlDays" placeholder="Enter days to live">
+      <mat-error *ngIf="editTemplateForm.get('ttlDays')?.hasError('required')">
+        TTL is required
+      </mat-error>
+      <mat-error *ngIf="editTemplateForm.get('ttlDays')?.hasError('min')">
+        TTL must be at least 1 day
+      </mat-error>
+    </mat-form-field>
+
+    <hr>
+
+    <!-- key usages -->
+    <div class="usage-row">
+      <div class="usage-col">
+        <h5>Key Usages</h5>
+        <div *ngFor="let option of keyUsageOptions" class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [value]="option"
+            [checked]="keyUsageOptions.includes(option)"
+            (change)="onCheckboxChange($event, 'keyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
+
+      <div class="usage-col">
+        <h5>Extended Key Usages</h5>
+        <div *ngFor="let option of extendedKeyUsageOptions" class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [value]="option"
+            [checked]="extendedKeyUsages.includes(option)"
+            (change)="onCheckboxChange($event, 'extendedKeyUsages')">
+          <label class="form-check-label">{{ option }}</label>
+        </div>
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" type="submit"
+            class="save-button" [disabled]="editTemplateForm.invalid">
+      Save Template
+    </button>
+  </form>
+</div>

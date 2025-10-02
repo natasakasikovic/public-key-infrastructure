@@ -4,6 +4,7 @@ import { RegisterRequest } from '../model/register-request.model';
 import { AuthService } from '../auth.service';
 import { passwordMatchValidator } from '../validators/password-match.validator';
 import zxcvbn from 'zxcvbn';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +20,8 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private toasterService: ToastrService,
   ) { }
 
   ngOnInit(): void {
@@ -52,20 +54,38 @@ export class RegisterComponent implements OnInit {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      console.log(this.registerForm.value);
-      var request: RegisterRequest = this.registerForm.value;
-      this.authService.register(request).subscribe({
-        next: () => {
-          console.log('Registration successful');
-          // TODO: add dialog about successful registration and email confirmation
-        },
-        error: (err) => {
-          console.error('Registration failed', err);
-        }
-      });
+      const request: RegisterRequest = this.registerForm.value;
+      if (!this.authService.getRole())
+        this.registerUser(request);
+      else
+        this.registerCaUser(request);
     } else {
       this.registerForm.markAllAsTouched();
     }
   }
+
+  registerUser(request: RegisterRequest): void {
+    this.authService.register(request).subscribe({
+      next: () => {
+        this.toasterService.success("Registration successful! Please check your email to activate your account.");
+      },
+      error: (err) => {
+        this.toasterService.error(err?.error?.message, "Failed to register");
+      }
+    });
+  }
+
+  registerCaUser(request: RegisterRequest): void {
+    this.authService.registerCaUser(request).subscribe({
+      next: () => {
+        this.toasterService.success("Registration successful! Activation email is sent.");
+      },
+      error: (err) => {
+        this.toasterService.error(err?.error?.message, "Failed to register");
+      }
+    });
+  }
+
+
 
 }
