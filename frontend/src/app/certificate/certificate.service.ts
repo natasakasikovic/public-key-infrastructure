@@ -34,7 +34,6 @@ export class CertificateService {
   }
 
   createSubordinateCertificate(request: CreateSubordinateCertificateRequest): Observable<void> {
-    console.log(request);
     return this.httpClient.post<void>(`${env.apiHost}/certificates/subordinate`, request);
   }
 

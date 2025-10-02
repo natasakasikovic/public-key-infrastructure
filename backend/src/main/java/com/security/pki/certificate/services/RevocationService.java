@@ -65,6 +65,7 @@ public class RevocationService {
 
         certificate.setStatus(Status.REVOKED);
         certificateRepository.save(certificate);
+        certificateRepository.revokeAllDescendants(certificate.getId(), Status.REVOKED.name());
         CertificateRevocation revocation = repository.save(mapper.toCertificateRevocation(request, certificate));
 
         updateCrl(certificate);
