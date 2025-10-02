@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class CertificateGenerator {
         }
     }
 
-    public X509Certificate generateSubordinateCertificate(CreateSubordinateCertificateDto request, Certificate signingCertificate, KeyPair keyPair, X500Name subject, BigInteger serialNumber, KeyPair parentKeyPair) {
+    public X509Certificate generateSubordinateCertificate(CreateSubordinateCertificateDto request, Certificate signingCertificate, PublicKey publicKey, X500Name subject, BigInteger serialNumber, KeyPair parentKeyPair) {
         try {
             final ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
                     .setProvider("BC").build(parentKeyPair.getPrivate());
@@ -89,11 +90,11 @@ public class CertificateGenerator {
                     request.getValidFrom(),
                     request.getValidTo(),
                     subject,
-                    keyPair.getPublic()
+                    publicKey
             );
 
             // subject key identifier
-            SubjectKeyIdentifier subjectKeyIdentifier = new JcaX509ExtensionUtils().createSubjectKeyIdentifier(keyPair.getPublic());
+            SubjectKeyIdentifier subjectKeyIdentifier = new JcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKey);
             certBuilder.addExtension(Extension.subjectKeyIdentifier, false, subjectKeyIdentifier);
 
             // authority key identifier

@@ -2,6 +2,7 @@ package com.security.pki.certificate.services;
 
 import com.security.pki.auth.services.AuthService;
 import com.security.pki.certificate.dtos.certificate.*;
+import com.security.pki.certificate.dtos.certificate.*;
 import com.security.pki.certificate.exceptions.CertificateDownloadException;
 import com.security.pki.certificate.exceptions.CertificateStorageException;
 import com.security.pki.certificate.exceptions.KeyPairRetrievalException;
@@ -101,7 +102,7 @@ public class CertificateService {
     }
 
     @Transactional
-    public void createSubordinateCertificate(CreateSubordinateCertificateDto request) {
+    public void createSubordinateCertificate(CreateSubordinateCertificateDto request, PublicKey publicKey) {
         UUID signingCertificateId = request.getSigningCertificateId();
         Certificate signingCertificate = findById(signingCertificateId);
         User user = null;
@@ -113,6 +114,8 @@ public class CertificateService {
 
         final BigInteger serialNumber = CertificateUtils.generateSerialNumber();
         final KeyPair keyPair = cryptoService.generateKeyPair();
+        if (publicKey == null)
+            publicKey = keyPair.getPublic();
         final KeyPair parentKeyPair = loadKeyPair(signingCertificate); // needed for extensions
 
         CertificateValidationContext context = new CertificateValidationContext(
@@ -126,7 +129,7 @@ public class CertificateService {
         for (CertificateValidator validator : validators)
             validator.validate(context);
 
-        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, keyPair, subjectX500Name, serialNumber, parentKeyPair);
+        final X509Certificate x509Certificate = certificateGenerator.generateSubordinateCertificate(request, signingCertificate, publicKey, subjectX500Name, serialNumber, parentKeyPair);
         Certificate certificate = mapper.toCertificateEntity(request, serialNumber, subjectX500Name, issuerX500Name, user, signingCertificate);
         storeCertificate(certificate, x509Certificate, keyPair.getPrivate());
     }

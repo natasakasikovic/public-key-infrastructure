@@ -58,6 +58,12 @@
 .custombutton:hover {
   background-color: #0056b3;
 }
+.selected {
+  background-color: #cce5ff !important;
+}
+tr.selected:hover {
+  background-color: #b8daff !important;
+}
 
 .ca-table {
   width: 100%;

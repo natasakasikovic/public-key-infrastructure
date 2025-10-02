@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -45,7 +44,7 @@ public class CertificateController {
 
     @PostMapping("/subordinate")
     public ResponseEntity<Void> createSubordinateCertificate(@RequestBody @Valid CreateSubordinateCertificateDto request) {
-        service.createSubordinateCertificate(request);
+        service.createSubordinateCertificate(request, null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -66,7 +65,7 @@ public class CertificateController {
     @PostMapping("/csr/self-generation")
     @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
     public ResponseEntity<Void> createCSRSelfGenerate(
-            @RequestParam String caCertificateId,
+            @RequestParam UUID caCertificateId,
             @RequestParam String validTo,
             @RequestParam MultipartFile pemFile
     ) {
@@ -104,11 +103,5 @@ public class CertificateController {
     @PreAuthorize("hasRole('ROLE_CA_USER')")
     public ResponseEntity<PagedResponse<CertificateResponseDto>> getValidAuthorizedCAs(Pageable pageable) {
         return ResponseEntity.ok(service.getAuthorizedIssuingCertificatesForUser(pageable));
-    }
-
-    @GetMapping("/available-ca")
-    @PreAuthorize("hasRole('ROLE_REGULAR_USER')")
-    public ResponseEntity<List<CaCertificateDto>> getAvailableCaCertificates() {
-        return ResponseEntity.ok(service.getAvailableCaCertificates());
     }
 }

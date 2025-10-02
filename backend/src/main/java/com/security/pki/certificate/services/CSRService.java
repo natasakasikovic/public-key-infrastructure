@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStreamReader;
 import java.security.PublicKey;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +24,14 @@ public class CSRService {
     private final CertificateMapper mapper;
     private final AuthService authService;
 
-    public void processCsrUpload(String caId, String until, MultipartFile csrFile) {
+    public void processCsrUpload(UUID caId, String until, MultipartFile csrFile) {
         PKCS10CertificationRequest csr = loadCsr(csrFile);
         User user = authService.getCurrentUser();
         PublicKey publicKey = extractKey(csr);
 
         CreateSubordinateCertificateDto request = mapper.fromCsr(csr, user, caId, until);
 
-
-        // invoke certificate creation
-        // certificateService.createEndEntityCertificate(request, publicKey);
-        System.out.println("Certificate request: " + request);
+        certificateService.createSubordinateCertificate(request, publicKey);
     }
 
     private PKCS10CertificationRequest loadCsr(MultipartFile file) {

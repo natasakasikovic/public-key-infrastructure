@@ -12,6 +12,7 @@ import { TemplateOverviewComponent } from './template/template-overview/template
 import { CertificateDetailsComponent } from './certificate/certificate-details/certificate-details.component';
 import { CaCertificateIssuanceComponent } from './certificate/ca-certificate-issuance/ca-certificate-issuance.component';
 import { CsrSelfUploadComponent } from './certificate/csr-self-upload/csr-self-upload.component';
+import { CsrAutoGenerateComponent } from './certificate/csr-auto-generate/csr-auto-generate.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
@@ -75,6 +76,12 @@ const routes: Routes = [
     component: CsrSelfUploadComponent,
     canActivate: [AuthGuard],
     data: { role: ['REGULAR_USER'] },
+  },
+  {
+    path: 'csr-auto-generate',
+    component: CsrAutoGenerateComponent,
+    canActivate: [AuthGuard],
+    data: { role: ['REGULAR_USER'] }
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login', pathMatch: 'full' },
