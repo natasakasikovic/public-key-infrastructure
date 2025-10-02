@@ -64,7 +64,7 @@ export class SubordinateCertificateIssuanceComponent implements OnInit {
     validTo: new FormControl('', Validators.required),
     signingCertificateId: new FormControl('', Validators.required),
     certificateType: new FormControl('', Validators.required),
-    pathLenConstraint: new FormControl(''),
+    pathLenConstraint: new FormControl(0),
     keyUsages: new FormArray([]),
     extendedKeyUsages: new FormArray([]),
     subjectAlternativeNames: new FormArray([]),

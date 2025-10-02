@@ -192,12 +192,11 @@ public class CertificateService {
     }
 
     private PagedResponse<CertificateResponseDto> getCACertificates(Long ownerId, Pageable pageable) {
-        List<Certificate> caCerts = repository.findByOwner_IdAndCanSignTrue(ownerId);
+        List<Certificate> caCerts = repository.findByOwner_Id(ownerId);
         if (caCerts.isEmpty())
             return mapper.toPagedResponse(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         LinkedHashMap<String, Certificate> collected = getIssuableCertificateChain(caCerts);
-
         List<Certificate> all = new ArrayList<>(collected.values());
         all.sort(Comparator.comparing(Certificate::getValidTo, Comparator.nullsLast(Comparator.reverseOrder())));
         return mapper.toPagedResponse(mapper.toPage(all, pageable));
