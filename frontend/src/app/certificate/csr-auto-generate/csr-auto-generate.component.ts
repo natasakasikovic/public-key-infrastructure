@@ -47,7 +47,7 @@ export class CsrAutoGenerateComponent implements OnInit {
 
   totalElements = 0;
   pageSize = 5;
-  
+
   constructor(
     private service: CertificateService,
     private router: Router,
@@ -118,7 +118,6 @@ export class CsrAutoGenerateComponent implements OnInit {
         void this.router.navigate(['/home']);
       },
       error: (err) => {
-        console.log(err)
         this.toasterService.error(
           'Failed to create certificate. Please try again later.'
         );
